@@ -1,0 +1,392 @@
+
+
+
+Network Working Group                                           J. Snell
+Internet-Draft                                              January 2012
+Intended status: Informational
+Expires: July 4, 2012
+
+
+                      HTTP Link and Unlink Methods
+                     draft-snell-http-linkmethod-00
+
+Abstract
+
+   TBD
+
+Status of this Memo
+
+   This Internet-Draft is submitted to IETF in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on July 4, 2012.
+
+Copyright Notice
+
+   Copyright (c) 2012 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+
+Snell                     Expires July 4, 2012                  [Page 1]
+
+Internet-Draft        HTTP Link and Unlink Methods          January 2012
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
+   2.  LINK  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+   3.  UNLINK  . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . . . 6
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . . . 6
+   6.  Normative References  . . . . . . . . . . . . . . . . . . . . . 6
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 7
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                     Expires July 4, 2012                  [Page 2]
+
+Internet-Draft        HTTP Link and Unlink Methods          January 2012
+
+
+1.  Introduction
+
+   TBD
+
+   In this document, the key words "MUST", "MUST NOT", "REQUIRED",
+   "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
+   and "OPTIONAL" are to be interpreted as described in [RFC2119].
+
+
+2.  LINK
+
+   The LINK method requests that a link relationship be established
+   between the target resource and one or more other resources specified
+   within the request.  The resources for which a link is to be
+   established, and the nature or purpose of the link is specified using
+   one or more Web Link Headers as specified by [RFC5988].
+
+   For example, to request the creation of a link between a target
+   resource located at "http://example.org/foo" and a resource located
+   at "http://example.com/bar" such that the latter is considered an
+   alternate of the former, the request would be:
+
+     LINK /foo HTTP/1.1
+     Host: example.org
+     Link: <http://example.com/bar>; rel="alternate"
+
+   Multiple Link headers can be used to establish multiple links:
+
+     LINK /foo HTTP/1.1
+     Host: example.org
+     Link: <http://example.com/bar>; rel="alternate",
+       <http://example.net/baz>; rel="tag"
+
+   A successful response SHOULD be 200 (OK) if the response includes a
+   representation describing the status, 202 (Accepted) if the action
+   has not yet been enacted, or 204 (No Content) if the action has been
+   enacted but the response does not include a representation.
+
+   Exactly how an established link manifests within the state of the
+   target resource is up to the server implementation and there is no
+   guarantee that links established using the LINK method, or any
+   changes in state that occur as a result of the link, will be
+   observable by the user agent.  A successful response only implies
+   that the user agent's intent was achieved at the time of its
+   processing by the origin server.
+
+   Bodies on LINK requests have no defined semantics.
+
+
+
+
+Snell                     Expires July 4, 2012                  [Page 3]
+
+Internet-Draft        HTTP Link and Unlink Methods          January 2012
+
+
+   Multiple, identical LINK requests are idempotent.  Link headers
+   SHOULD be considered identical if they specify the same combination
+   of Target IRI and Relation Type, where Target IRI's are compared
+   character-by-character in a case-sensitive fashion and Relation Types
+   are compared character-by-character in a case-insensitive fashion.
+   If multiple rel values are specified within the Link header, the
+   ordering of those rel values is insignificant when comparing Links.
+
+   For example, the following SHOULD be considered identical:
+
+    Link: <http://example.org/foo>; rel="alternate edit"
+    Link: <http://example.org/foo>; rel="Alternate Edit"
+    Link: <http://example.org/foo>; rel="edit alternate"
+    Link: <http://example.org/foo>; rel="Edit Alternate"
+    Link: <http://example.org/foo>; rel="alternate",
+      <http://example.org/foo>; rel="edit"
+
+   While the following SHOULD NOT be considered identicial:
+
+    Link: <http://example.org/foo>; rel="alternate edit"
+    Link: <http://example.org/FOO>; rel="alternate edit"
+
+   This specification does not define exactly how LINK affects the state
+   of an origin server beyond what can be expressed by the intent of the
+   user agent request and the semantics of the origin server response.
+   Generally speaking, all implementation details behind the resource
+   are intentionally hidden by the server.
+
+   The successful processing of a LINK request might not result in a
+   significant change of state on the origin server.  That is, the state
+   of the target resource might not be changed to the extent that the
+   resource's Validators (Entity Tag or Last Modified) are modified.
+
+   Responses to the LINK method are not cacheable.  Because it is not
+   possible for a Cache to determine whether the successful application
+   of a LINK request will result in an observable change of state on the
+   origin-server, the Cache MUST assume the method is not safe and MUST
+   invalidate the effective Request URI.
+
+
+3.  UNLINK
+
+   The UNLINK method requests the removal of an existing link
+   relationship between the target resource and one or more other
+   resources specified within the request.  The links to be removed are
+   specified using one or more Web Link Headers.
+
+   For example, to request the removal of an existing link between a
+
+
+
+Snell                     Expires July 4, 2012                  [Page 4]
+
+Internet-Draft        HTTP Link and Unlink Methods          January 2012
+
+
+   target resource located at "http://example.org/foo" and a resource
+   located at "http://example.com/bar", the request would be:
+
+     UNLINK /foo HTTP/1.1
+     Host: example.org
+     Link: <http://example.com/bar>; rel="alternate"
+
+   Multiple Link headers can be used to request the removal of multiple
+   links:
+
+     UNLINK /foo HTTP/1.1
+     Host: example.org
+     Link: <http://example.com/bar>; rel="alternate",
+       <http://example.net/baz>; rel="tag"
+
+   A successful response SHOULD be 200 (OK) if the response includes a
+   representation describing the status, 202 (Accepted) if the action
+   has not yet been enacted, or 204 (No Content) if the action has been
+   enacted but the response does not include a representation.
+
+   There is no guarantee that any changes in state that occur as a
+   result of removing the link will be observable by the user agent.  A
+   successful response only implies that the user agent's intent was
+   achieved at the time of its processing by the origin server.
+
+   Bodies on UNLINK requests have no defined semantics.
+
+   Multiple, identical UNLINK requests are idempotent.  Link headers
+   SHOULD be considered identical following the same rules established
+   above for the LINK request.
+
+   This specification does not define exactly how UNLINK affects the
+   state of an origin server beyond what can be expressed by the intent
+   of the user agent request and the semantics of the origin server
+   response.  Generally speaking, all implementation details behind the
+   resource are intentionally hidden by the server.
+
+   The successful processing of an UNLINK request might not result in a
+   significant change of state on the origin server.  That is, the state
+   of the target resource might not be changed to the extent that the
+   resource's Validators (Entity Tag or Last Modified) are modified.
+
+   Responses to the UNLINK method are not cacheable.  Because it is not
+   possible for a Cache to determine whether the successful application
+   of an UNLINK request will result in an observable change of state on
+   the origin-server, the Cache MUST assume the method is not safe and
+   MUST invalidate the effective Request URI.
+
+
+
+
+Snell                     Expires July 4, 2012                  [Page 5]
+
+Internet-Draft        HTTP Link and Unlink Methods          January 2012
+
+
+4.  IANA Considerations
+
+   TBD
+
+
+5.  Security Considerations
+
+   TBD
+
+   Specific preferences requested by a client can introduce security
+   considerations and concerns beyond those discussed in HTTP/1.1 Parts
+   1 [I-D.ietf-httpbis-p1-messaging], 2 [I-D.ietf-httpbis-p2-semantics],
+   3 [I-D.ietf-httpbis-p3-payload], 4 [I-D.ietf-httpbis-p4-conditional],
+   5 [I-D.ietf-httpbis-p5-range], 6 [I-D.ietf-httpbis-p6-cache], and 7
+   [I-D.ietf-httpbis-p7-auth].  Implementors must refer to the
+   specifications and descriptions of each preference to determine the
+   security considerations relevant to each.
+
+
+6.  Normative References
+
+   [I-D.ietf-httpbis-p1-messaging]
+              Fielding, R., Gettys, J., Mogul, J., Nielsen, H.,
+              Masinter, L., Leach, P., Berners-Lee, T., Lafon, Y., and
+              J. Reschke, "HTTP/1.1, part 1: URIs, Connections, and
+              Message Parsing", draft-ietf-httpbis-p1-messaging-18 (work
+              in progress), January 2012.
+
+   [I-D.ietf-httpbis-p2-semantics]
+              Fielding, R., Gettys, J., Mogul, J., Nielsen, H.,
+              Masinter, L., Leach, P., Berners-Lee, T., Lafon, Y., and
+              J. Reschke, "HTTP/1.1, part 2: Message Semantics",
+              draft-ietf-httpbis-p2-semantics-18 (work in progress),
+              January 2012.
+
+   [I-D.ietf-httpbis-p3-payload]
+              Fielding, R., Gettys, J., Mogul, J., Nielsen, H.,
+              Masinter, L., Leach, P., Berners-Lee, T., Lafon, Y., and
+              J. Reschke, "HTTP/1.1, part 3: Message Payload and Content
+              Negotiation", draft-ietf-httpbis-p3-payload-18 (work in
+              progress), January 2012.
+
+   [I-D.ietf-httpbis-p4-conditional]
+              Fielding, R., Gettys, J., Mogul, J., Nielsen, H.,
+              Masinter, L., Leach, P., Berners-Lee, T., Lafon, Y., and
+              J. Reschke, "HTTP/1.1, part 4: Conditional Requests",
+              draft-ietf-httpbis-p4-conditional-18 (work in progress),
+              January 2012.
+
+
+
+Snell                     Expires July 4, 2012                  [Page 6]
+
+Internet-Draft        HTTP Link and Unlink Methods          January 2012
+
+
+   [I-D.ietf-httpbis-p5-range]
+              Fielding, R., Gettys, J., Mogul, J., Nielsen, H.,
+              Masinter, L., Leach, P., Berners-Lee, T., Lafon, Y., and
+              J. Reschke, "HTTP/1.1, part 5: Range Requests and Partial
+              Responses", draft-ietf-httpbis-p5-range-18 (work in
+              progress), January 2012.
+
+   [I-D.ietf-httpbis-p6-cache]
+              Fielding, R., Gettys, J., Mogul, J., Nielsen, H.,
+              Masinter, L., Leach, P., Berners-Lee, T., Lafon, Y.,
+              Nottingham, M., and J. Reschke, "HTTP/1.1, part 6:
+              Caching", draft-ietf-httpbis-p6-cache-18 (work in
+              progress), January 2012.
+
+   [I-D.ietf-httpbis-p7-auth]
+              Fielding, R., Gettys, J., Mogul, J., Nielsen, H.,
+              Masinter, L., Leach, P., Berners-Lee, T., Lafon, Y., and
+              J. Reschke, "HTTP/1.1, part 7: Authentication",
+              draft-ietf-httpbis-p7-auth-18 (work in progress),
+              January 2012.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC5988]  Nottingham, M., "Web Linking", RFC 5988, October 2010.
+
+
+Author's Address
+
+   James M Snell
+
+   Email: jasnell@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                     Expires July 4, 2012                  [Page 7]
+

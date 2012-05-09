@@ -1,0 +1,129 @@
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+  <!ENTITY rfc2616 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2616.xml'> 
+  <!ENTITY rfc4918 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4918.xml'> 
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'> 
+  <!ENTITY rfc3864 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3864.xml'>
+  <!ENTITY rfc5226 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5226.xml'>
+  <!ENTITY rfc2026 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2026.xml'>
+  <!ENTITY rfc5234 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5234.xml'>
+  
+  <!ENTITY part1 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p1-messaging-17.xml'>
+  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p2-semantics-17.xml'>
+  <!ENTITY part3 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p3-payload-17.xml'>
+  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p4-conditional-17.xml'>
+  <!ENTITY part5 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p5-range-17.xml'>
+  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p6-cache-17.xml'>
+  <!ENTITY part7 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p7-auth-17.xml'>
+  
+]>
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-federated-social-context-00"> 
+  <front> 
+    <title abbrev="Federated Social Context"> 
+      Federated Social Context
+    </title> 
+ 
+    <author initials="J.M." surname="Snell" fullname="James M Snell"> 
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+    
+    <date month="January" year="2012" /> 
+ 
+    <area>Applications</area> 
+    <!-- workgroup>Individual Submission</workgroup--> 
+    <keyword>I-D</keyword> 
+    <keyword>http</keyword> 
+    <keyword>link</keyword> 
+    <keyword>unlink</keyword>
+ 
+    <abstract> 
+      <t>TBD</t> 
+    </abstract> 
+ 
+  </front> 
+  
+  <middle> 
+    <section anchor="intro" title="Introduction"> 
+ 
+<!-- 
+1. Define the Key Terms
+   - Social Context
+   - Participant
+   - Agent
+   - Authenticator
+   - Hub
+ -->
+ 
+      <t>TBD</t> 
+      
+      <t>In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
+      "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
+      are to be  interpreted as described in <xref target="RFC2119" />.</t> 
+ 
+      <section title="Definitions">
+        <t><list style="hanging">
+        <t hangText="Social Context">Definition</t>
+        <t hangText="Participant">An entity, typically a person, participating
+        in a shared social context.</t>
+        <t hangText="Agent">The application a participant uses to interact with
+        a shared social context.</t>
+        <t hangText="Authenticator">A service that provides authentication and
+        authorization services for both participants and their agents within 
+        the shared social context.</t>
+        <t hangText="Hub">A service that acts as the definitive source for 
+        all information relating to a particular social context. All participants
+        and agents use the Hub to publish and receive information relating to 
+        the social context. </t>
+        </list></t>
+      </section>
+ 
+    </section> 
+    
+    <section title="Social Context">
+    </section>
+             
+    <section title="IANA Considerations"> 
+      <t>TBD</t>
+    </section> 
+      
+    <section title="Security Considerations"> 
+      <t>TBD</t>
+
+      <t>Specific preferences requested by a client can introduce security 
+      considerations and concerns beyond those discussed in HTTP/1.1 Parts
+      <xref target="I-D.ietf-httpbis-p1-messaging">1</xref>, 
+      <xref target="I-D.ietf-httpbis-p2-semantics">2</xref>, 
+      <xref target="I-D.ietf-httpbis-p3-payload">3</xref>, 
+      <xref target="I-D.ietf-httpbis-p4-conditional">4</xref>, 
+      <xref target="I-D.ietf-httpbis-p5-range">5</xref>, 
+      <xref target="I-D.ietf-httpbis-p6-cache">6</xref>, and
+      <xref target="I-D.ietf-httpbis-p7-auth">7</xref>.
+      Implementors must refer to the specifications and descriptions of each
+      preference to determine the security considerations relevant to each.</t>          
+    </section> 
+  </middle> 
+  <back>
+    <references title="Normative References"> 
+      &rfc2119;
+      &rfc3864;
+      &rfc5226;
+      &rfc2026;
+      &rfc5234;
+      &part1;
+      &part2;
+      &part3;
+      &part4;
+      &part5;
+      &part6;
+      &part7;
+    </references>
+  </back>
+</rfc> 
+ 

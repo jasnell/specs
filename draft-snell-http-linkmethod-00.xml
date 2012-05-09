@@ -1,0 +1,240 @@
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+  <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>  
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+  
+  <!ENTITY part1 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p1-messaging-18.xml'>
+  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p2-semantics-18.xml'>
+  <!ENTITY part3 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p3-payload-18.xml'>
+  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p4-conditional-18.xml'>
+  <!ENTITY part5 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p5-range-18.xml'>
+  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p6-cache-18.xml'>
+  <!ENTITY part7 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p7-auth-18.xml'>
+  
+]>
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-http-linkmethod-00"> 
+  <front> 
+    <title abbrev="HTTP Link and Unlink Methods"> 
+      HTTP Link and Unlink Methods
+    </title> 
+ 
+    <author initials="J.M." surname="Snell" fullname="James M Snell"> 
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+    
+    <date month="January" year="2012" /> 
+ 
+    <area>Applications</area> 
+    <!-- workgroup>Individual Submission</workgroup--> 
+    <keyword>I-D</keyword> 
+    <keyword>http</keyword> 
+    <keyword>link</keyword> 
+    <keyword>unlink</keyword>
+ 
+    <abstract> 
+      <t>TBD</t> 
+    </abstract> 
+ 
+  </front> 
+  
+  <middle> 
+    <section anchor="intro" title="Introduction"> 
+ 
+      <t>TBD</t> 
+      
+      <t>In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
+      "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
+      are to be  interpreted as described in <xref target="RFC2119" />.</t> 
+ 
+    </section> 
+    
+    <section anchor="link" title="LINK">
+      <t>The LINK method requests that a link relationship be established 
+      between the target resource and one or more other resources specified
+      within the request. The resources for which a link is to be established, 
+      and the nature or purpose of the link is specified using one or more 
+      Web Link Headers as specified by <xref target="RFC5988"/>.</t>
+      
+      <t>For example, to request the creation of a link between a target resource 
+      located at "http://example.org/foo" and a resource located at 
+      "http://example.com/bar" such that the latter is considered an 
+      alternate of the former, the request would be:</t>
+      
+      <figure><artwork>
+  LINK /foo HTTP/1.1
+  Host: example.org
+  Link: &lt;http://example.com/bar&gt;; rel="alternate"
+      </artwork></figure>
+      
+      <t>Multiple Link headers can be used to establish multiple links:</t>
+      
+      <figure><artwork>
+  LINK /foo HTTP/1.1
+  Host: example.org
+  Link: &lt;http://example.com/bar&gt;; rel="alternate",
+    &lt;http://example.net/baz&gt;; rel="tag"
+      </artwork></figure>
+      
+      <t>A successful response SHOULD be 200 (OK) if the response includes
+      a representation describing the status, 202 (Accepted) if the action 
+      has not yet been enacted, or 204 (No Content) if the action has been
+      enacted but the response does not include a representation.</t>
+      
+      <t>Exactly how an established link manifests within the state of the 
+      target resource is up to the server implementation and there is no 
+      guarantee that links established using the LINK method, or any changes
+      in state that occur as a result of the link, will be observable by the 
+      user agent. A successful response only implies that the user agent's 
+      intent was achieved at the time of its processing by the origin server.</t>
+      
+      <t>Bodies on LINK requests have no defined semantics.</t>
+      
+      <t>Multiple, identical LINK requests are idempotent. Link headers 
+      SHOULD be considered identical if they specify the same combination 
+      of Target IRI and Relation Type, where Target IRI's are compared 
+      character-by-character in a case-sensitive fashion and Relation
+      Types are compared character-by-character in a case-insensitive 
+      fashion. If multiple rel values are specified within the Link 
+      header, the ordering of those rel values is insignificant when 
+      comparing Links.</t>
+      
+      <t>For example, the following SHOULD be considered identical:</t>
+      
+      <figure><artwork>
+ Link: &lt;http://example.org/foo&gt;; rel="alternate edit"
+ Link: &lt;http://example.org/foo&gt;; rel="Alternate Edit"
+ Link: &lt;http://example.org/foo&gt;; rel="edit alternate"
+ Link: &lt;http://example.org/foo&gt;; rel="Edit Alternate"
+ Link: &lt;http://example.org/foo&gt;; rel="alternate",
+   &lt;http://example.org/foo&gt;; rel="edit"
+      </artwork></figure>
+      
+      <t>While the following SHOULD NOT be considered identicial:</t>
+      
+      <figure><artwork>
+ Link: &lt;http://example.org/foo&gt;; rel="alternate edit"
+ Link: &lt;http://example.org/FOO&gt;; rel="alternate edit"
+      </artwork></figure>
+      
+      <t>This specification does not define exactly how LINK affects the 
+      state of an origin server beyond what can be expressed by the intent
+      of the user agent request and the semantics of the origin server 
+      response. Generally speaking, all implementation details behind the
+      resource are intentionally hidden by the server.</t>
+      
+      <t>The successful processing of a LINK request might not result in
+      a significant change of state on the origin server. That is, the 
+      state of the target resource might not be changed to the extent that
+      the resource's Validators (Entity Tag or Last Modified) are modified.</t>
+      
+      <t>Responses to the LINK method are not cacheable. Because it is not
+      possible for a Cache to determine whether the successful application of
+      a LINK request will result in an observable change of state on the 
+      origin-server, the Cache MUST assume the method is not safe and MUST
+      invalidate the effective Request URI. </t>
+      
+    </section>
+    
+    <section anchor="unlink" title="UNLINK">
+
+      <t>The UNLINK method requests the removal of an existing link relationship 
+      between the target resource and one or more other resources specified
+      within the request. The links to be removed are specified using one or more 
+      Web Link Headers.</t>
+      
+      <t>For example, to request the removal of an existing link between a 
+      target resource located at "http://example.org/foo" and a resource 
+      located at "http://example.com/bar", the request would be:</t>
+      
+      <figure><artwork>
+  UNLINK /foo HTTP/1.1
+  Host: example.org
+  Link: &lt;http://example.com/bar&gt;; rel="alternate"
+      </artwork></figure>
+      
+      <t>Multiple Link headers can be used to request the removal of multiple links:</t>
+      
+      <figure><artwork>
+  UNLINK /foo HTTP/1.1
+  Host: example.org
+  Link: &lt;http://example.com/bar&gt;; rel="alternate",
+    &lt;http://example.net/baz&gt;; rel="tag"
+      </artwork></figure>
+      
+      <t>A successful response SHOULD be 200 (OK) if the response includes
+      a representation describing the status, 202 (Accepted) if the action 
+      has not yet been enacted, or 204 (No Content) if the action has been
+      enacted but the response does not include a representation.</t>
+      
+      <t>There is no guarantee that any changes in state that occur as a result 
+      of removing the link will be observable by the  user agent. A successful 
+      response only implies that the user agent's intent was achieved at the 
+      time of its processing by the origin server.</t>
+      
+      <t>Bodies on UNLINK requests have no defined semantics.</t>
+      
+      <t>Multiple, identical UNLINK requests are idempotent. Link headers 
+      SHOULD be considered identical following the same rules established
+      above for the LINK request.</t>
+      
+      <t>This specification does not define exactly how UNLINK affects the 
+      state of an origin server beyond what can be expressed by the intent
+      of the user agent request and the semantics of the origin server 
+      response. Generally speaking, all implementation details behind the
+      resource are intentionally hidden by the server.</t>
+      
+      <t>The successful processing of an UNLINK request might not result in
+      a significant change of state on the origin server. That is, the 
+      state of the target resource might not be changed to the extent that
+      the resource's Validators (Entity Tag or Last Modified) are modified.</t>
+      
+      <t>Responses to the UNLINK method are not cacheable. Because it is not
+      possible for a Cache to determine whether the successful application of
+      an UNLINK request will result in an observable change of state on the 
+      origin-server, the Cache MUST assume the method is not safe and MUST
+      invalidate the effective Request URI. </t>
+
+    </section>
+             
+    <section title="IANA Considerations"> 
+      <t>TBD</t>
+    </section> 
+      
+    <section title="Security Considerations"> 
+      <t>TBD</t>
+
+      <t>Specific preferences requested by a client can introduce security 
+      considerations and concerns beyond those discussed in HTTP/1.1 Parts
+      <xref target="I-D.ietf-httpbis-p1-messaging">1</xref>, 
+      <xref target="I-D.ietf-httpbis-p2-semantics">2</xref>, 
+      <xref target="I-D.ietf-httpbis-p3-payload">3</xref>, 
+      <xref target="I-D.ietf-httpbis-p4-conditional">4</xref>, 
+      <xref target="I-D.ietf-httpbis-p5-range">5</xref>, 
+      <xref target="I-D.ietf-httpbis-p6-cache">6</xref>, and
+      <xref target="I-D.ietf-httpbis-p7-auth">7</xref>.
+      Implementors must refer to the specifications and descriptions of each
+      preference to determine the security considerations relevant to each.</t>          
+    </section> 
+  </middle> 
+  <back>
+    <references title="Normative References"> 
+      &rfc2119;
+      &rfc5988;
+      &part1;
+      &part2;
+      &part3;
+      &part4;
+      &part5;
+      &part6;
+      &part7;
+    </references>
+  </back>
+</rfc> 
+ 

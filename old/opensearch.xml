@@ -1,0 +1,199 @@
+<?xml version='1.0'?>
+ <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+    <!ENTITY rfc2119 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'> 
+    <!ENTITY rfc4287 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4287.xml'> 
+    <!ENTITY rfc3986 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3986.xml'>  
+    <!ENTITY rfc3023 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3023.xml'>  
+    <!ENTITY rfc3548 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3548.xml'>  
+    <!ENTITY rfc3987 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3987.xml'>  
+    <!ENTITY xml PUBLIC ''
+      'http://xml.resource.org/public/rfc/bibxml4/reference.W3C.REC-xml-20040204.xml'> 
+     <!ENTITY xmlnames PUBLIC ''
+      'http://xml.resource.org/public/rfc/bibxml4/reference.W3C.REC-xml-names-19990114.xml'> 
+    <!ENTITY xmlbase PUBLIC ''
+      'http://xml.resource.org/public/rfc/bibxml4/reference.W3C.REC-xmlbase-20010627.xml'>
+]>
+<?rfc compact="yes" ?>
+<?rfc toc="yes" ?>
+<?rfc symrefs="yes" ?>
+<?rfc sortrefs="yes"?>
+<?rfc iprnotified="no" ?>
+<?rfc strict="yes" ?>
+<rfc category="exp" ipr="none" docName="OpenSearch"> 
+<front> 
+<title abbrev="OpenSearch">OpenSearch</title> 
+<author initials="J." surname="Snell" fullname="James M. Snell"> 
+<organization></organization> 
+<address> 
+<postal> 
+<street></street> 
+<city></city> <region></region> <code></code> 
+<country></country> 
+</postal> 
+<phone></phone> 
+<email>jasnell@gmail.com</email> 
+<uri></uri> 
+</address> 
+</author> 
+<date month="March" year="2011" /> 
+<area>General</area> 
+<keyword>I-D</keyword> 
+<keyword>Internet-Draft</keyword> 
+<keyword>XML</keyword> 
+<keyword>Extensible Markup Language</keyword> 
+<keyword>Atom</keyword> 
+<keyword>RSS</keyword> 
+<keyword>Syndication</keyword> 
+<abstract><t>TBD</t></abstract> 
+</front> 
+<middle> 
+<section anchor="introduction" title="Introduction"> 
+ 
+<t>TBD</t> 
+ 
+</section> 
+ 
+<section title="Notational Conventions"> 
+ 
+<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", 
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be 
+interpreted as described in BCP 14, <xref target="RFC2119" /></t> 
+ 
+</section> 
+
+<section anchor="description" title="Description Document">
+
+<t>The OpenSearch Description Document can be used to describe the 
+request and response interface of a search service.</t>
+
+  <section anchor="description-example" title="Example">
+  
+  <t>Example of a simple OpenSearch description document:</t>
+  
+  <figure><artwork><![CDATA[
+  {
+    "displayName": "Web Search",
+    "summary": "Use example.com to search the web.",
+    "contact": {
+      "emails":[{
+        "value": "admin@example.com"
+      }]
+    },
+    "patterns": [{
+      "template": "http://example.com/?q={searchTerms}"
+    }]
+  }
+  ]]></artwork></figure>
+  
+  <t>Example or a details OpenSearch description document:</t>
+  
+  <figure><artwork><![CDATA[
+  {
+   "displayName": "Web Search"
+   "summary": "Use Example.com to search the Web.",
+   "contact": {
+     "emails":[{
+       "value": "admin@example.com"
+     }]
+   },
+   "patterns": [
+     {
+       "mimeType": "application/atom+xml",
+       "template": "http://example.org/?q={searchTerms}&format=atom",
+       "outputEncoding": "UTF-8",
+       "inputEncoding": "UTF-8"
+     },
+     {
+       "mimeType": "application/json",
+       "template": "http://example.org/?q={searchTerms}&format=json",
+       "outputEncoding": "UTF-8",
+       "inputEncoding": "UTF-8"
+     },
+     {
+       "mimeType": "application/html",
+       "template": "http://example.org/?q={searchTerms}",
+       "outputEncoding": "UTF-8",
+       "inputEncoding": "UTF-8"
+     }
+   ],
+   "images": [
+     {
+       "url": "http://example.org/websearch.png",
+       "height": 64,
+       "width": 64
+     },
+     {
+       "url": "http://example.org/websearch.ico",
+       "height": 16,
+       "width": 16
+     }
+   ],
+   "queries": [
+     {
+       "role": "example",
+       "searchterms": "cat"
+     }
+   ],
+   "developer": {
+     "displayName": "Example.com development team"
+   },
+   "attribution": "Search data Copyright 2005, Example.com, Inc.",
+   "adultContent": False,
+   "lang": "en-US"
+  }
+  ]]></artwork></figure>
+  
+  </section>
+
+  <section anchor="description-properties" title="Description Properties">
+  
+  
+  
+  </section>
+
+</section>
+
+<section anchor="template" title="URI Template Syntax">
+</section>
+
+<section anchor="query" title="Query Object">
+</section>
+
+<section anchor="response" title="Response Format">
+</section>
+
+
+<section title="Security Considerations"> 
+
+<t>TBD</t>
+
+</section> 
+ 
+<section title="IANA Considerations"> 
+ 
+<t>TBD</t>  
+  
+</section> 
+ 
+</middle> 
+ 
+<back> 
+<references title="Normative References"> 
+  &rfc2119;
+  &rfc3986;
+  &rfc4287;
+  &rfc3023;
+  &rfc3548;
+  &rfc3987;
+  &xml;
+  &xmlbase;
+  &xmlnames;
+</references> 
+</back> 
+</rfc>
