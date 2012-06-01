@@ -9,7 +9,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="std" ipr="trust200811" docName="draft-snell-additional-link-relations-03"> 
+<rfc category="std" ipr="trust200811" docName="draft-snell-additional-link-relations-04"> 
   <front> 
     <title abbrev="Additional Link Relations"> 
       Additional Link Relation Types
@@ -65,6 +65,15 @@
   
   {...}
       </artwork></figure>
+    
+    </section>
+        
+    <section anchor="preview" title="&quot;preview&quot;">
+    
+      <t>The "preview" Link relation can be usd to refer to a resource
+      that serves as a preview of the link's context, for instance, a 
+      screen capture of a video, or a brief snippet of audio from a 
+      song.</t>
     
     </section>
         
@@ -174,7 +183,8 @@
   Sally
       </artwork></figure>
       
-      <t>Note that the "type" specified by the type link relation MUST NOT be
+      <t>Note that, when used within an HTTP message as in the example, 
+      the "type" specified by the type link relation MUST NOT be
       confused with the media type of the payload itself as given by the 
       Content-Type header. The "type" link relation references the payload's 
       abstract semantic type whereas the Content-Type header identifies the 
@@ -194,6 +204,13 @@
         <t>Relation Name: about</t>
         <t>Description: Refers to a resource that is the subject of the link's
         context.</t>
+        <t>Reference: This specification.</t>
+      </list></t>
+      
+      <t><list style="symbols">
+        <t>Relation Name: preview</t>
+        <t>Description: Refers to a resource that provides a preview of the 
+        link's context.</t>
         <t>Reference: This specification.</t>
       </list></t>
       
