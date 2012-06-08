@@ -1,0 +1,82 @@
+Activity Streams Protocol (ASP)
+-------------------------------
+
+Charter
+
+Current Status: 
+
+Chairs:
+  ?
+  ?
+  
+Application Area Directors:
+  ?
+  ?
+
+Application Area Advisor:
+  ?
+  
+Tech Advisor:
+  ?
+  
+Mailing Lists:
+  General Discussion: ?
+  To Subscribe: ?
+  Archive: ?
+  
+Description of Working Group:
+  
+  This Working Group is charged with maintaining and developing
+  the "core" specifications for the Activity Streams format and 
+  protocol.
+  
+  The Working Group's specification deliverables are:
+  
+  * A document describing an updated conceptual model 
+    for an "activity" and "activity stream" that is fully
+    backwards compatible with the existing JSON Activity 
+    Streams 1.0 model defined at http://activitystrea.ms/specs/json/1.0/
+    but incorporates important lessons learned and best 
+    practices learned through implementation experience.
+  * A document that describes a core set of verbs, object types
+    and general extension properties for use with the 
+    Activity Streams format and establishes a registry 
+    for tracking and extending new verbs, object types 
+    and extensions.
+  * One or more documents describing general extensions 
+    to the Activity Streams model including:
+    * An extension for representing responses to activities
+    * An extension for explicitly identifying the target 
+      audience of an activity
+    * An extension supporting the definition of new 
+      extension verbs and object types. 
+    * 
+  * A document describing a basic protocol for the publication
+    of activities. This protocol must enable the publication, 
+    distribution and aggregation of activities and activity 
+    streams. The creation, editing and deleting of individual
+    activities is not considered to be a goal of the protocol.
+  
+  The working group will build on the work already done by the 
+  existing Activity Streams community (http://activitystrea.ms)
+  and will leverage experience gained through the implementation
+  of the JSON Activity Streams 1.0 format as the basis for
+  standards track documents that are fully backwards compatible 
+  with the JSON Activity Streams 1.0 format. Changes to the 
+  existing semantics or significant new required capabilities 
+  within the core Activity Streams model are out of scope. 
+  The working group may, however, consider optional extensions 
+  and capabilities that do not alter the existing semantics.
+  
+  The Working Group will utilize the following external document
+  specifications as initial input:
+  
+  * http://activitystrea.ms/specs/json/1.0/
+  * http://activitystrea.ms/specs/atom/1.0/
+  * http://activitystrea.ms/specs/json/schema/activity-schema.html
+  * http://activitystrea.ms/specs/json/targeting/1.0/
+  * http://activitystrea.ms/specs/json/replies/1.0/
+  * https://raw.github.com/activitystreams/activity-streams-verb-definition/master/activity-streams-verb-definition.txt
+  
+Goals and Milestones:
+  ?
