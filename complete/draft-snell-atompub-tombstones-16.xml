@@ -33,7 +33,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc iprnotified="no" ?>
 <?rfc strict="yes" ?>
-<rfc category="std" ipr="trust200811" docName="draft-snell-atompub-tombstones-16.txt"> 
+<rfc category="std" ipr="trust200811" docName="draft-snell-atompub-tombstones-16"> 
 <front> 
 <title abbrev="Atom deleted-entry">The Atom "deleted-entry" Element</title> 
 <author initials="J.M." surname="Snell" fullname="James M Snell"> 
@@ -42,7 +42,7 @@
 <uri>http://ibm.com</uri> 
 </address> 
 </author> 
-<date month="June" year="2012" /> 
+<date month="July" year="2012" /> 
 <area>General</area> 
 <keyword>I-D</keyword> 
 <keyword>Internet-Draft</keyword> 
@@ -161,8 +161,9 @@ specifies a date and time more recent than or equal to the at:deleted-entry
 element's when value. If an at:deleted-entry element and an atom:entry element
 sharing the same atom:id value exist in the same feed and the at:deleted-entry
 element's when value specifies a more recent date than that specified by the 
-atom:entry element's atom:updated element, then the atom:entry SHOULD be considered 
-to have been removed from the feed.</t> 
+atom:entry element's atom:updated element, the implication is that the entry 
+has been deleted since the time it was published and the presence of the 
+at:deleted-entry represents a retraction of the older entry.</t> 
  
 <t>Implementors should note that the at:deleted-entry element is informative
 in nature only and may be ignored by Atom processors. The presence of an 
