@@ -33,7 +33,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc iprnotified="no" ?>
 <?rfc strict="yes" ?>
-<rfc category="std" ipr="trust200811" docName="draft-snell-atompub-tombstones-16"> 
+<rfc category="std" ipr="trust200811" docName="draft-snell-atompub-tombstones-17"> 
 <front> 
 <title abbrev="Atom deleted-entry">The Atom "deleted-entry" Element</title> 
 <author initials="J.M." surname="Snell" fullname="James M Snell"> 
@@ -156,11 +156,11 @@ attribute values.</t>
  
 <t>An Atom feed MAY contain atom:entry elements and at:deleted-entry elements
 sharing the same atom:id value. In such cases, the implication is that the
-particular atom:entry has either been published to the and then subsequently 
-removed; or that a previously removed entry has been republished to the feed.
-To determine which condition applies, the processors needs to compare the 
-value of the at:deleted-entry element's when attribute to the value of the 
-corresponding atom:entry element's atom:updated value:
+particular atom:entry has either been published to the feed and then subsequently 
+removed; or that a previously removed entry has been republished to the feed
+following a previous deletion. To determine which condition applies, the 
+processor needs to compare the value of the at:deleted-entry element's when 
+attribute to the value of the corresponding atom:entry element's atom:updated value:
   <list style="symbols"> 
     <t>If the when attribute specifies a value equal to or more recent than
     that specified by the atom:updated element, the atom:entry is assumed 

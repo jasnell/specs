@@ -1,0 +1,62 @@
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+  <!ENTITY rfc6415 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6415.xml'>
+  <!ENTITY rfc5785 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5785.xml'>
+  <!ENTITY rfc6570 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6570.xml'>
+]>
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-http2-input-00"> 
+  <front> 
+    <title abbrev="application/merge-patch"> 
+      HTTP/2.0 Discussion Input
+    </title> 
+ 
+    <author initials="J.M." surname="Snell" fullname="James M Snell"> 
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+    
+    <date month="July" year="2012" /> 
+ 
+    <keyword>I-D</keyword> 
+    <keyword>http</keyword>
+    <keyword>spdy</keyword>
+ 
+    <abstract> 
+      <t>This memo describes a variety of issues and concepts intended
+      add to discussion around the development of the next version of 
+      the HTTP protocol. It is not the intention of this document to
+      provide a complete proposal in it's own right.</t> 
+    </abstract> 
+ 
+  </front> 
+  
+  <middle> 
+
+    <section title="Revised SPDY Header Structure">
+    </section>
+    
+    <section title="SPDY Key Negotiation Control Frames">
+    </section>
+    
+    <section title="The Session Header">
+    </section>
+
+  </middle> 
+
+  <back>
+    <references title="Normative References"> 
+  &rfc2119;
+  &rfc6415;
+  &rfc5785;
+  &rfc6570;
+    </references>
+  </back>
+</rfc> 
+ 
