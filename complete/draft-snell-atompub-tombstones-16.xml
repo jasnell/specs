@@ -154,21 +154,35 @@ attribute values.</t>
   </feed> 
 ]]></artwork></figure> 
  
-<t>An Atom feed MAY contain atom:entry elements and at:deleted-entry elements 
-sharing the same atom:id value.  Atom processors SHOULD ignore any at:deleted-entry 
-elements sharing an atom:id value with an atom:entry whose atom:updated element 
-specifies a date and time more recent than or equal to the at:deleted-entry 
-element's when value. If an at:deleted-entry element and an atom:entry element
-sharing the same atom:id value exist in the same feed and the at:deleted-entry
-element's when value specifies a more recent date than that specified by the 
-atom:entry element's atom:updated element, the implication is that the entry 
-has been deleted since the time it was published and the presence of the 
-at:deleted-entry represents a retraction of the older entry.</t> 
- 
-<t>Implementors should note that the at:deleted-entry element is informative
-in nature only and may be ignored by Atom processors. The presence of an 
-at:deleted-entry element does not guarantee that the atom:entry to which it
-is referring will no longer be available.</t>
+<t>An Atom feed MAY contain atom:entry elements and at:deleted-entry elements
+sharing the same atom:id value. In such cases, the implication is that the
+particular atom:entry has either been published to the and then subsequently 
+removed; or that a previously removed entry has been republished to the feed.
+To determine which condition applies, the processors needs to compare the 
+value of the at:deleted-entry element's when attribute to the value of the 
+corresponding atom:entry element's atom:updated value:
+  <list style="symbols"> 
+    <t>If the when attribute specifies a value equal to or more recent than
+    that specified by the atom:updated element, the atom:entry is assumed 
+    to have been published then subsequently removed. Processors SHOULD
+    ignore the older atom:entry element.</t>
+    <t>If the when attribute specifies a value older than that specified by
+    the atom:updated element, the atom:entry is assumed to have been 
+    republished to the feed following a prior removal. Processors SHOULD
+    ignore the older at:deleted-entry element.</t>
+  </list>
+</t>
+  
+<t>Publishers of feeds containing at:deleted-entry elements should note that 
+the at:deleted-entry element is advisory in nature only and may be ignored by 
+Atom processors. The presence of an at:deleted-entry element does not guarantee 
+that the atom:entry to which it is referring will no longer be available. For
+example, if an entry was published to a feed document that was published
+and processed yesterday by an aggregator application, then is subsequently 
+deleted today, with a corresponding at:deleted-entry element added to the feed
+as a signal that the entry was deleted, there is no guarantee that the 
+aggregator application will pay any attention to the at:deleted-entry element
+during subsequent processing operations.</t>
  
 <t>Elements and attributes from any XML vocabulary MAY be used within an
 at:deleted-entry element. Processors encountering such markup MUST NOT stop 
