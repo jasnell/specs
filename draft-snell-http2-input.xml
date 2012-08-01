@@ -39,13 +39,241 @@
   
   <middle> 
 
-    <section title="Revised SPDY Header Structure">
+    <section title="Binary Optimized Header Encoding">
+    
+      <t>Binary Optimized Header Encoding is a proposed
+      alternative serialization for headers within SPDY SYN_STREAM, 
+      SYN_REPLY and HEADERS frames that is designed to optimize 
+      generation, consumption and processing of the most commonly 
+      used HTTP headers.</t>
+      
+      <t>TODO: More explanation of why we want to do this.</t>
+      
+      <section title="Header Types">
+        
+        <section title="Registered Headers">
+        
+          <t>Registered Headers are well-known and well-defined 
+          headers for which there is a published RFC and IANA 
+          registration. Each is assigned a numeric ID and a 
+          codepage ranging in value between 0 and 7. If the 
+          codepage is 0, the implication is that the header 
+          MUST be understood in order for the request or response
+          message to be handled properly. Codepages 1-5 represent
+          "MUST-IGNORE" headers; that is, such headers MUST be 
+          ignored by processors if they are unrecognized by the
+          processing application. Codepages 6 and 7 are reserved 
+          for "Private Use", with Codepage 6 being reserved for
+          "MUST UNDERSTAND PRIVATE USE" headers.</t>
+        
+<figure><preamble>The basic structure of Registered Headers:</preamble><artwork>
+  +------------------------------+
+  |0| cp(3-bit) |   id (12-bit)  |
+  +------------------------------+
+  | flags(8-bit) |  len (16-bit) |
+  +------------------------------+
+  |          value...            |
+  +------------------------------+
+</artwork></figure>
+
+          <t>The first single bit within the structure identifies the header
+          type. When this bit is off, the header is a Registered Header.</t>
+          
+          <t>The next three bits identify the headers codepage. The value is 
+          interpreted as an unsigned integer in the range 0-7.</t>
+          
+          <t>The next twelve bits specify the header's specific numeric 
+          position within the codepage.</t>
+          
+          <t>Following the identifier are 8 reserved flag bits.
+            <list style="symbols">
+              <t>Bit 0x1 indicates that the header value contains 
+              UTF-8 encoded character content. If the bit is not 
+              set, the value is assumed to contain non-character-based
+              binary data.</t>
+              <t>Bit 0x2 indicates that the header is a "Content Header", 
+              if set, or a "Stream Header" if not set.</t>
+            </list>
+          </t>
+          
+          <t>The remaining content of the structure consists of a 16-bit 
+          unsigned integer specifying the remaining length of the header 
+          value. The value MAY be zero length.</t>
+          
+          <t>The minimum length of a registered header is 5-octets (40-bits).</t>
+          
+        </section>
+      
+        <section title="Extension Headers">
+          
+          <t>Extension Headers are simple name+value pairs essentially
+          as they exist today, but with a number of important modifications.</t>
+          
+<figure><preamble>The structure of Extension Headers</preamble><artwork>
+  +------------------------------+
+  |1| flags(7-bit) | namelen (8) |
+  +------------------------------+
+  | name | val len (16) | value  |
+  +------------------------------+
+</artwork>
+
+          <t>The first single bit identifies the header type. When this bit is on,
+          the header is an Extension Header.</t>
+          
+          <t>The next seven bits are reserved flags.
+            <list style="symbols">
+              <t>Bit 0x1 indicates that the header value contains 
+              UTF-8 encoded character content. If the bit is not 
+              set, the value is assumed to contain non-character-based
+              binary data.</t>
+              <t>Bit 0x2 indicates that the header is a "Content Header", 
+              if set, or a "Stream Header" if not set.</t>
+            </list>
+          </t>
+          
+          <t>The next 8-bits specify the length in octets of the ASCII-encoded 
+          header name as unsigned integer.</t>
+          
+          <t>The length of the value is specified as an unsigned 16-bit integer.</t>
+          
+        </section>
+        
+      </section>
+      
+      <section title="The Content Header Flag">
+        
+        <t>Within HTTP/1.1, a single HTTP request message can 
+        contain a mix of headers that apply to either the request
+        as a whole, or specifically to the requests payload.
+        Typically, implementations are required to have intimate
+        knowledge of each individual header's definition in order 
+        to determine the scope to which the header applies.</t>
+        
+        <t>TODO: More on why this important</t>
+        
+        <t>The Binary Optimized Header Encoding introduces the 
+        ability to explicitly flag individual headers as applying
+        to the SPDY Stream or Payload.</t>
+        
+      </section>
+      
+      <section title="Binary vs. Character Values">
+        
+        <t>TBD</t>
+        
+      </section>
+    
+      <section title="Example Headers">
+        
+        <t>Assume the following registered headers:</t>
+        
+        <texttable>
+          <ttcol>HTTP Header</ttcol>
+          <ttcol>Codepage</ttcol>
+          <ttcol>ID</ttcol>
+          <c>Version</c>
+          <c>0</c>
+          <c>1</c>
+          <c>Method</c>
+          <c>0</c>
+          <c>2</c>
+          <c>Host</c>
+          <c>0</c>
+          <c>3</c>
+          <c>Path</c>
+          <c>0</c>
+          <c>4</c>
+          <c>Accept-Lang</c>
+          <c>1</c>
+          <c>1</c>
+        </texttable>
+        
+        <t>And the following values representing known HTTP Methods:</t>
+        
+        <texttable>
+          <ttcol>Method</ttcol>
+          <ttcol>Value</ttcol>
+          <c>GET</c>
+          <c>1</c>
+          <c>POST</c>
+          <c>2</c>
+          <c>PUT</c>
+          <c>3</c>
+          <c>DELETE</c>
+          <c>4</c>
+          <c>PATCH</c>
+          <c>5</c>
+          <c>HEAD</c>
+          <c>6</c>
+          <c>OPTIONS</c>
+          <c>7</c>
+          <c>CONNECT</c>
+          <c>8</c>
+        </texttable>
+
+<figure><preamble>The Version header can be encoded as (7-bytes):</preamble><artwork>
+  00 01 00 00 02 02 00    |.......|
+</artwork></figure>
+
+<figure><preamble>The GET Method header can be encoded as (6-bytes):</preamble><artwork>
+  00 02 00 00 01 01       |......|
+</artwork></figure>
+
+<figure><preamble>The Host Header can be encoded as (20-bytes):</preamble><artwork>
+  00 03 01 00 0f 77 77 77 |.....www|
+  2e 65 78 61 6d 70 6c 65 |ww.examp|
+  2e 6f 72 67             |le.o|
+</artwork></figure>
+
+<figure><preamble>A simple Accept-Lang header would be encoded as (10-bytes):</preamble><artwork>
+  10 01 01 00 05 65 6e 2d |.....en-|
+  55 53                   |US|
+</artwork></figure>
+        
+<figure><preamble>A Path header encoding the request URI (45-bytes):</preamble><artwork>
+  00 04 01 00 28 2f 74 68  |...../th|
+  69 73 2f 69 73 2f 74 68  |is/is/th|
+  65 2f 72 65 71 75 65 73  |e/reques|
+  74 3f 69 73 3d 69 74 26  |t?is=it&amp;|
+  6e 6f 74 3d 62 65 61 75  |not=beau|
+  74 69 66 75 6c           |tiful|
+</artwork></figure>
+        
+        <t>The combined serialization of the five headers into a single block
+        requires a total of 89 bytes. By comparison, the equivalent serialization
+        using the existing SPDY encoding requires 150 bytes sans compression
+        (approximately 107 bytes compressed).</t>
+        
+<figure><preamble>The equivalent SPDY encoding:</preamble><artwork>
+  00 00 00 05 00 00 00 08  |........|
+  3a 76 65 72 73 69 6f 6e  |:version|
+  00 00 00 03 31 2e 31 00  |....1.1.|
+  00 00 07 3a 6d 65 74 68  |...:meth|
+  6f 64 00 00 00 03 47 45  |od....GE|
+  54 00 00 00 05 3a 68 6f  |T....:ho|
+  73 74 00 00 00 0f 77 77  |st....ww|
+  77 2e 65 78 61 6d 70 6c  |w.exampl|
+  65 2e 6f 72 67 00 00 00  |e.org...|
+  0f 41 63 63 65 70 74 2d  |.Accept-|
+  4c 61 6e 67 75 61 67 65  |Language|
+  00 00 00 05 65 6e 2d 55  |....en-U|
+  53 00 00 00 05 3a 70 61  |S....:pa|
+  74 68 00 00 00 28 2f 74  |th..../t|
+  68 69 73 2f 69 73 2f 74  |his/is/t|
+  68 65 2f 72 65 71 75 65  |he/reque|
+  73 74 3f 69 73 3d 69 74  |st?is=it|
+  26 6e 6f 74 3d 62 65 61  |&amp;not=bea|
+  75 74 69 66 75 6c        |utiful|
+</artwork></figure>
+        
+      </section>
+
     </section>
     
     <section title="SPDY Key Negotiation Control Frames">
     </section>
     
-    <section title="The Session Header">
+    <section title="The Routing-Token Header">
     </section>
 
   </middle> 
