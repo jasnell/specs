@@ -32,3 +32,5 @@ activitystreams/registry/
 activitystreams/website/
 
 .DS_Store
+
+.tm_properties
