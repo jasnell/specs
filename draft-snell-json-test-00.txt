@@ -128,7 +128,7 @@ Internet-Draft           application/merge-patch          September 2012
 
    The "base" predicate is a special-case used to establish a root
    reference point for the evaluation of a contained predicate.  It will
-   evaluate as true if, and only if, it's contained predicate evaluates
+   evaluate as true if, and only if, its contained predicate evaluates
    as true.
 
    For example, given the JSON document:

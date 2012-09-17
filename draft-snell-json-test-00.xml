@@ -51,7 +51,7 @@
     
     <t>The <spanx style="verb">base</spanx> predicate is a special-case
     used to establish a root reference point for the evaluation of a 
-    contained predicate. It will evaluate as true if, and only if, it's
+    contained predicate. It will evaluate as true if, and only if, its
     contained predicate evaluates as true.</t>
     
     <figure><preamble>For example, given the JSON document:</preamble>
