@@ -1,0 +1,672 @@
+
+
+
+Network Working Group                                           J. Snell
+Internet-Draft                                        September 17, 2012
+Intended status: Informational
+Expires: March 21, 2013
+
+
+                               JSON Test
+                        draft-snell-json-test-00
+
+Abstract
+
+   TBD
+
+Status of this Memo
+
+   This Internet-Draft is submitted to IETF in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on March 21, 2013.
+
+Copyright Notice
+
+   Copyright (c) 2012 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+
+
+Snell                    Expires March 21, 2013                 [Page 1]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+Table of Contents
+
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
+   2.  Predicates . . . . . . . . . . . . . . . . . . . . . . . . . .  3
+     2.1.  base . . . . . . . . . . . . . . . . . . . . . . . . . . .  3
+     2.2.  contains . . . . . . . . . . . . . . . . . . . . . . . . .  3
+     2.3.  ends_with  . . . . . . . . . . . . . . . . . . . . . . . .  4
+     2.4.  less_than  . . . . . . . . . . . . . . . . . . . . . . . .  5
+     2.5.  matches  . . . . . . . . . . . . . . . . . . . . . . . . .  5
+     2.6.  more_than  . . . . . . . . . . . . . . . . . . . . . . . .  6
+     2.7.  starts_with  . . . . . . . . . . . . . . . . . . . . . . .  6
+     2.8.  test . . . . . . . . . . . . . . . . . . . . . . . . . . .  7
+     2.9.  type_of  . . . . . . . . . . . . . . . . . . . . . . . . .  8
+   3.  Aggregate Predicates . . . . . . . . . . . . . . . . . . . . .  9
+     3.1.  not  . . . . . . . . . . . . . . . . . . . . . . . . . . .  9
+     3.2.  and  . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+     3.3.  or . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+     3.4.  Nesting Aggregate Predicates . . . . . . . . . . . . . . . 11
+   4.  Security Considerations  . . . . . . . . . . . . . . . . . . . 12
+   5.  Normative References . . . . . . . . . . . . . . . . . . . . . 12
+   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                    Expires March 21, 2013                 [Page 2]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+1.  Introduction
+
+   TBD
+
+   In this document, the key words "MUST", "MUST NOT", "REQUIRED",
+   "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
+   and "OPTIONAL" are to be interpreted as described in [RFC2119].
+
+
+2.  Predicates
+
+2.1.  base
+
+   The "base" predicate is a special-case used to establish a root
+   reference point for the evaluation of a contained predicate.  It will
+   evaluate as true if, and only if, it's contained predicate evaluates
+   as true.
+
+   For example, given the JSON document:
+
+     {
+       "a": {
+         "b": {
+           "c": "this is a test"
+         }
+       }
+     }
+
+   The following establishes the path "/a" as the root against which the
+   contained "test" predicate is evaluated:
+
+     {
+       "base": "/a", "predicate": {
+         "test": "/b/c", "value": "this is a test"
+       }
+     }
+
+2.2.  contains
+
+   The "contains" predicate evaluates as true if, and only if, the
+   referenced element is defined and has a value whose string
+   representation contains the exact sequence of characters given by the
+   predicate object's "value" member.
+
+
+
+
+
+
+
+
+Snell                    Expires March 21, 2013                 [Page 3]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+   For example, given the JSON document:
+
+     {
+       "a": {
+         "b": "This is a test"
+       }
+     }
+
+   The following predicate would evaluate as "true":
+
+     {
+       "contains": "/a/b", "value": " is a "
+     }
+
+   By default, character matching MUST be performed in a case-sensitive
+   manner unless the value of the predicate's optional "ignore_case"
+   member is "true".
+
+   For instance, the following will evaluate as "true":
+
+     {
+       "contains": "/a/b/", "value": " Is A ", "ignore_case": true
+     }
+
+2.3.  ends_with
+
+   The "ends_with" predicate evaluates as true if, and only if, the
+   referenced element is defined and has a value whose string
+   representation ends with the exact sequence of characters given by
+   the predicate object's "value" member.
+
+   For example, given the JSON document:
+
+     {
+       "a": {
+         "b": "This is a test"
+       }
+     }
+
+   The following predicate would evaluate as "true":
+
+     {
+       "ends_with": "/a/b", "value": " test"
+     }
+
+   By default, character matching MUST be performed in a case-sensitive
+   manner unless the value of the predicate's optional "ignore_case"
+   member is "true".
+
+
+
+Snell                    Expires March 21, 2013                 [Page 4]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+   For instance, the following will evaluate as "true":
+
+     {
+       "ends_with": "/a/b/", "value": " TEST", "ignore_case": true
+     }
+
+2.4.  less_than
+
+   The "less_than" predicate evaluates as true if, and only if, the
+   referenced element is defined and specifies a number whose value is
+   less than that specified by the predicate object's "value" member.
+
+   For example, given the JSON document:
+
+     {
+       "a": {
+         "b": 10
+       }
+     }
+
+   The following will evaluate as "true":
+
+     {
+       "less_than": "/a/b", "value": 15
+     }
+
+2.5.  matches
+
+   The "matches" predicate evaluates as true if, and only if, the
+   referenced element is defined and has a value whose string
+   representation matches the regular expression provided by the
+   predicate object's "value" member.
+
+   For example, given the JSON document:
+
+     {
+       "a": {
+         "b": "this is a test"
+       }
+     }
+
+   The following evalutes as "true":
+
+     {
+       "matches": "/a/b", "value": "/is a/"
+     }
+
+   The predicate's matching pattern is expressed as a string value
+
+
+
+Snell                    Expires March 21, 2013                 [Page 5]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+   following the JavaScript Regular Expression syntax.
+
+2.6.  more_than
+
+   The "more_than" predicate evaluates as true if, and only if, the
+   referenced element is defined and specifies a number whose value is
+   greater than that specified by the predicate object's "value" member.
+
+   For example, given the JSON document:
+
+     {
+       "a": {
+         "b": 10
+       }
+     }
+
+   The following will evaluate as "true":
+
+     {
+       "more_than": "/a/b", "value": 5
+     }
+
+2.7.  starts_with
+
+   The "starts_with" predicate evaluates as true if, and only if, the
+   referenced element is defined and has a value whose string
+   representation begins with the exact sequence of characters given by
+   the predicate object's "value" member.
+
+   For example, given the JSON document:
+
+     {
+       "a": {
+         "b": "This is a test"
+       }
+     }
+
+   The following predicate would evaluate as "true":
+
+     {
+       "starts_with": "/a/b", "value": "This "
+     }
+
+   By default, character matching MUST be performed in a case-sensitive
+   manner unless the value of the predicate's optional "ignore_case"
+   member is "true".
+
+
+
+
+
+Snell                    Expires March 21, 2013                 [Page 6]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+   For instance, the following will evaluate as "true":
+
+     {
+       "starts_with": "/a/b/", "value": "this ", "ignore_case": true
+     }
+
+2.8.  test
+
+   The "test" predicate can be used to determine if a given element
+   exists and if it's value is equal to a specified value.
+
+   For example, given the JSON document:
+
+     {
+       "a": {
+         "b": "this is a test"
+       }
+     }
+
+   The following predicate evaluates as "true" because the element
+   "/a/b" exists.
+
+     {
+       "test": "/a/b"
+     }
+
+   When the predicate contains a "value" member, the predicate tests
+   that the value of the given element is equal to the value specified.
+
+   The following predicate evaluates as "true" because the value of
+   element "/a/b" is equal to "this is a test".
+
+     {
+       "test": "/a/b", "value": "this is a test"
+     }
+
+   The "test" predicate is defined to exactly mimic the definition of
+   JSON Patch's "test" operation, and as such adheres to identical
+   semantics when determining the value equality.
+
+   Specifically, as defined by JSON Patch: values are equal if they are
+   of the same JSON type and are considered equal by the following rules
+   for each type (adapted from the JSON-Patch specification and included
+   here as a conventient reference):
+   o  strings: are considered equal if, after unescaping any sequence(s)
+      in both strings starting with a reverse solidus, they contain the
+      same number of Unicode characters and their code points are
+      position-wise equal.
+
+
+
+Snell                    Expires March 21, 2013                 [Page 7]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+   o  numbers: are considered equal if subtracting one from the other
+      results in 0.
+   o  arrays: are considered equal if they contain the same number of
+      values, and each value can be considered equal to the value at the
+      corresponding position in the other array.
+   o  objects: are considered equal if they contain the same number of
+      members, and each member can be considered equal to a member in
+      the other object, by comparing their keys as strings, and values
+      using this list of type-specific rules.
+   o  literals (false, true and null): are considered equal if they are
+      the same.
+
+   As is also the case with JSON-Patch, these checks are logical
+   comparisons that ignore, for instance, whitespace between member
+   values of an array and the ordering of members in an object.
+
+   Unlike JSON-Patch, a "test" predicate MAY contain an additional
+   boolean "ignore_case" member that, when set to "true", modifies the
+   string equality check described above to ignore case.
+
+2.9.  type_of
+
+   The "type_of" predicate evaluates as true if, and only if, the
+   referenced element exists and specifies a values whose JSON type is
+   equal to that specified by the predicate's "value" member.
+
+   The possible values that can be specified are: "number", "string",
+   "boolean", "object", "array", "null" or "undefined".
+
+   For example, given the JSON document:
+
+     {
+       "a": {
+         "b": "this is a test",
+         "c": [1,2,3]
+       }
+     }
+
+   The following predicate would evaluate as "true"
+
+     {
+       "type_of": "/a/b", "value": "string"
+     }
+
+   Note that the "type_of" predicate is generally identical to
+   JavaScript's built in "typeof" operator with the exception that
+   JavaScript's operator does not distinguish between Array and Object
+   types.  That is, when executing the JavaScript code "typeof doc.a.c"
+
+
+
+Snell                    Expires March 21, 2013                 [Page 8]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+   against the example JSON document given above, JavaScript will report
+   the type as "object" rather than "array".  By contrast, the "type_of"
+   predicate distinguishes the two types of values.
+
+
+3.  Aggregate Predicates
+
+3.1.  not
+
+   The "not" predicate evaluates as "true" if, and only if, each of it's
+   contained set of predicate operations evaluate as "false".
+
+   For example, given the JSON document:
+
+     {
+       "a" : {
+         "b" : "foo",
+         "c" : {
+           "d": 10
+         }
+       }
+     }
+
+   The following would evaluate as "true" because the element "/a/b/e"
+   is undefined and the value of element "/a/c/d" is not less than 5.
+
+     {
+       "not": [
+         {"test": "/a/b/e"},
+         {"less_than": "/a/c/d", "value": 5}
+       ]
+     }
+
+   However, the following would evaluate as "false" because the element
+   "/a/c" exists and the value for element "/a/b" begins with the letter
+   "f"
+
+     {
+       "not": [
+         {"not":[{"test": "/a/c"}]},
+         {"starts_with": "/a/b", "value": "f"}
+       ]
+     }
+
+
+
+
+
+
+
+
+Snell                    Expires March 21, 2013                 [Page 9]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+3.2.  and
+
+   The "and" predicate evaluates as "true" if, and only if, all of it's
+   contained set of predicate operations evaluate as "true".
+
+   For example, given the JSON document:
+
+     {
+       "a" : {
+         "b" : "foo",
+         "c" : {
+           "d": 10
+         }
+       }
+     }
+
+   The following would evaluate as "true" because the element "/a/b" is
+   defined and the value of element "/a/c/d" is less than 15.
+
+     {
+       "and": [
+         {"test": "/a/b"},
+         {"less_than": "/a/c/d", "value": 15}
+       ]
+     }
+
+   However, the following would evaluate as "false" because the while
+   element "/a/c" exists, the value of that element is not a string.
+
+     {
+       "and": [
+         {"test": "/a/c"},
+         {"type_of": "/a/c", "value": "string"}
+       ]
+     }
+
+3.3.  or
+
+   The "or" predicate evaluates as "true" if, and only if, at least one
+   of it's contained set of predicate operations evaluate as "true".
+
+
+
+
+
+
+
+
+
+
+
+Snell                    Expires March 21, 2013                [Page 10]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+   For example, given the JSON document:
+
+     {
+       "a" : {
+         "b" : "foo",
+         "c" : {
+           "d": 10
+         }
+       }
+     }
+
+   The following would evaluate as "true" because the element "/a/b" is
+   defined.
+
+     {
+       "or": [
+         {"test": "/a/b"},
+         {"less_than": "/a/c/d", "value": 5}
+       ]
+     }
+
+   However, the following would evaluate as "false" because neither
+   elements "/a/e" or "/a/f" exist.
+
+     {
+       "or": [
+         {"test": "/a/e"},
+         {"test": "/a/f"}
+       ]
+     }
+
+3.4.  Nesting Aggregate Predicates
+
+   Aggregate Predicate objects can be combined to defined more complex
+   test operations.  For example:
+
+     {
+       "or": [
+         {"not": [
+           "test": "/a/b/c",
+           "starts_with": "/a/b/c", "value": "f"
+         ]},
+         {"not": [
+           "test": "/a/b/d",
+           "type_of": "/a/b/d", "value": "number"
+         ]}
+       ]
+     }
+
+
+
+Snell                    Expires March 21, 2013                [Page 11]
+
+Internet-Draft           application/merge-patch          September 2012
+
+
+4.  Security Considerations
+
+   None.
+
+
+5.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
+              Uniform Resource Identifiers (URIs)", RFC 5785,
+              April 2010.
+
+   [RFC6415]  Hammer-Lahav, E. and B. Cook, "Web Host Metadata",
+              RFC 6415, October 2011.
+
+   [RFC6570]  Gregorio, J., Fielding, R., Hadley, M., Nottingham, M.,
+              and D. Orchard, "URI Template", RFC 6570, March 2012.
+
+
+Author's Address
+
+   James M Snell
+
+   Email: jasnell@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                    Expires March 21, 2013                [Page 12]
+

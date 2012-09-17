@@ -1,0 +1,532 @@
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+  <!ENTITY rfc6415 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6415.xml'>
+  <!ENTITY rfc5785 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5785.xml'>
+  <!ENTITY rfc6570 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6570.xml'>
+]>
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-json-test-00"> 
+  <front> 
+    <title abbrev="application/merge-patch"> 
+      JSON Test
+    </title> 
+ 
+    <author initials="J.M." surname="Snell" fullname="James M Snell"> 
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+    
+    <date month="September" year="2012" /> 
+ 
+    <area>Applications</area> 
+    <!-- workgroup>Individual Submission</workgroup--> 
+    <keyword>I-D</keyword> 
+    <keyword>json</keyword>
+    <keyword>predicate</keyword>
+ 
+    <abstract> 
+      <t>TBD</t> 
+    </abstract> 
+ 
+  </front> 
+  
+  <middle> 
+
+<section anchor="intro" title="Introduction"> 
+  <t>TBD</t>
+  <t>In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
+  "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
+  are to be  interpreted as described in <xref target="RFC2119" />.</t> 
+</section> 
+
+<section anchor="predicates" title="Predicates">
+
+  <section anchor="base" title="base">
+    
+    <t>The <spanx style="verb">base</spanx> predicate is a special-case
+    used to establish a root reference point for the evaluation of a 
+    contained predicate. It will evaluate as true if, and only if, it's
+    contained predicate evaluates as true.</t>
+    
+    <figure><preamble>For example, given the JSON document:</preamble>
+    <artwork>
+  {
+    "a": {
+      "b": {
+        "c": "this is a test"
+      }
+    }
+  }
+    </artwork></figure>
+    
+    <figure><preamble>The following establishes the path "/a" as the
+    root against which the contained <spanx style="verb">test</spanx>
+    predicate is evaluated:</preamble><artwork>
+  {
+    "base": "/a", "predicate": {
+      "test": "/b/c", "value": "this is a test"
+    }
+  }
+    </artwork></figure>
+    
+  </section>
+
+  <section anchor="contains" title="contains">
+  
+    <t>The <spanx style="verb">contains</spanx> predicate evaluates
+    as true if, and only if, the referenced element is defined
+    and has a value whose string representation contains the exact
+    sequence of characters given by the predicate object's 
+    <spanx style="verb">value</spanx> member.</t>
+    
+    <figure><preamble>For example, given the JSON document:</preamble>
+    <artwork>
+  {
+    "a": {
+      "b": "This is a test"
+    }
+  }
+    </artwork></figure>
+  
+    <figure><preamble>The following predicate would evaluate as 
+      <spanx style="verb">true</spanx>:</preamble><artwork>
+  {
+    "contains": "/a/b", "value": " is a "
+  }
+    </artwork></figure>
+    
+    <t>By default, character matching MUST be performed in a 
+    case-sensitive manner unless the value of the predicate's optional <spanx style="verb">ignore_case</spanx> member is <spanx style="verb">true</spanx>.</t>
+    
+    <figure><preamble>For instance, the following will evaluate as <spanx style="verb">true</spanx>:</preamble><artwork>
+  {
+    "contains": "/a/b/", "value": " Is A ", "ignore_case": true
+  }
+    </artwork></figure>
+
+  </section>
+  
+  <section anchor="ends_with" title="ends_with">
+    
+    <t>The <spanx style="verb">ends_with</spanx> predicate evaluates
+    as true if, and only if, the referenced element is defined and 
+    has a value whose string representation ends with the exact
+    sequence of characters given by the predicate object's 
+    <spanx style="verb">value</spanx> member.</t>
+    
+    <figure><preamble>For example, given the JSON document:</preamble>
+    <artwork>
+  {
+    "a": {
+      "b": "This is a test"
+    }
+  }
+    </artwork></figure>
+  
+    <figure><preamble>The following predicate would evaluate as 
+      <spanx style="verb">true</spanx>:</preamble><artwork>
+  {
+    "ends_with": "/a/b", "value": " test"
+  }
+    </artwork></figure>
+    
+    <t>By default, character matching MUST be performed in a 
+    case-sensitive manner unless the value of the predicate's optional <spanx style="verb">ignore_case</spanx> member is <spanx style="verb">true</spanx>.</t>
+    
+    <figure><preamble>For instance, the following will evaluate as <spanx style="verb">true</spanx>:</preamble><artwork>
+  {
+    "ends_with": "/a/b/", "value": " TEST", "ignore_case": true
+  }
+    </artwork></figure> 
+    
+  </section>
+  
+  <section anchor="less_than" title="less_than">
+    
+    <t>The <spanx style="verb">less_than</spanx> predicate evaluates
+    as true if, and only if, the referenced element is defined and 
+    specifies a number whose value is less than that specified by the 
+    predicate object's <spanx style="verb">value</spanx> member.</t>
+    
+    <figure><preamble>For example, given the JSON document:</preamble>
+    <artwork>
+  {
+    "a": {
+      "b": 10
+    }
+  }
+    </artwork></figure>
+    
+    <figure><preamble>The following will evaluate as 
+      <spanx style="verb">true</spanx>:</preamble><artwork>
+  {
+    "less_than": "/a/b", "value": 15
+  }
+    </artwork></figure>
+    
+  </section>
+
+  <section anchor="matches" title="matches">
+    
+    <t>The <spanx style="verb">matches</spanx> predicate evaluates
+    as true if, and only if, the referenced element is defined and
+    has a value whose string representation matches the regular 
+    expression provided by the predicate object's <spanx style="verb">value</spanx> member.</t>
+    
+    <figure><preamble>For example, given the JSON document:</preamble>
+    <artwork>
+  {
+    "a": {
+      "b": "this is a test"
+    }
+  }
+    </artwork></figure>
+    
+    <figure><preamble>The following evalutes as 
+      <spanx style="verb">true</spanx>:</preamble><artwork>
+  {
+    "matches": "/a/b", "value": "/is a/"
+  }
+    </artwork></figure>
+    
+    <t>The predicate's matching pattern is expressed as a string 
+    value following the JavaScript Regular Expression syntax.</t> 
+    
+  </section>
+    
+  <section anchor="more_than" title="more_than">
+    
+    <t>The <spanx style="verb">more_than</spanx> predicate evaluates
+    as true if, and only if, the referenced element is defined and 
+    specifies a number whose value is greater than that specified by the 
+    predicate object's <spanx style="verb">value</spanx> member.</t>
+    
+    <figure><preamble>For example, given the JSON document:</preamble>
+    <artwork>
+  {
+    "a": {
+      "b": 10
+    }
+  }
+    </artwork></figure>
+    
+    <figure><preamble>The following will evaluate as 
+      <spanx style="verb">true</spanx>:</preamble><artwork>
+  {
+    "more_than": "/a/b", "value": 5
+  }
+    </artwork></figure>
+    
+  </section>
+
+  <section anchor="starts_with" title="starts_with">
+    
+    <t>The <spanx style="verb">starts_with</spanx> predicate evaluates
+    as true if, and only if, the referenced element is defined and 
+    has a value whose string representation begins with the exact
+    sequence of characters given by the predicate object's 
+    <spanx style="verb">value</spanx> member.</t>
+    
+    <figure><preamble>For example, given the JSON document:</preamble>
+    <artwork>
+  {
+    "a": {
+      "b": "This is a test"
+    }
+  }
+    </artwork></figure>
+  
+    <figure><preamble>The following predicate would evaluate as 
+      <spanx style="verb">true</spanx>:</preamble><artwork>
+  {
+    "starts_with": "/a/b", "value": "This "
+  }
+    </artwork></figure>
+    
+    <t>By default, character matching MUST be performed in a 
+    case-sensitive manner unless the value of the predicate's optional <spanx style="verb">ignore_case</spanx> member is <spanx style="verb">true</spanx>.</t>
+    
+    <figure><preamble>For instance, the following will evaluate as <spanx style="verb">true</spanx>:</preamble><artwork>
+  {
+    "starts_with": "/a/b/", "value": "this ", "ignore_case": true
+  }
+    </artwork></figure> 
+    
+  </section>
+    
+  <section anchor="test" title="test">
+    
+    <t>The <spanx style="verb">test</spanx> predicate can be used to 
+    determine if a given element exists and if it's value is equal to
+    a specified value.</t>
+    
+    <figure><preamble>For example, given the JSON document:</preamble>
+    <artwork>
+  {
+    "a": {
+      "b": "this is a test"
+    }
+  }
+    </artwork></figure>
+    
+    <figure><preamble>The following predicate evaluates as 
+      <spanx style="verb">true</spanx> because the element 
+      "/a/b" exists.</preamble>
+    <artwork>
+  {
+    "test": "/a/b"
+  }    
+    </artwork></figure>
+    
+    <t>When the predicate contains a <spanx style="verb">value</spanx>
+    member, the predicate tests that the value of the given element 
+    is equal to the value specified.</t>
+    
+    <figure><preamble>The following predicate evaluates as 
+      <spanx style="verb">true</spanx> because the value of 
+      element "/a/b" is equal to "this is a test".</preamble>
+    <artwork>
+  {
+    "test": "/a/b", "value": "this is a test"
+  }    
+    </artwork></figure>
+    
+    <t>The <spanx style="verb">test</spanx> predicate is defined
+    to exactly mimic the definition of JSON Patch's <spanx style="verb">test</spanx> operation, and as such adheres to 
+    identical semantics when determining the value equality.</t>
+    
+    <t>Specifically, as defined by JSON Patch: values are equal
+      if they are of the same JSON type and are considered equal 
+      by the following rules for each type (adapted from the 
+      JSON-Patch specification and included here as a conventient
+      reference):
+      <list style="symbols">
+        <t>strings: are considered equal if, after unescaping any sequence(s) in both strings starting with a reverse solidus, they contain the same number of Unicode characters and their code points are position-wise equal.</t>
+        <t>numbers: are considered equal if subtracting one from the other results in 0.</t>
+        <t>arrays: are considered equal if they contain the same number of values, and each value can be considered equal to the value at the corresponding position in the other array.</t>
+        <t>objects: are considered equal if they contain the same number of members, and each member can be considered equal to a member in the other object, by comparing their keys as strings, and values using this list of type-specific rules.</t>
+        <t>literals (false, true and null): are considered equal if they are the same.</t>
+      </list>
+    </t>
+ 
+    <t>As is also the case with JSON-Patch, these checks are logical comparisons that ignore, for instance, whitespace between member values of an array and the ordering of members in an object.</t>
+    
+    <t>Unlike JSON-Patch, a <spanx style="verb">test</spanx>
+      predicate MAY contain an additional boolean
+      <spanx style="verb">ignore_case</spanx> member that, when 
+      set to <spanx style="verb">true</spanx>, modifies the 
+      string equality check described above to ignore case.</t>
+      
+  </section>
+  
+  <section anchor="type_of" title="type_of">
+    
+    <t>The <spanx style="verb">type_of</spanx> predicate 
+    evaluates as true if, and only if, the referenced element
+    exists and specifies a values whose JSON type is equal to
+    that specified by the predicate's <spanx style="verb">value</spanx> member.</t>
+    
+    <t>The possible values that can be specified are: "number",
+    "string", "boolean", "object", "array", "null" or 
+    "undefined".</t>
+    
+    <figure><preamble>For example, given the JSON document:</preamble><artwork>
+  {
+    "a": {
+      "b": "this is a test",
+      "c": [1,2,3]
+    }
+  }
+    </artwork></figure>
+    
+    <figure><preamble>The following predicate would evaluate as 
+      <spanx style="verb">true</spanx></preamble><artwork>
+  {
+    "type_of": "/a/b", "value": "string"
+  }
+    </artwork></figure>
+
+    <t>Note that the <spanx style="verb">type_of</spanx> predicate
+    is generally identical to JavaScript's built in <spanx style="verb">typeof</spanx> operator with the exception that 
+    JavaScript's operator does not distinguish between Array and 
+    Object types. That is, when executing the JavaScript code
+    <spanx style="verb">typeof doc.a.c</spanx> against the 
+    example JSON document given above, JavaScript will report 
+    the type as "object" rather than "array". By contrast, the 
+    <spanx style="verb">type_of</spanx> predicate distinguishes
+    the two types of values.</t>
+        
+  </section>
+    
+</section>
+
+<section anchor="aggregates" title="Aggregate Predicates">
+    
+  <section anchor="not" title="not">
+    
+    <t>The <spanx style="verb">not</spanx> predicate
+    evaluates as <spanx style="verb">true</spanx> if, and 
+    only if, each of it's contained set of predicate 
+    operations evaluate as <spanx style="verb">false</spanx>.</t>
+    
+    <figure><preamble>For example, given the JSON 
+      document:</preamble><artwork>
+  {
+    "a" : {
+      "b" : "foo",
+      "c" : {
+        "d": 10
+      }
+    }
+  }
+    </artwork></figure>
+    
+    <figure><preamble>The following would evaluate as <spanx style="verb">true</spanx> because the element "/a/b/e" is undefined and the value of element "/a/c/d" is not less than 5.</preamble><artwork>
+  {
+    "not": [
+      {"test": "/a/b/e"},
+      {"less_than": "/a/c/d", "value": 5}
+    ]
+  }
+    </artwork></figure>
+    
+    <figure><preamble>However, the following would evaluate as 
+      <spanx style="verb">false</spanx> because the element "/a/c"
+      exists and the value for element "/a/b" begins with the letter
+      "f"</preamble><artwork>
+  {
+    "not": [
+      {"not":[{"test": "/a/c"}]},
+      {"starts_with": "/a/b", "value": "f"}
+    ]
+  }
+    </artwork></figure>    
+  </section>
+  
+  <section anchor="and" title="and">
+    
+    <t>The <spanx style="verb">and</spanx> predicate
+    evaluates as <spanx style="verb">true</spanx> if, and 
+    only if, all of it's contained set of predicate 
+    operations evaluate as <spanx style="verb">true</spanx>.</t>
+
+    <figure><preamble>For example, given the JSON 
+      document:</preamble><artwork>
+  {
+    "a" : {
+      "b" : "foo",
+      "c" : {
+        "d": 10
+      }
+    }
+  }
+    </artwork></figure>
+    
+    <figure><preamble>The following would evaluate as <spanx style="verb">true</spanx> because the element "/a/b" is defined and the value of element "/a/c/d" is less than 15.</preamble><artwork>
+  {
+    "and": [
+      {"test": "/a/b"},
+      {"less_than": "/a/c/d", "value": 15}
+    ]
+  }
+    </artwork></figure>
+    
+    <figure><preamble>However, the following would evaluate as 
+      <spanx style="verb">false</spanx> because the while element 
+      "/a/c" exists, the value of that element is not a 
+      string.</preamble><artwork>
+  {
+    "and": [
+      {"test": "/a/c"},
+      {"type_of": "/a/c", "value": "string"}
+    ]
+  }
+    </artwork></figure>
+    
+  </section>
+  
+  <section anchor="or" title="or">
+
+    <t>The <spanx style="verb">or</spanx> predicate
+    evaluates as <spanx style="verb">true</spanx> if, and 
+    only if, at least one of it's contained set of predicate 
+    operations evaluate as <spanx style="verb">true</spanx>.</t>
+
+    <figure><preamble>For example, given the JSON 
+      document:</preamble><artwork>
+  {
+    "a" : {
+      "b" : "foo",
+      "c" : {
+        "d": 10
+      }
+    }
+  }
+    </artwork></figure>
+    
+    <figure><preamble>The following would evaluate as <spanx style="verb">true</spanx> because the element "/a/b" is defined.</preamble><artwork>
+  {
+    "or": [
+      {"test": "/a/b"},
+      {"less_than": "/a/c/d", "value": 5}
+    ]
+  }
+    </artwork></figure>
+    
+    <figure><preamble>However, the following would evaluate as 
+      <spanx style="verb">false</spanx> because neither elements "/a/e" or "/a/f" exist.</preamble><artwork>
+  {
+    "or": [
+      {"test": "/a/e"},
+      {"test": "/a/f"}
+    ]
+  }
+    </artwork></figure>   
+
+  </section>
+  
+  <section title="Nesting Aggregate Predicates">
+    
+    <t>Aggregate Predicate objects can be combined to defined 
+      more complex test operations. For example:</t>
+    
+    <figure><artwork>
+  {
+    "or": [
+      {"not": [
+        "test": "/a/b/c",
+        "starts_with": "/a/b/c", "value": "f"
+      ]},
+      {"not": [
+        "test": "/a/b/d",
+        "type_of": "/a/b/d", "value": "number"
+      ]}
+    ]
+  }
+    </artwork></figure>
+    
+  </section>
+  
+</section>
+        
+<section title="Security Considerations">
+<t>None.</t>
+</section>
+
+</middle> 
+<back>
+<references title="Normative References"> 
+  &rfc2119;
+  &rfc6415;
+  &rfc5785;
+  &rfc6570;
+</references>
+</back>
+</rfc> 
+ 
