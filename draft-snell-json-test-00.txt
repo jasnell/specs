@@ -2,17 +2,18 @@
 
 
 Network Working Group                                           J. Snell
-Internet-Draft                                        September 17, 2012
+Internet-Draft                                           October 2, 2012
 Intended status: Informational
-Expires: March 21, 2013
+Expires: April 5, 2013
 
 
-                               JSON Test
+                             JSON Predicate
                         draft-snell-json-test-00
 
 Abstract
 
-   TBD
+   JSON Predicates defines a syntax for serializing various predicate
+   expressions as JSON Objects.
 
 Status of this Memo
 
@@ -29,7 +30,7 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on March 21, 2013.
+   This Internet-Draft will expire on April 5, 2013.
 
 Copyright Notice
 
@@ -51,33 +52,36 @@ Copyright Notice
 
 
 
-
-Snell                    Expires March 21, 2013                 [Page 1]
+Snell                     Expires April 5, 2013                 [Page 1]
 
-Internet-Draft           application/merge-patch          September 2012
+Internet-Draft           application/merge-patch            October 2012
 
 
 Table of Contents
 
    1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
-   2.  Predicates . . . . . . . . . . . . . . . . . . . . . . . . . .  3
-     2.1.  base . . . . . . . . . . . . . . . . . . . . . . . . . . .  3
-     2.2.  contains . . . . . . . . . . . . . . . . . . . . . . . . .  3
-     2.3.  ends_with  . . . . . . . . . . . . . . . . . . . . . . . .  4
-     2.4.  less_than  . . . . . . . . . . . . . . . . . . . . . . . .  5
-     2.5.  matches  . . . . . . . . . . . . . . . . . . . . . . . . .  5
-     2.6.  more_than  . . . . . . . . . . . . . . . . . . . . . . . .  6
-     2.7.  starts_with  . . . . . . . . . . . . . . . . . . . . . . .  6
-     2.8.  test . . . . . . . . . . . . . . . . . . . . . . . . . . .  7
-     2.9.  type_of  . . . . . . . . . . . . . . . . . . . . . . . . .  8
-   3.  Aggregate Predicates . . . . . . . . . . . . . . . . . . . . .  9
-     3.1.  not  . . . . . . . . . . . . . . . . . . . . . . . . . . .  9
-     3.2.  and  . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
-     3.3.  or . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
-     3.4.  Nesting Aggregate Predicates . . . . . . . . . . . . . . . 11
-   4.  Security Considerations  . . . . . . . . . . . . . . . . . . . 12
-   5.  Normative References . . . . . . . . . . . . . . . . . . . . . 12
-   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 12
+   2.  Predicate Objects  . . . . . . . . . . . . . . . . . . . . . .  4
+     2.1.  Predicate Context  . . . . . . . . . . . . . . . . . . . .  5
+     2.2.  First Order Predicates . . . . . . . . . . . . . . . . . .  6
+       2.2.1.  contains . . . . . . . . . . . . . . . . . . . . . . .  6
+       2.2.2.  defined  . . . . . . . . . . . . . . . . . . . . . . .  7
+       2.2.3.  ends . . . . . . . . . . . . . . . . . . . . . . . . .  7
+       2.2.4.  less . . . . . . . . . . . . . . . . . . . . . . . . .  8
+       2.2.5.  matches  . . . . . . . . . . . . . . . . . . . . . . .  9
+       2.2.6.  more . . . . . . . . . . . . . . . . . . . . . . . . . 10
+       2.2.7.  starts . . . . . . . . . . . . . . . . . . . . . . . . 10
+       2.2.8.  type . . . . . . . . . . . . . . . . . . . . . . . . . 11
+       2.2.9.  undefined  . . . . . . . . . . . . . . . . . . . . . . 12
+     2.3.  Second-Order Predicates  . . . . . . . . . . . . . . . . . 12
+       2.3.1.  and  . . . . . . . . . . . . . . . . . . . . . . . . . 13
+       2.3.2.  not  . . . . . . . . . . . . . . . . . . . . . . . . . 14
+       2.3.3.  or . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+       2.3.4.  Nesting Second Order Predicates  . . . . . . . . . . . 17
+     2.4.  Error Handling . . . . . . . . . . . . . . . . . . . . . . 18
+     2.5.  Using JSON Predicate within JSON Patch Documents . . . . . 19
+   3.  Security Considerations  . . . . . . . . . . . . . . . . . . . 20
+   4.  Normative References . . . . . . . . . . . . . . . . . . . . . 20
+   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 20
 
 
 
@@ -104,538 +108,988 @@ Table of Contents
 
 
 
-
-
-
-
-Snell                    Expires March 21, 2013                 [Page 2]
+Snell                     Expires April 5, 2013                 [Page 2]
 
-Internet-Draft           application/merge-patch          September 2012
+Internet-Draft           application/merge-patch            October 2012
 
 
 1.  Introduction
 
-   TBD
+   This specification defines JSON Predicates, a JSON-based syntax for
+   the description and serialization of logical boolean predicate
+   operations intended to be used in conjunction with other JSON-based
+   mechanisms, such as JSON Patch, as a means of incorporating
+   conditional handling during the processing of a JSON document.
+
+   For example, JSON Predicates can be used to extend a JSON Patch
+   [I-D.ietf-appsawg-json-patch] document to provide a broader range of
+   conditional processing options not currently supported by JSON Patch.
+
+   Example: Given a source JSON document
+
+     {
+       "a": {
+         "b": {
+           "c": "ABC!XYZ"
+         }
+       }
+     }
+
+   The following JSON Patch with JSON Predicates document will first
+   test that the value of the "c" property is a string containing the
+   character sequence "ABC" prior to applying the specified "replace"
+   operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                     Expires April 5, 2013                 [Page 3]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
+     [
+       {
+         "op": "and",
+         "path": "/a/b",
+         "apply": [
+           {
+             "op": "type-of",
+             "path": "/a/b/c",
+             "value": "string"
+           },
+           {
+             "op": "contains",
+             "path": "/a/b/c",
+             "value": "ABC"
+           }
+         ]
+       },
+       {
+         "op": "replace",
+         "path": "/a/b/c",
+         "value": 123
+       }
+     ]
+
+   It is important to note this specification does not define a distinct
+   JSON Predicates Document format.  Rather, it is the intent for JSON
+   Predicates to be used within other JSON-based document formats, like
+   JSON Patch.
+
+   TODO: Lots more needs to be said here.
 
    In this document, the key words "MUST", "MUST NOT", "REQUIRED",
    "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
    and "OPTIONAL" are to be interpreted as described in [RFC2119].
 
 
-2.  Predicates
+2.  Predicate Objects
 
-2.1.  base
+   A JSON Predicate is a JSON Object whose name value pairs describe a
+   testable conditions that evaluate as either true or false.
 
-   The "base" predicate is a special-case used to establish a root
-   reference point for the evaluation of a contained predicate.  It will
-   evaluate as true if, and only if, its contained predicate evaluates
-   as true.
+   The essential components of a JSON Predicate include:
+   o  A label identifying the predicate operation,
+   o  A reference to the value that is to be tested, and
+   o  A condition against which that referenced value is to be
+      evaluated.
 
-   For example, given the JSON document:
-
-     {
-       "a": {
-         "b": {
-           "c": "this is a test"
-         }
-       }
-     }
-
-   The following establishes the path "/a" as the root against which the
-   contained "test" predicate is evaluated:
-
-     {
-       "base": "/a", "predicate": {
-         "test": "/b/c", "value": "this is a test"
-       }
-     }
-
-2.2.  contains
-
-   The "contains" predicate evaluates as true if, and only if, the
-   referenced element is defined and has a value whose string
-   representation contains the exact sequence of characters given by the
-   predicate object's "value" member.
+   Predicate objects MUST have exactly one "op" member whose value
 
 
 
-
-
-
-
-
-Snell                    Expires March 21, 2013                 [Page 3]
+Snell                     Expires April 5, 2013                 [Page 4]
 
-Internet-Draft           application/merge-patch          September 2012
+Internet-Draft           application/merge-patch            October 2012
 
+
+   indicates the type of predicate operation to perform.  It's value
+   MUST be one of: "and", "contains", "defined", "ends", "less",
+   "matches", "more", "not", "or", "starts", "type", or "undefined".
+   The semantics for each are defined in the sections that follow.
+
+   Note that the value of the "op" member is case-sensitive and that
+   each of the operations listed are in lower-case.  The value "Starts",
+   for example, is not equivalent to "starts".
+
+   If the "op" member specifies any value other than one of those listed
+   above, the evaluation of the predicate operation MUST cease and
+   treated as if a boolean value of "false" was returned.  The
+   application processing the predicate operation MAY signal that an
+   error condition has occurred depending on the specific requirements
+   of the domain within which JSON Predicates are being used.
+
+   The remaining structure of each predicate operation depends on it's
+   specific type.  There are two basic types of predicates.
+   o  First Order Predicates that are used to test a single discreet
+      name value pair against a single condition and
+   o  Second Order Predicates that aggregate one or more subordinate
+      First or Second Order Predicates.
+
+   In addition to the required "op" member, First Order Predicates MUST
+   have exactly one "path" member whose value MUST be a string
+   containing a JSON-Pointer value referencing the location of the name
+   value pair that is to be tested.
+
+   Second Order Predicates MUST have exactly one "apply" member whose
+   value is a JSON Array containing one or more First or Second Order
+   Predicate Objects.
+
+   Additional members can be required depending on the specific
+   predicate operation.  All other members not explicitly defined by
+   this specification MUST be ignored.
+
+   Note that the ordering of members in JSON objects is not significant;
+   therefore the following operations are equivalent:
+
+   {"op": "contains", "path": "/a/b/c", "value": "ABC"}
+   {"path": "/a/b/c", "op": "contains", "value": "ABC"}
+   {"value": "ABC", "path": "/a/b/c", "op": "contains"}
+
+2.1.  Predicate Context
+
+   All JSON Predicates are evaluated against a given base context.  The
+   nature of this context is dependent entirely on the application
+   within which JSON Predicates is being used.  For instance, when used
+
+
+
+Snell                     Expires April 5, 2013                 [Page 5]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
+   together with JSON Patch, the JSON Predicate operations are evaluated
+   relative to the JSON document that is the target of the JSON Patch
+   operation.
+
+   Although Predicate Objects use JSON Pointer references to identify
+   values against which a predicate operation is evaluated, the base
+   context is not required to be a JSON object or array.  In such cases,
+   however, it is the responsibility of the application implementation
+   to determine how to interpret the JSON Pointer reference relative to
+   the base context.
+
+2.2.  First Order Predicates
+
+2.2.1.  contains
+
+   The "contains" predicate evaluates as true if the referenced element
+   is defined and has a value whose string representation contains the
+   exact sequence of characters given by the predicate object's "value"
+   member.
 
    For example, given the JSON document:
 
-     {
-       "a": {
-         "b": "This is a test"
-       }
+   {
+     "a": {
+       "b": "This is a test"
      }
+   }
 
    The following predicate would evaluate as "true":
 
-     {
-       "contains": "/a/b", "value": " is a "
-     }
+   {
+     "op": "contains",
+     "path": "/a/b",
+     "value": " is a "
+   }
 
    By default, character matching MUST be performed in a case-sensitive
-   manner unless the value of the predicate's optional "ignore_case"
-   member is "true".
+   manner.  To override this default behavior, the predicate object MAY
+   contain an "ignore_case" member whose value is either "true" (to
+   perform case-insensitive matching) or false.
+
+
+
+
+
+
+
+
+
+
+
+Snell                     Expires April 5, 2013                 [Page 6]
+
+Internet-Draft           application/merge-patch            October 2012
+
 
    For instance, the following will evaluate as "true":
 
-     {
-       "contains": "/a/b/", "value": " Is A ", "ignore_case": true
-     }
+   {
+     "op": "contains",
+     "path": "/a/b/",
+     "value": " Is A ",
+     "ignore_case": true
+   }
 
-2.3.  ends_with
+2.2.2.  defined
 
-   The "ends_with" predicate evaluates as true if, and only if, the
-   referenced element is defined and has a value whose string
-   representation ends with the exact sequence of characters given by
-   the predicate object's "value" member.
+   The "defined" predicate evaluates as true if the referenced element
+   exists within the target context.
 
    For example, given the JSON document:
 
-     {
-       "a": {
-         "b": "This is a test"
-       }
+   {
+   "a": {
+     "b": null
+    }
+   }
+
+   The following predicate would evaluate as "true" because the path
+   "/a/b" exist within the document despite being explicitly set to
+   null:
+
+   {
+     "op": "defined",
+     "path": "/a/b"
+   }
+
+   The following predicate would evaluate as "false" because the path
+   "/a/c" does exist within the document.
+
+   {
+     "op": "defined",
+     "path": "/a/c"
+   }
+
+2.2.3.  ends
+
+   The "ends" predicate evaluates as true if the referenced element is
+   defined and has a value whose string representation ends with the
+   exact sequence of characters given by the predicate object's "value"
+   member.
+
+
+
+
+
+
+Snell                     Expires April 5, 2013                 [Page 7]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
+   For example, given the JSON document:
+
+   {
+     "a": {
+       "b": "This is a test"
      }
+   }
 
    The following predicate would evaluate as "true":
 
-     {
-       "ends_with": "/a/b", "value": " test"
-     }
+   {
+     "op": "ends",
+     "path": "/a/b",
+     "value": " test"
+   }
 
    By default, character matching MUST be performed in a case-sensitive
-   manner unless the value of the predicate's optional "ignore_case"
-   member is "true".
-
-
-
-Snell                    Expires March 21, 2013                 [Page 4]
-
-Internet-Draft           application/merge-patch          September 2012
-
+   manner.  To override this default behavior, the predicate object MAY
+   contain an "ignore_case" member whose value is either "true" (to
+   perform case-insensitive matching) or false.
 
    For instance, the following will evaluate as "true":
 
-     {
-       "ends_with": "/a/b/", "value": " TEST", "ignore_case": true
-     }
+   {
+     "op": "ends",
+     "path": "/a/b/",
+     "value": " TEST",
+     "ignore_case": true
+   }
 
-2.4.  less_than
+2.2.4.  less
 
-   The "less_than" predicate evaluates as true if, and only if, the
-   referenced element is defined and specifies a number whose value is
-   less than that specified by the predicate object's "value" member.
+   The "less" predicate evaluates as true if the referenced element is
+   defined and specifies a number whose value is less than that
+   specified by the predicate object's "value" member.
 
    For example, given the JSON document:
 
-     {
-       "a": {
-         "b": 10
-       }
+   {
+     "a": {
+       "b": 10
      }
+   }
+
+
+
+
+
+
+
+
+Snell                     Expires April 5, 2013                 [Page 8]
+
+Internet-Draft           application/merge-patch            October 2012
+
 
    The following will evaluate as "true":
 
-     {
-       "less_than": "/a/b", "value": 15
-     }
+   {
+     "op": "less",
+     "path": "/a/b",
+     "value": 15
+   }
 
-2.5.  matches
+2.2.5.  matches
 
-   The "matches" predicate evaluates as true if, and only if, the
-   referenced element is defined and has a value whose string
-   representation matches the regular expression provided by the
-   predicate object's "value" member.
+   The "matches" predicate evaluates as true if the referenced element
+   is defined and has a value whose string representation matches the
+   regular expression provided by the predicate object's "value" member.
 
    For example, given the JSON document:
 
-     {
-       "a": {
-         "b": "this is a test"
-       }
+   {
+     "a": {
+       "b": "this is a test"
      }
+   }
 
    The following evalutes as "true":
 
-     {
-       "matches": "/a/b", "value": "/is a/"
-     }
+   {
+     "op": "matches",
+     "path": "/a/b",
+     "value": "[\\w\\s]*"
+   }
 
    The predicate's matching pattern is expressed as a string value
+   conforming to the JavaScript Regular Expression syntax.
+
+   By default, character matching MUST be performed in a case-sensitive
+   manner.  To override this default behavior, the predicate object MAY
+   contain an "ignore_case" member whose value is either "true" (to
+   perform case-insensitive matching) or false.  Setting the value of
+   "ignore_case" to true is equivalent to using the "i" modifier flag
+   within the JavaScript Regular Expression syntax (e.g. "/\w\s/*/i").
+
+   For instance:
+
+   {
+     "op": "ends",
+     "path": "/a/b/",
+     "value": "[\\w\\s]*",
+     "ignore_case": true
+   }
 
 
 
-Snell                    Expires March 21, 2013                 [Page 5]
+Snell                     Expires April 5, 2013                 [Page 9]
 
-Internet-Draft           application/merge-patch          September 2012
+Internet-Draft           application/merge-patch            October 2012
 
 
-   following the JavaScript Regular Expression syntax.
+2.2.6.  more
 
-2.6.  more_than
-
-   The "more_than" predicate evaluates as true if, and only if, the
-   referenced element is defined and specifies a number whose value is
-   greater than that specified by the predicate object's "value" member.
+   The "more" predicate evaluates as true if the referenced element is
+   defined and specifies a number whose value is greater than that
+   specified by the predicate object's "value" member.
 
    For example, given the JSON document:
 
-     {
-       "a": {
-         "b": 10
-       }
+   {
+     "a": {
+       "b": 10
      }
+   }
 
    The following will evaluate as "true":
 
-     {
-       "more_than": "/a/b", "value": 5
-     }
+   {
+     "op": "more",
+     "path": "/a/b",
+     "value": 5
+   }
 
-2.7.  starts_with
+2.2.7.  starts
 
-   The "starts_with" predicate evaluates as true if, and only if, the
-   referenced element is defined and has a value whose string
-   representation begins with the exact sequence of characters given by
-   the predicate object's "value" member.
+   The "starts" predicate evaluates as true if the referenced element is
+   defined and has a value whose string representation begins with the
+   exact sequence of characters given by the predicate object's "value"
+   member.
 
    For example, given the JSON document:
 
-     {
-       "a": {
-         "b": "This is a test"
-       }
+   {
+     "a": {
+       "b": "This is a test"
      }
+   }
 
    The following predicate would evaluate as "true":
 
-     {
-       "starts_with": "/a/b", "value": "This "
-     }
+   {
+     "op": "starts",
+     "path": "/a/b",
+     "value": "This "
+   }
 
    By default, character matching MUST be performed in a case-sensitive
-   manner unless the value of the predicate's optional "ignore_case"
-   member is "true".
+   manner.  To override this default behavior, the predicate object MAY
+   contain an "ignore_case" member whose value is either "true" (to
 
 
 
-
-
-Snell                    Expires March 21, 2013                 [Page 6]
+Snell                     Expires April 5, 2013                [Page 10]
 
-Internet-Draft           application/merge-patch          September 2012
+Internet-Draft           application/merge-patch            October 2012
 
+
+   perform case-insensitive matching) or false.
 
    For instance, the following will evaluate as "true":
 
-     {
-       "starts_with": "/a/b/", "value": "this ", "ignore_case": true
-     }
+   {
+     "op": "starts",
+     "path": "/a/b/",
+     "value": "this ",
+     "ignore_case": true
+   }
 
-2.8.  test
+2.2.8.  type
 
-   The "test" predicate can be used to determine if a given element
-   exists and if it's value is equal to a specified value.
+   The "type" predicate evaluates as true if the referenced element
+   exists and specifies a value whose JSON type is equal to that
+   specified by the predicate's "value" member.
 
-   For example, given the JSON document:
-
-     {
-       "a": {
-         "b": "this is a test"
-       }
-     }
-
-   The following predicate evaluates as "true" because the element
-   "/a/b" exists.
-
-     {
-       "test": "/a/b"
-     }
-
-   When the predicate contains a "value" member, the predicate tests
-   that the value of the given element is equal to the value specified.
-
-   The following predicate evaluates as "true" because the value of
-   element "/a/b" is equal to "this is a test".
-
-     {
-       "test": "/a/b", "value": "this is a test"
-     }
-
-   The "test" predicate is defined to exactly mimic the definition of
-   JSON Patch's "test" operation, and as such adheres to identical
-   semantics when determining the value equality.
-
-   Specifically, as defined by JSON Patch: values are equal if they are
-   of the same JSON type and are considered equal by the following rules
-   for each type (adapted from the JSON-Patch specification and included
-   here as a conventient reference):
-   o  strings: are considered equal if, after unescaping any sequence(s)
-      in both strings starting with a reverse solidus, they contain the
-      same number of Unicode characters and their code points are
-      position-wise equal.
-
-
-
-Snell                    Expires March 21, 2013                 [Page 7]
-
-Internet-Draft           application/merge-patch          September 2012
-
-
-   o  numbers: are considered equal if subtracting one from the other
-      results in 0.
-   o  arrays: are considered equal if they contain the same number of
-      values, and each value can be considered equal to the value at the
-      corresponding position in the other array.
-   o  objects: are considered equal if they contain the same number of
-      members, and each member can be considered equal to a member in
-      the other object, by comparing their keys as strings, and values
-      using this list of type-specific rules.
-   o  literals (false, true and null): are considered equal if they are
-      the same.
-
-   As is also the case with JSON-Patch, these checks are logical
-   comparisons that ignore, for instance, whitespace between member
-   values of an array and the ordering of members in an object.
-
-   Unlike JSON-Patch, a "test" predicate MAY contain an additional
-   boolean "ignore_case" member that, when set to "true", modifies the
-   string equality check described above to ignore case.
-
-2.9.  type_of
-
-   The "type_of" predicate evaluates as true if, and only if, the
-   referenced element exists and specifies a values whose JSON type is
-   equal to that specified by the predicate's "value" member.
-
-   The possible values that can be specified are: "number", "string",
+   The "value" member MUST specify one of: "number", "string",
    "boolean", "object", "array", "null" or "undefined".
 
    For example, given the JSON document:
 
-     {
-       "a": {
-         "b": "this is a test",
-         "c": [1,2,3]
-       }
+   {
+     "a": {
+       "b": "this is a test",
+       "c": [1,2,3]
      }
+   }
 
    The following predicate would evaluate as "true"
 
-     {
-       "type_of": "/a/b", "value": "string"
-     }
+   {
+     "op": "type",
+     "path": "/a/b",
+     "value": "string"
+   }
 
-   Note that the "type_of" predicate is generally identical to
-   JavaScript's built in "typeof" operator with the exception that
-   JavaScript's operator does not distinguish between Array and Object
-   types.  That is, when executing the JavaScript code "typeof doc.a.c"
+   Note that the "type" predicate is generally identical to JavaScript's
+   built in "typeof" operator with the exception that JavaScript's
+   operator does not distinguish between Array and Object types.  That
+   is, when executing the JavaScript code "typeof doc.a.c" against the
+   example JSON document given above, JavaScript will report the type as
+   "object" rather than "array".  By contrast, the "type" predicate
+   distinguishes the two types of values.
 
 
 
-Snell                    Expires March 21, 2013                 [Page 8]
+
+
+
+
+Snell                     Expires April 5, 2013                [Page 11]
 
-Internet-Draft           application/merge-patch          September 2012
+Internet-Draft           application/merge-patch            October 2012
 
 
-   against the example JSON document given above, JavaScript will report
-   the type as "object" rather than "array".  By contrast, the "type_of"
-   predicate distinguishes the two types of values.
+2.2.9.  undefined
 
-
-3.  Aggregate Predicates
-
-3.1.  not
-
-   The "not" predicate evaluates as "true" if, and only if, each of it's
-   contained set of predicate operations evaluate as "false".
+   The "undefined" predicate evaluates as true if the referenced element
+   does not exist within the target context.
 
    For example, given the JSON document:
 
-     {
-       "a" : {
-         "b" : "foo",
-         "c" : {
-           "d": 10
-         }
+   {
+   "a": {
+     "b": null
+    }
+   }
+
+   The following predicate would evaluate as "true" because the path
+   "/a/c" does not exist within the document:
+
+   {
+     "op": "undefined",
+     "path": "/a/c"
+   }
+
+   However, the following predicate would evaluate as "false" because
+   the path "/a/b" does exist within the document, despite specifying an
+   explicit null value.
+
+   {
+     "op": "undefined",
+     "path": "/a/b"
+   }
+
+2.3.  Second-Order Predicates
+
+   Second Order Predicates are defined as sets of one or more
+   subordinate First and Second Order Predicates.
+
+   All Second Order Predicates MAY contain a "path" member whose value
+   specifies a root path prefix for all contained predicates.  For
+   example, given the JSON document:
+
+   {
+     "a": {
+       "b": {
+         "c": "ABC!"
        }
      }
+   }
+
+
+
+
+
+Snell                     Expires April 5, 2013                [Page 12]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
+   The following would evaluate as true because the path "/a/b/c" is
+   defined.
+
+   {
+     "op": "and",
+     "path": "/a/b",
+     "apply": [
+       {
+         "op": "defined",
+         "path": "/c"
+       }
+     ]
+   }
+
+   The above example is equivalent to:
+
+       {
+         "op": "and",
+         "apply": [
+           {
+             "op": "defined",
+             "path": "/a/b/c"
+           }
+         ]
+       }
+
+2.3.1.  and
+
+   The "and" predicate evaluates as "true" if all of it's contained set
+   of predicate operations evaluate as "true".
+
+   For example, given the JSON document:
+
+   {
+     "a" : {
+       "b" : "foo",
+       "c" : {
+         "d": 10
+       }
+     }
+   }
+
+
+
+
+
+
+
+
+
+
+Snell                     Expires April 5, 2013                [Page 13]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
+   The following would evaluate as "true" because the element "/a/b" is
+   defined and the value of element "/a/c/d" is less than 15.
+
+   {
+     "op": "and",
+     "apply" [
+       {
+         "op": "defined",
+         "path": "/a/b"
+       },
+       {
+         "op": "less",
+         "path": "/a/c/d",
+         "value": 15
+       }
+     ]
+   }
+
+   However, the following would evaluate as "false" because the while
+   element "/a/c" exists, the value of that element is not a string.
+
+   {
+     "op": "and",
+     "apply": [
+       {
+         "op": "test",
+         "path": "/a/c"
+       },
+       {
+         "op": "type",
+         "path": "/a/c",
+         "value": "string"
+       }
+     ]
+   }
+
+2.3.2.  not
+
+   The "not" predicate evaluates as "true" if all of it's contained set
+   of predicate operations evaluate as "false".
+
+
+
+
+
+
+
+
+
+
+
+Snell                     Expires April 5, 2013                [Page 14]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
+   For example, given the JSON document:
+
+   {
+     "a" : {
+       "b" : "foo",
+       "c" : {
+         "d": 10
+       }
+     }
+   }
 
    The following would evaluate as "true" because the element "/a/b/e"
    is undefined and the value of element "/a/c/d" is not less than 5.
 
-     {
-       "not": [
-         {"test": "/a/b/e"},
-         {"less_than": "/a/c/d", "value": 5}
-       ]
-     }
+   {
+     "op": "not",
+     "apply": [
+       {
+         "op": "defined",
+         "path": "/a/b/e"
+       },
+       {
+         "op": "less",
+         "path": "/a/c/d",
+         "value": 5
+       }
+     ]
+   }
 
    However, the following would evaluate as "false" because the element
    "/a/c" exists and the value for element "/a/b" begins with the letter
    "f"
 
-     {
-       "not": [
-         {"not":[{"test": "/a/c"}]},
-         {"starts_with": "/a/b", "value": "f"}
-       ]
-     }
+   {
+     "op": "not",
+     "apply": [
+       {
+         "op": "undefined",
+         "path": "/a/c"
+       },
+       {
+         "op": "starts",
+         "path": "/a/b",
+         "value": "f"
+       }
+     ]
+   }
 
 
 
 
-
-
-
-
-Snell                    Expires March 21, 2013                 [Page 9]
+Snell                     Expires April 5, 2013                [Page 15]
 
-Internet-Draft           application/merge-patch          September 2012
+Internet-Draft           application/merge-patch            October 2012
 
 
-3.2.  and
+2.3.3.  or
 
-   The "and" predicate evaluates as "true" if, and only if, all of it's
+   The "or" predicate evaluates as "true" if at least one of it's
    contained set of predicate operations evaluate as "true".
 
    For example, given the JSON document:
 
-     {
-       "a" : {
-         "b" : "foo",
-         "c" : {
-           "d": 10
-         }
+   {
+     "a" : {
+       "b" : "foo",
+       "c" : {
+         "d": 10
        }
      }
-
-   The following would evaluate as "true" because the element "/a/b" is
-   defined and the value of element "/a/c/d" is less than 15.
-
-     {
-       "and": [
-         {"test": "/a/b"},
-         {"less_than": "/a/c/d", "value": 15}
-       ]
-     }
-
-   However, the following would evaluate as "false" because the while
-   element "/a/c" exists, the value of that element is not a string.
-
-     {
-       "and": [
-         {"test": "/a/c"},
-         {"type_of": "/a/c", "value": "string"}
-       ]
-     }
-
-3.3.  or
-
-   The "or" predicate evaluates as "true" if, and only if, at least one
-   of it's contained set of predicate operations evaluate as "true".
-
-
-
-
-
-
-
-
-
-
-
-Snell                    Expires March 21, 2013                [Page 10]
-
-Internet-Draft           application/merge-patch          September 2012
-
-
-   For example, given the JSON document:
-
-     {
-       "a" : {
-         "b" : "foo",
-         "c" : {
-           "d": 10
-         }
-       }
-     }
+   }
 
    The following would evaluate as "true" because the element "/a/b" is
    defined.
 
-     {
-       "or": [
-         {"test": "/a/b"},
-         {"less_than": "/a/c/d", "value": 5}
-       ]
-     }
+   {
+     "op": "or",
+     "apply": [
+       {
+         "op": "defined",
+         "path": "/a/b"
+       },
+       {
+         "op": "less",
+         "path": "/a/c/d",
+         "value": 5
+       }
+     ]
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                     Expires April 5, 2013                [Page 16]
+
+Internet-Draft           application/merge-patch            October 2012
+
 
    However, the following would evaluate as "false" because neither
    elements "/a/e" or "/a/f" exist.
 
-     {
-       "or": [
-         {"test": "/a/e"},
-         {"test": "/a/f"}
-       ]
-     }
+   {
+     "op": "or",
+     "apply": [
+       {
+         "op": "test",
+         "path": "/a/e"
+       },
+       {
+         "op": "test",
+         "path": "/a/f"
+       }
+     ]
+   }
 
-3.4.  Nesting Aggregate Predicates
+2.3.4.  Nesting Second Order Predicates
 
-   Aggregate Predicate objects can be combined to defined more complex
-   test operations.  For example:
-
-     {
-       "or": [
-         {"not": [
-           "test": "/a/b/c",
-           "starts_with": "/a/b/c", "value": "f"
-         ]},
-         {"not": [
-           "test": "/a/b/d",
-           "type_of": "/a/b/d", "value": "number"
-         ]}
-       ]
-     }
+   Second Order Predicates can be combined in a variety of ways to
+   define more complex test operations.  For example:
 
 
 
-Snell                    Expires March 21, 2013                [Page 11]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                     Expires April 5, 2013                [Page 17]
 
-Internet-Draft           application/merge-patch          September 2012
+Internet-Draft           application/merge-patch            October 2012
 
 
-4.  Security Considerations
+   {
+     "op": "or",
+     "apply": [
+       {
+         "op": "not",
+         "apply": [
+           {
+             "op": "defined",
+             "path": "/a/b/c"
+           },
+           {
+             "op": "starts",
+             "path": "/a/b/c",
+             "value": "f"
+           }
+         ]
+       },
+       {
+         "op": "not",
+         "apply": [
+           {
+             "op": "defined",
+             "path": "/a/b/d"
+           },
+           {
+             "op": "type",
+             "path": "/a/b/d",
+             "value": "number"
+           }
+         ]
+       }
+     ]
+   }
 
-   None.
+2.4.  Error Handling
+
+   When an error condition is encounted during the processing of a JSON
+   Predicate, the predicate MUST evaluate as false.
+
+   Error conditions can arise in each of the following conditions:
+   o  JSON Predicate Objects contained within a document fail to conform
+      to any normative requirement of this specification, or
+   o  The Predicate Object specifies an unknown predicate operation, or
+   o  The Predicate Object specifies a JSON Pointer referencing a value
+      that does not exist and the specified Predicate operation is not
+      specifically intended to test for the absence of a value (i.e. the
+      "undefined" predicate), or
 
 
-5.  Normative References
+
+
+Snell                     Expires April 5, 2013                [Page 18]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
+   o  A First Order Predicate Object specifies a predicate operation
+      that requires a "value" member providing the condition to test but
+      no "value" member is provided.
+
+2.5.  Using JSON Predicate within JSON Patch Documents
+
+   While JSON Predicate objects can be used in a variety of
+   applications, the syntax has been specifically designed for
+   compatibility with the JSON Patch Document format.  JSON Predicate
+   objects MAY be used directly within a JSON Patch Document as tests to
+   evaluate whether or not the application of a set of patch operations
+   should succeed or fail.
+
+   For example, given the following JSON document:
+
+   {
+     "a": {
+       "b": {
+         "c": "123"
+       }
+     }
+   }
+
+   The following JSON Patch + JSON Predicates document will first test
+   that the path "/a/b/c" references a value matching the given regular
+   expression prior to replacing that value:
+
+   [
+     {
+       "op": "matches",
+       "path": "/a/b/c",
+       "value": "\\d{3}"
+     },
+     {
+       "op": "replace",
+       "path": "/a/b/c",
+       "value": "ABC"
+     }
+   ]
+
+   When a JSON Predicate object within a JSON Patch document evaluates
+   as false, processing of the JSON Patch Document MUST be handled
+   exactly the same as an unsuccessful JSON Patch operation would be
+   handled as defined in JSON-PATCH [I-D.ietf-appsawg-json-patch],
+   Section 5.  Specifically, processing of the JSON Patch document
+   SHOULD terminate and application of the entire patch document SHALL
+   NOT be deemed successful.
+
+
+
+
+Snell                     Expires April 5, 2013                [Page 19]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
+   Note that JSON Patch implementations that do not implement or
+   recognize JSON Predicate objects will treat such objects as unknown
+   patch operations that will cause evaluation of the Patch document to
+   fail.
+
+
+3.  Security Considerations
+
+   JSON Predicate objects do not, by themselves, introduce any
+   particular security concerns.  Note that JSON documents that consist
+   of an arbitrary number of nested Second Order Predicate objects can
+   have a detrimental impact on overall performance and could be
+   leveraged by a malicious entity as part of a denial of service
+   attack.
+
+
+4.  Normative References
+
+   [I-D.ietf-appsawg-json-patch]
+              Bryan, P. and M. Nottingham, "JSON Patch",
+              draft-ietf-appsawg-json-patch-05 (work in progress),
+              September 2012.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
-
-   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
-              Uniform Resource Identifiers (URIs)", RFC 5785,
-              April 2010.
-
-   [RFC6415]  Hammer-Lahav, E. and B. Cook, "Web Host Metadata",
-              RFC 6415, October 2011.
-
-   [RFC6570]  Gregorio, J., Fielding, R., Hadley, M., Nottingham, M.,
-              and D. Orchard, "URI Template", RFC 6570, March 2012.
 
 
 Author's Address
@@ -662,11 +1116,5 @@ Author's Address
 
 
 
-
-
-
-
-
-
-Snell                    Expires March 21, 2013                [Page 12]
+Snell                     Expires April 5, 2013                [Page 20]
 
