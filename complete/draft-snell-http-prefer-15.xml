@@ -248,12 +248,9 @@
       response message as an indication as to which Prefer tokens were
       honored by the server and applied to the processing of a request.</t>
 
-      <figure>
-        <figure><artwork> 
+      <figure><artwork> 
   Preference-Applied = "Preference-Applied" ":" 1#token
-        </artwork></figure> 
-
-      </figure>
+      </artwork></figure>
 
       <t>Note that the syntax of the Preference-Applied header differs from
       that of the Prefer header in that token values and parameters are not
@@ -383,7 +380,7 @@
       constructing the response.</t>
       
       <figure><preamble>An example request specifying the "return-representation" preference:</preamble>
-      <artwork>
+      <artwork><![CDATA[
   PATCH /item/123 HTTP/1.1
   Host: example.org
   Content-Type: text/patch
@@ -393,7 +390,7 @@
   < ABCDEFGHIJKLMNOPQRSTUVWXYZ
   ---
   > BCDFGHJKLMNPQRSTVWXYZ
-      </artwork>
+      ]]></artwork>
       </figure>
       
       <figure><preamble>An example response containing the resource representation:</preamble>
