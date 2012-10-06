@@ -49,7 +49,7 @@
  
       <t>Within the course of processing an HTTP request there are typically
       a range of required and optional behaviors that a server or intermediary 
-      can employ. These often manifest is a variety of subtle and not-so-subtle 
+      can employ. These often manifest in a variety of subtle and not-so-subtle 
       ways within the response.</t>
       
       <t>For example, when using the HTTP PUT method to modify a resource -- 
@@ -114,7 +114,7 @@
         <t>This specification uses the Augmented Backus-Naur Form (ABNF) 
         notation of <xref target="RFC5234"/> and includes, by reference,
         the "token", "word", "OWS", "BWS" rules and the #rule 
-        extension as defined within Sections 1.2 and 3.2.4 of 
+        extension as defined within Sections 3.2.1 and 3.2.4 of 
         <xref target="I-D.ietf-httpbis-p1-messaging"/>.</t>
       </section>
  
@@ -122,7 +122,7 @@
         
     <section title="The Prefer Request Header Field" anchor="prefer"> 
     
-      <t>The Prefer request-header field is used to indicate that particular 
+      <t>The Prefer request header field is used to indicate that particular 
       server behaviors are preferred by the client, but not required for 
       successful completion of the request.  Prefer is similar in nature to the 
       Expect header field defined by Section 6.1.2 of <xref target="I-D.ietf-httpbis-p2-semantics"/> 
@@ -157,16 +157,14 @@
       The meaning and application of such parameters is dependent on the definition 
       of each preference token and the server's implementation thereof.</t>
       
-      <t>If a particular preference token or parameter is specified multiple
-      times, repeated occurrences MUST be ignored without signaling an error or 
-      otherwise altering the processing of the request.</t>
-      
       <t>Comparison of preference token names is case-insensitive while values
       are case-sensitive regardless of whether token or quoted-string values 
       are used.</t> 
        
-      <t>The Prefer request header field is end-to-end and MUST be forwarded 
-      by a proxy if the request is forwarded.</t> 
+      <t>The Prefer header field is end-to-end and SHOULD be forwarded 
+      by a proxy if the request is forwarded unless Prefer is explicitly
+      identified as being hop-by-hop using the Connection header field 
+      defined by <xref target="I-D.ietf-httpbis-p1-messaging"/>, Section 6.1.</t> 
       
       <t>In various situations, a proxy might determine that it is capable of 
       honoring a preference independently of the server to which the request 
@@ -174,9 +172,7 @@
       of providing asynchronous handling of a request using 202 Accepted 
       responses independently of the origin server. Such proxies can choose to 
       honor the "return-asynch" preference on their own despite whether the 
-      origin is capable or willing to do so. In such cases, however, the proxy 
-      is still required to forward the Prefer header on to the origin
-      server.</t> 
+      origin is capable or willing to do so.</t> 
       
       <t>Individual preference tokens MAY define their own requirements and 
       restrictions as to whether and how intermediaries can apply the preference to 
@@ -202,7 +198,13 @@
       </artwork></figure>
 
       <t>No significance is given to the order in which preference tokens
-      appear within a request.</t>
+      appear within a request with one exception described below.</t>
+      
+      <t>In order to avoid possible ambiguity, individual preference tokens 
+      SHOULD NOT appear multiple times within a single request. If any preference 
+      is specified more than once, only the first instance is to be considered. 
+      All subsequent occurrences SHOULD be ignored without signaling an error or 
+      otherwise altering the processing of the request.</t>
       
       <t>Due to the inherent complexities involved with properly 
       implementing server-driven content negotiation, effective caching,
@@ -312,8 +314,7 @@
       the server to respond asynchronously to a response. For instance, in the case
       when the length of time it takes to generate a response will exceed 
       some arbitrary threshold established by the server, the server can 
-      honor the return-asynch preference by returning either a "202 Accepted"
-      or "303 See Other" response.</t>
+      honor the return-asynch preference by returning a "202 Accepted" response.</t>
       
       <figure><preamble>ABNF:</preamble><artwork>
   return-asynch = "return-asynch"
@@ -339,33 +340,41 @@
   HTTP/1.1 202 Accepted
   Location: http://example.org/collection/123
       </artwork></figure>
-      
-      <figure><preamble>An alternative asynchronous response using "303 See Other":</preamble>
-      <artwork>
-  HTTP/1.1 303 See Other
-  Location: http://example.org/collection/123
-  Retry-After: 10
-      </artwork>
-      </figure>
+            
+      <t>While the "202 Accepted" response status is defined by 
+      <xref target="I-D.ietf-httpbis-p2-semantics"/>, little guidance is given on 
+      how and when to use the response code and the process for determining
+      the subsequent final result of the operation is left entirely undefined. Therefore,
+      whether and how any given server supports asynchronous responses is an 
+      implementation specific detail that is considered to be out of the scope
+      of this specification.</t>
       
     </section>
 
-    <section title="The &quot;return-representation&quot; Preference" anchor="return-representation"> 
+    <section title="The &quot;return-representation&quot; and &quot;return-minimal&quot; Preferences" anchor="return-representation"> 
       <t>The "return-representation" preference indicates that the client prefers
       that the server include an entity representing the current state of the 
       resource in the response to a successful request.</t>
       
+      <t>The "return-minimal" preference, on the other hand, indicates that the client wishes
+      the server to return only a minimal response to a successful request.
+      Typically, such responses would utilize the "204 No Content" status, but other
+      codes MAY be used as appropriate, such as a "200" status with a zero-length
+      response entity. The determination of what constitutes an appropriate minimal response
+      is solely at the discretion of the server.</t>
+      
       <figure><preamble>ABNF:</preamble><artwork>
   return-representation = "return-representation"
+  return-minimal        = "return-minimal"
       </artwork></figure>
       
       <t>When honoring the "return-representation" preference, the returned 
       representation might not be a representation of the effective request URI
       when the request is affecting another resource. In such cases, the 
-      Content-Location header can be used to identity the URI of the returned
+      Content-Location header can be used to identify the URI of the returned
       representation.</t>
       
-      <t>The "return-representation" preference is intended primarily to provide
+      <t>The "return-representation" preference is intended to provide
       a means of optimizing communication between the client and server
       by eliminating the need for a subsequent GET request to retrieve the 
       current representation of the resource following a modification.</t>
@@ -405,29 +414,9 @@
       </artwork>
       </figure>
       
-      <t>The "return-minimal" and "return-representation" preferences are
-      mutually exclusive directives.  A request that contains both preferences
-      can be treated as though neither were specified.</t>
-      
-    </section> 
-
-    <section title="The &quot;return-minimal&quot; Preference" anchor="return-minimal"> 
-      <t>The "return-minimal" preference indicates that the client wishes
-      the server to return a minimal response to a successful request.
-      Typically, such responses would utilize the "204 No Content" status, but other
-      codes MAY be used as appropriate, such as a "200" status with a zero-length
-      response entity. The determination of what constitutes an appropriate minimal response
-      is solely at the discretion of the server.</t>
-      
-      <figure><preamble>ABNF:</preamble><artwork>
-  return-minimal = "return-minimal"
-      </artwork></figure>
-      
-      <t>The "return-minimal" preference is intended to 
-      provide a means of optimizing communication between the client
-      and server by reducing the amount of data the server is required to
-      return to the client following a request. This can be 
-      particularly useful, for instance, when communicating with 
+      <t>In contrast, the "return-minimal" preference can reduce the amount 
+      of data the server is required to return to the client following a request. 
+      This can be particularly useful, for instance, when communicating with 
       limited-bandwidth mobile devices or when the client simply 
       does not require any further information about the result of a 
       request beyond knowing if it was successfully processed.</t>
@@ -447,65 +436,49 @@
       <artwork>
   HTTP/1.1 201 Created
   Location: http://example.org/collection/123
-  Content-Length: 0
       </artwork>
       </figure>
       
-      <t>The "return-minimal" and "return-representation" preferences are 
-      mutually exclusive directives that MUST NOT be used in combination 
-      within a single request. If a server receives a request containing 
-      both the "return-minimal" and "return-representation" preferences, 
-      it MAY choose to ignore either or both of the stated preferences but 
-      MUST NOT signal an error or fail to process the request solely on the 
-      basis of those preferences.</t> 
+      <t>The "return-minimal" and "return-representation" preferences are
+      mutually exclusive directives.  A request that contains both preferences
+      can be treated as though neither were specified.</t>
       
     </section> 
               
     <section title="The &quot;wait&quot; Preference" anchor="wait">
       <t>The "wait" preference can be used to establish an upper bound on the 
-      length of time, in seconds, the client is willing to wait for a response, 
-      after which the client might choose to abandon the request.
-      In the case generating a response will take longer than the time specified,
-      the server, or proxy, MAY choose to utilize an asynchronous processing 
-      model by returning, for example, "202 Accepted" or "303 See Other" responses.</t>
+      length of time, in seconds, the client expects it will take the server 
+      to process the request once it has been received. In the case that 
+      generating a response will take longer than the time specified, 
+      the server, or proxy, can choose to utilize an asynchronous processing 
+      model by returning -- for example -- a "202 Accepted" response.</t>
+
       <figure><preamble>ABNF:</preamble><artwork>
   wait = "wait" BWS "=" BWS delta-seconds
       </artwork></figure>
-      
-      <t>Clients specifying the "wait" preference SHOULD also use the 
-      Date header field, as specified in Section 9.2 of <xref target="I-D.ietf-httpbis-p2-semantics"/>,
-      within the request to establish the time at which the client began waiting
-      for the completion of the request. Failing to include a Date header field
-      in the request would require the server to use the instant it received 
-      or began processing the request as the baseline for determining how long
-      the client has been waiting which could yield unintended results.</t>
-      
-      <t>The lack of a Date header in the request, or poor clock synchronization 
-      between the client and server makes it impossible to determine the exact 
-      length of time the client has already been waiting when the request 
-      is received by the server. The only reliable information conveyed by the 
-      wait preference is that the client is not expecting the server to spend 
-      more than the specified time on request processing and can terminate the 
-      transaction at any time.</t>
-      
-      <figure><preamble>An example request specifying the "wait" and "return-asynch" 
-      preferences to indicate that the client wishes the server to respond
-      asynchronously if processing of the request will take longer than 10
-      seconds:</preamble>
+
+      <t>It is important to consider that HTTP messages spend some time 
+      traversing the network and being processed by intermediaries.  This 
+      increases the length of time that a client will wait for a response 
+      in addition to the time the server takes to process the request.  
+      A client that has strict timing requirements can estimate these factors 
+      and adjust the wait value accordingly.</t>
+
+      <t>As with other preferences, the "wait" preference could be ignored.
+      Clients can abandon requests that take longer than they are
+      prepared to wait.</t>
+            
+      <figure><preamble>For example, a server receiving the following 
+      request might choose to respond asynchronously if processing the 
+      request will take longer than 10 seconds:</preamble>
       <artwork>
   POST /collection HTTP/1.1
   Host: example.org
   Content-Type: text/plain
   Prefer: return-asynch, wait=10
-  Date: Tue, 20 Dec 2011 12:34:56 GMT
   
   {Data}
       </artwork></figure>
-      
-      <t>The utility of the "wait" preference in networks with high or
-      unpredictable latency is questionable, at best. In general, effective
-      use of the preference will require low and predictable latency and good 
-      clock synchronization between the client and server.</t>
       
     </section>
      
@@ -518,13 +491,11 @@
     minor syntactical or semantic errors, but the server is still capable of 
     comprehending and successfully processing the request, a decision must be
     made to either reject the request with an appropriate "4xx" error response
-    or go ahead with processing. The "strict" preference can be used by 
-    the client to indicate that, in such conditions, it would prefer that
-    the server reject the request, while the "lenient" preference indicates 
-    that the client would prefer the server to attempt to process the 
-    request. The specific meaning and application of the "strict" and "lenient"
-    directives is specific to each type of resource, the request method and 
-    the operation of the server.</t>
+    or go ahead with processing. The "strict" preference can be used to indicate 
+    that, while any particular error may be recoverable, the client would prefer 
+    that the server reject the request. The "lenient" preference, on the other
+    hand, indicates that the client wishes the server to attempt to process the 
+    request.</t>
     
     <figure><preamble>ABNF:</preamble><artwork>
   handling = "strict" / "lenient"
@@ -536,15 +507,6 @@
   Host: example.org
   Content-Type: text/plain
   Prefer: strict
-    </artwork>
-    </figure>
-    
-    <figure><preamble>An example request specifying the "lenient" preference:</preamble>
-    <artwork>
-  POST /collection HTTP/1.1
-  Host: example.org
-  Content-Type: text/plain
-  Prefer: lenient
     </artwork>
     </figure>
     
@@ -561,7 +523,7 @@
     <t><list> 
     <t>Header field name: Prefer</t>  
     <t>Applicable Protocol: HTTP</t>
-    <t>Status:</t>
+    <t>Status: Standard</t>
     <t><![CDATA[Author: James M Snell <jasnell@gmail.com>]]></t>
     <t>Change controller: IETF</t>
     <t>Specification document: this specification</t>
@@ -570,7 +532,7 @@
     <t><list> 
     <t>Header field name: Preference-Applied</t>  
     <t>Applicable Protocol: HTTP</t>
-    <t>Status:</t>
+    <t>Status: Standard</t>
     <t><![CDATA[Author: James M Snell <jasnell@gmail.com>]]></t>
     <t>Change controller: IETF</t>
     <t>Specification document: this specification</t>
@@ -688,7 +650,7 @@
       <t>Specific preferences requested by a client can introduce security 
       considerations and concerns beyond those discussed within
       <xref target="I-D.ietf-httpbis-p1-messaging">HTTP/1.1</xref> and it's
-      additional associated specification documents. Implementors need to 
+      additional associated specification documents. Implementers need to 
       refer to the specifications and descriptions of each preference to 
       determine the security considerations relevant to each.</t> 
       
