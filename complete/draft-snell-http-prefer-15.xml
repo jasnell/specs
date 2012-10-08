@@ -128,7 +128,7 @@
       Expect header field defined by Section 6.1.2 of <xref target="I-D.ietf-httpbis-p2-semantics"/> 
       with the exception that servers are allowed to ignore stated preferences.</t> 
       
-      <figure><artwork> 
+      <figure><preamble>ABNF:</preamble><artwork> 
   Prefer     = "Prefer" ":" 1#preference
   preference = token [ BWS "=" BWS word ] 
                *( OWS ";" [ OWS parameter ] )
@@ -197,14 +197,13 @@
   Date: Tue, 20 Dec 2011 12:34:56 GMT
       </artwork></figure>
 
-      <t>No significance is given to the order in which preference tokens
-      appear within a request with one exception described below.</t>
-      
-      <t>In order to avoid possible ambiguity, individual preference tokens 
+      <t>To avoid possible ambiguity, individual preference tokens 
       SHOULD NOT appear multiple times within a single request. If any preference 
       is specified more than once, only the first instance is to be considered. 
       All subsequent occurrences SHOULD be ignored without signaling an error or 
-      otherwise altering the processing of the request.</t>
+      otherwise altering the processing of the request. This is the only case
+      in which the ordering of preferences within a request is considered to 
+      be significant.</t>
       
       <t>Due to the inherent complexities involved with properly 
       implementing server-driven content negotiation, effective caching,
@@ -250,22 +249,19 @@
       response message as an indication as to which Prefer tokens were
       honored by the server and applied to the processing of a request.</t>
 
-      <figure><artwork> 
+      <figure><preamble>ABNF:</preamble><artwork> 
   Preference-Applied = "Preference-Applied" ":" 1#token
       </artwork></figure>
 
-      <t>Note that the syntax of the Preference-Applied header differs from
-      that of the Prefer header in that token values and parameters are not
-      included.</t>
+      <t>The syntax of the Preference-Applied header differs from that of 
+      the Prefer header in that token values and parameters are not included.</t>
 
       <t>Use of the Preference-Applied header is only necessary when it is 
       not readily and obviously apparent that a server applied a given preference 
       and such ambiguity might have an impact on the client's handling of the 
-      response.</t>
-        
-      <t>For instance, when using either the "return-representation" or 
+      response. For instance, when using either the "return-representation" or 
       "return-minimal" preferences, a client application might not be capable of 
-      reliably determining if the preference was applied simply by examining the 
+      reliably determining that the preference was applied simply by examining the 
       payload of the response. In such case the Preference-Applied 
       header field can be used.</t>
 
@@ -543,20 +539,17 @@
         <t>IANA is asked to create a new registry, "HTTP Preferences",
         under the Hypertext Transfer Protocol (HTTP) Parameters group.
         New registrations will use the Specification Required policy 
-        <xref target="RFC5226"/>.</t>
-      
-        <t>The requirements for registered preferences are described in
-        <xref target="definitions" />.</t>
+        <xref target="RFC5226"/>. The requirements for registered 
+        preferences are described in <xref target="definitions" />.</t>
 
         <t>Registration requests consist of the completed registration template
         below, typically published in the required specification.  However, to
         allow for the allocation of values prior to publication, the Designated
         Expert can approve registration based on a separately submitted
-        template once they are satisfied that a specification will be published.</t>
-
-        <t>Note that preferences can be registered by third parties, if the
-        Designated Expert determines that an unregistered preference is
-        widely deployed and not likely to be registered in a timely manner.</t>
+        template once they are satisfied that a specification will be published.
+        Preferences can be registered by third parties if the Designated Expert 
+        determines that an unregistered preference is widely deployed and not 
+        likely to be registered in a timely manner.</t>
 
         <t>The registration template is:</t>
 
@@ -572,13 +565,11 @@
 
         <t>Registration requests should be sent to the ietf-http-wg@w3.org
         mailing list, marked clearly in the subject line (e.g., "NEW PREFERENCE
-        - example" to register an "example" preference).</t>
-
-        <t>Within at most 14 days of the request, the Designated Expert(s) will
-        either approve or deny the registration request, communicating this
-        decision to the review list and IANA.  Denials should include an
-        explanation and, if applicable, suggestions as to how to make the
-        request successful.</t>
+        - example" to register an "example" preference). Within at most 14 days 
+        of the request, the Designated Expert(s) will either approve or deny 
+        the registration request, communicating this decision to the review list 
+        and IANA.  Denials should include an explanation and, if applicable, 
+        suggestions as to how to make the request successful.</t>
       
       </section> 
       
@@ -617,9 +608,9 @@
       <t> 
           <list style="symbols"> 
             <t>Preference: wait</t> 
-            <t>Description: Indicates an upper bound to the lenght of 
-            time the client is willing to wait for a response, after which
-            the request can be aborted.</t> 
+            <t>Description: Indicates an upper bound to the length of 
+            time the client expects it will take the server to process 
+            the request once it has been received.</t> 
             <t>Reference: [this specification], <xref target="wait"/></t>
           </list> 
         </t> 

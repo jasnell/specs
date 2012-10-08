@@ -39,8 +39,10 @@
   <middle> 
     <section anchor="intro" title="Introduction"> 
  
-      <t>This specification defines a number of new Link Relation Types
-      for a variety of common linking scenarios.</t> 
+      <t>The fundamental model for Web Links and the Registry of Link
+      Relations are established by <xref target="RFC5988"/>. This specification 
+      defines and adds the following additional types of link relations to 
+      the registry: about, preview, privacy-policy, terms-of-service, and type.</t>
       
       <t>In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
       "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
@@ -184,7 +186,7 @@
       ]]></artwork></figure>
       
       <t>When used within the header of an HTTP message, the "type" specified 
-      by the type link relation MUST NOT be confused with the media type of 
+      by the type link relation cannot be confused with the content type of 
       the payload as given by the Content-Type header. The "type" link relation 
       references the payload's abstract semantic type whereas the Content-Type 
       header identifies the specific serialization format of the payload.</t>
