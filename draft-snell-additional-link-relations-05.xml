@@ -1,7 +1,5 @@
 <?xml version="1.0"?> 
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'> 
-  <!ENTITY rfc5023 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5023.xml'>
   <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
 ]>
 <?rfc toc="yes"?> 
@@ -9,7 +7,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="std" ipr="trust200811" docName="draft-snell-additional-link-relations-04"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-additional-link-relations-05"> 
   <front> 
     <title abbrev="Additional Link Relations"> 
       Additional Link Relation Types
@@ -21,7 +19,7 @@
       </address> 
     </author> 
     
-    <date month="May" year="2012" /> 
+    <date month="October" year="2012" /> 
  
     <area>Applications</area> 
     <keyword>I-D</keyword> 
@@ -44,10 +42,6 @@
       defines and adds the following additional types of link relations to 
       the registry: about, preview, privacy-policy, terms-of-service, and type.</t>
       
-      <t>In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
-      "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
-      are to be  interpreted as described in <xref target="RFC2119" />.</t> 
-  
     </section> 
         
     <section anchor="about" title="&quot;about&quot;">
@@ -124,7 +118,7 @@
       <t>Note that in the absence of clear legal obligations placed on an 
       entity either through contract or law, the presence of a "privacy-policy" 
       Link does not constitute a legally binding obligation on the part of the 
-      service. The linked resource MUST be interpreted as only a description of 
+      service. The linked resource can only be interpreted as a description of 
       the expected practice.</t>
       
       <t>It is recommended that publishers of privacy policy resources linked to 
@@ -247,11 +241,7 @@
   </middle> 
  
   <back>
-    <references title="Normative References"> 
-      &rfc2119;
-    </references>
     <references title="Informative References">
-      &rfc5023;
       &rfc5988;
     </references>
   </back>
