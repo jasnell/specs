@@ -7,7 +7,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-additional-link-relations-05"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-additional-link-relations-06"> 
   <front> 
     <title abbrev="Additional Link Relations"> 
       Additional Link Relation Types
@@ -47,8 +47,9 @@
     <section anchor="about" title="&quot;about&quot;">
     
       <t>The "about" Link relation can be used to refer to a resource
-      that is the subject of the link's context. Multiple subjects can be 
-      indicated through the use of multiple "about" link relations.</t>
+      that is the subject or topic of the link's context. Multiple 
+      subjects can be indicated through the use of multiple "about" link 
+      relations.</t>
       
       <t>For example, if the context resource is a review about a particular
       product, the "about" link can be used to reference the URL of the 
@@ -67,11 +68,12 @@
     <section anchor="preview" title="&quot;preview&quot;">
     
       <t>The "preview" Link relation can be used to refer to a resource
-      that serves as a preview of the link's context, for instance, a 
-      screen capture of a video, or a brief snippet of audio from a 
-      song.</t>
+      that serves as a preview of the link's context, likely with reduced
+      quality or limited content. For instance, the preview link might reference
+      a screen capture of a video, a brief snippet of audio from a 
+      song or a thumbnail representation of an image.</t>
       
-      <t>For example, issue a HTTP HEAD request to a URI representing a 
+      <t>For example, issuing a HTTP HEAD request to a URI representing a 
       large video or image file might return a link to a short or lower
       quality preview of the original:</t>
       
@@ -81,7 +83,7 @@
   Link: <http://example.org/preview/10-second-preview.mpg>; 
     rel="preview"; type="video/mpeg"
         ]]></artwork></figure> 
-    
+        
     </section>
         
     <section anchor="privacy-policy" title="&quot;privacy-policy&quot;">
@@ -174,7 +176,7 @@
       <figure><artwork><![CDATA[
   HTTP/1.1 200 OK
   Content-Type: text/plain
-  Link: <http://example.org/Person/givenName>; type="type"
+  Link: <http://example.org/Person/givenName>; rel="type"
   
   Sally
       ]]></artwork></figure>
@@ -199,35 +201,35 @@
         <t>Relation Name: about</t>
         <t>Description: Refers to a resource that is the subject of the link's
         context.</t>
-        <t>Reference: This specification.</t>
+        <t>Reference: This specification, <xref target="about"/></t>
       </list></t>
       
       <t><list style="symbols">
         <t>Relation Name: preview</t>
         <t>Description: Refers to a resource that provides a preview of the 
         link's context.</t>
-        <t>Reference: This specification.</t>
+        <t>Reference: This specification, <xref target="preview"/></t>
       </list></t>
       
       <t><list style="symbols">
         <t>Relation Name: privacy-policy</t>
         <t>Description: Refers to a Privacy Policy associated with the link's
         context.</t>
-        <t>Reference: This specification.</t>
+        <t>Reference: This specification, <xref target="privacy-policy"/></t>
       </list></t>
       
       <t><list style="symbols">
         <t>Relation Name: terms-of-service</t>
         <t>Description: Refers to the Terms of Service associated with the 
         link's context.</t>
-        <t>Reference: This specification.</t>
+        <t>Reference: This specification, <xref target="terms-of-service"/></t>
       </list></t>
       
       <t><list style="symbols">
         <t>Relation Name: type</t>
         <t>Description: Refers to a resource identifying the abstract semantic
         type the link's context is considered to be an instance of.</t>
-        <t>Reference: This specification.</t>
+        <t>Reference: This specification, <xref target="type"/></t>
       </list></t>
       
     </section> 

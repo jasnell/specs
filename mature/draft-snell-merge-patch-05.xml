@@ -3,14 +3,13 @@
   <!ENTITY rfc5789 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5789.xml'>  
   <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
   <!ENTITY rfc4627 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4627.xml'>
-  <!ENTITY jsonpatch PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-appsawg-json-patch-05.xml'>
 ]>
 <?rfc toc="yes"?> 
 <?rfc strict="yes"?> 
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-merge-patch-04"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-merge-patch-05"> 
   <front> 
     <title abbrev="application/merge-patch"> 
       The application/json-merge-patch Media Type
@@ -43,72 +42,46 @@
   <middle> 
     <section anchor="intro" title="Introduction"> 
  
-      <t>The HTTP PATCH method <xref target="RFC5789"/> provides a 
-      mechanism for requesting partial modifications of resources. The 
-      payload entity contained by a PATCH request provides a description
-      of the changes that are to be made to a target resource. The 
-      general term used to describe such payloads is a "Patch Document".</t>
+      <t>This specification defines the JSON "Merge Patch" document 
+      format, processing rules, and associated MIME media type identifier.
+      The Merge Patch format is primarily intended for use with the 
+      HTTP PATCH method <xref target="RFC5789"/> as a means of describing
+      a set of modifications to a subset of target resource's content.</t>
       
-      <t>A partial modification request using PATCH can generally take one of
-      two forms. The Patch Document can either
-        <list style="symbols">
-          <t>Provide an explicit description of the changes being requested --
-          as is done, for instance, with the JSON Patch format described 
-          in <xref target="I-D.ietf-appsawg-json-patch"/> -- or,</t>
-          <t>Provide a modified subset of the original resource and allow
-          the Server to determine the set of changes being requested.</t>
-        </list>
-      </t> 
-      
-      <t>Either approach is valid. However, when using the latter approach -- 
-      generally termed a "Merge Patch" within this specification -- it is often 
-      difficult for a server to determine the client's exact intent when using 
-      generic media types that do not have clearly defined PATCH semantics. The
-      <xref target="RFC4627">JSON format</xref> is one such example.</t>
-      
-      <t>To best illustrate the problem -- albeit with an example that is 
-      somewhat extreme -- consider an example where a user agent wishes to 
-      modify the following JSON Patch Document currently existing on a server:</t> 
+      <t>For example, given the following original JSON document:</t>
       
       <figure><artwork>
-  [
-   {"op": "add", "path": "/title", "value":"Goodbye!"},
-   {"op": "remove", "path": "/link"}
-  ]
-      </artwork></figure>
-
-      <figure><preamble>Supposing the user agent wishes to remove the "remove"     
-      statement from the document and change the "value" of the "title" from "Goodbye" 
-      to "Hello World", if it sends the following request to the server intending
-      to perform a Merge Patch style modification: </preamble>
-      <artwork>
-  PATCH /patches/1 HTTP/1.1
-  Host: example.org
-  Content-Type: application/json-patch
-  
-  [{"op":"add", "path": "title", "value":"Hello world"}]
+  {
+    "a": "b",
+    "c": {
+      "d": "e"
+    }
+  }
       </artwork></figure>
       
-      <t>The server has no choice but to interpret the request as a normal
-      JSON Patch operation, resulting in an unintended modification of the 
-      target resource.</t>
-      
-      <t>What is needed in this case is a mechanism that will allow the 
-      user agent sending the PATCH request to explicitly signal that it 
-      is requesting a Merge Patch style modification of the resource.</t>
-      
-      <t>Using the "application/json-merge-patch" Media Type defined herein, the 
-      user agent's original intent can be clearly and unambiguously communicated
-      to the server within the request:</t>
+      <t>A change to the value of the "a" member can be described simply as:</t>
       
       <figure><artwork>
-  PATCH /patches/1 HTTP/1.1
+  PATCH /target HTTP/1.1
   Host: example.org
-  Content-Type: application/json-merge-patch; charset="UTF-8"
+  Content-Type: application/json-merge-patch
   
-  [{"op":"add", "path": "title", "value":"Hello world"}]
+  {"a": "z"}
       </artwork></figure>
       
+      <t>When applied to the target resource, only the value of the "a" member 
+      will be modified, leaving the remaining content untouched.</t>
+      
+      <t>The Merge Patch format generally supports two types of changes: removing 
+      and setting JSON object members. JSON arrays are treated the same as 
+      JSON primitives: the whole value can be replaced, but not partially modified. 
+      The JSON null value is given a special meaning to indicate the removal of an
+      existing value. These constraints allow Merge Patch to use a format that closely 
+      mimics the document being modified. The constraints mean Merge Patch is suitable 
+      for patching JSON documents that primarily use objects for their structure, 
+      and do not make use of explicit null values. The Merge Patch format is not 
+      appropriate for all JSON syntaxes.</t>
+ 
       <t>In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
       "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
       are to be  interpreted as described in <xref target="RFC2119" />.</t> 
@@ -123,12 +96,7 @@
       PATCH request, it is the responsibility of the server receiving
       and processing the request to inspect the payload entity and 
       determine the specific set of operations that are to be performed
-      to modify the target resource. The actual set of modifications
-      to be made will be specific to the semantics and requirements of 
-      the target resource.</t>
-      
-      <t>The "application/json-merge-patch" media type MAY contain a "charset" 
-      parameter that is used to identify the character set encoding utilized.</t>
+      to modify the target resource.</t>
       
       <figure><preamble>For example, given the following example JSON document:</preamble>
       <artwork>
@@ -166,21 +134,21 @@
       
       <t>Upon receiving the request, the server is responsible for inspecting
       the payload and determining, based on it's own understanding of the 
-      target resource media type and the underlying data model the target 
-      resource represents, what specific operations will be applied to 
-      modify the resource.</t>
+      target resource media type and the underlying data model of the target 
+      resource, what specific operations will be applied to modify the resource.</t>
                  
-      <t>A server receiving this patch request MUST apply the following rules
+      <t>A server receiving this patch request   apply the following rules
       to determine the specific set of change operations to be performed:
         <list style="numbers">
+        <t>If either the root of the JSON data provided in the payload or 
+        the root of the target resource are JSON Arrays, the target resource 
+        is to be replaced, in whole, by the provided data.</t>
         <t>If the root of the JSON data provided in the payload is an 
-        Array, the target resource is to be replaced, in whole, by
-        the provided data.</t>
-        <t>If the root of the JSON data provided in the payload is an 
-        Object, for each distinct member specified in that object:
+        Object, for each distinct member specified within that object:
           <list style="symbols">
             <t>If the member is currently undefined within the target resource,
-            the member and the given value is to be added to the target.</t>
+            and the given value is not null, the member and the value are to be 
+            added to the target.</t>
             <t>If the value is explicitly set to null and that member is currently 
             defined within the target resource, the existing member is removed.</t>
             <t>If the value is either a non-null JSON primitive or an Array and
@@ -202,7 +170,7 @@
       </t>
       
       <t>Applying these rules to the previous example, the set of specific 
-      change operations the server would derive from the request would be:
+      change operations derived from the request are:
         <list style="symbols">
           <t>Change the existing value of the "title" member from "Goodbye!"
           to "Hello!",</t>
@@ -214,8 +182,8 @@
         </list>
       </t>
       
-      <figure><preamble>The resulting JSON document would be similar to (note
-      that the specific ordering of members within JSON documents is insigificant):</preamble>
+      <figure><preamble>The resulting JSON document would be similar to the following 
+      (the specific ordering of members within JSON documents is insigificant):</preamble>
           <artwork>
       {
         "title": "Hello!",
@@ -239,10 +207,10 @@
       
       <t>If the request attempts to remove a member from the target resource
       that does not currently exist, the server SHOULD NOT consider the 
-      request to be in error. The requested removal operation is simply 
+      request to be in error. The requested removal operation is simply to
       be ignored by the server as the final modified state of the target 
       resource will still accurately reflect the user-agent's original 
-      intention.</t>
+      intent.</t>
     
     </section>
              
@@ -298,9 +266,6 @@
       &rfc2119;
       &rfc5789;
       &rfc4627;
-    </references>
-    <references title="Informational References">
-      &jsonpatch;
     </references>
   </back>
 </rfc> 

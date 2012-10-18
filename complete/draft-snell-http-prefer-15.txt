@@ -2,9 +2,9 @@
 
 
 Network Working Group                                           J. Snell
-Internet-Draft                                           October 4, 2012
+Internet-Draft                                          October 12, 2012
 Intended status: Standards Track
-Expires: April 7, 2013
+Expires: April 15, 2013
 
 
                          Prefer Header for HTTP
@@ -31,7 +31,7 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 7, 2013.
+   This Internet-Draft will expire on April 15, 2013.
 
 Copyright Notice
 
@@ -52,7 +52,7 @@ Copyright Notice
 
 
 
-Snell                     Expires April 7, 2013                 [Page 1]
+Snell                    Expires April 15, 2013                 [Page 1]
 
 Internet-Draft                 HTTP Prefer                  October 2012
 
@@ -66,17 +66,17 @@ Table of Contents
    3.  The Preference-Applied Response Header Field . . . . . . . . .  7
    4.  Preference Definitions . . . . . . . . . . . . . . . . . . . .  8
      4.1.  The "return-asynch" Preference . . . . . . . . . . . . . .  8
-     4.2.  The "return-representation" Preference . . . . . . . . . .  9
-     4.3.  The "return-minimal" Preference  . . . . . . . . . . . . . 10
-     4.4.  The "wait" Preference  . . . . . . . . . . . . . . . . . . 11
-     4.5.  The "strict" and "lenient" Processing Preferences  . . . . 12
-   5.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 13
+     4.2.  The "return-representation" and "return-minimal"
+           Preferences  . . . . . . . . . . . . . . . . . . . . . . .  9
+     4.3.  The "wait" Preference  . . . . . . . . . . . . . . . . . . 11
+     4.4.  The "strict" and "lenient" Processing Preferences  . . . . 12
+   5.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 12
      5.1.  The Registry of Preferences  . . . . . . . . . . . . . . . 13
      5.2.  Initial Registry Contents  . . . . . . . . . . . . . . . . 14
-   6.  Security Considerations  . . . . . . . . . . . . . . . . . . . 15
+   6.  Security Considerations  . . . . . . . . . . . . . . . . . . . 14
    7.  References . . . . . . . . . . . . . . . . . . . . . . . . . . 15
      7.1.  Normative References . . . . . . . . . . . . . . . . . . . 15
-     7.2.  Informative References . . . . . . . . . . . . . . . . . . 16
+     7.2.  Informative References . . . . . . . . . . . . . . . . . . 15
    Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 16
 
 
@@ -108,7 +108,7 @@ Table of Contents
 
 
 
-Snell                     Expires April 7, 2013                 [Page 2]
+Snell                    Expires April 15, 2013                 [Page 2]
 
 Internet-Draft                 HTTP Prefer                  October 2012
 
@@ -117,7 +117,7 @@ Internet-Draft                 HTTP Prefer                  October 2012
 
    Within the course of processing an HTTP request there are typically a
    range of required and optional behaviors that a server or
-   intermediary can employ.  These often manifest is a variety of subtle
+   intermediary can employ.  These often manifest in a variety of subtle
    and not-so-subtle ways within the response.
 
    For example, when using the HTTP PUT method to modify a resource --
@@ -164,7 +164,7 @@ Internet-Draft                 HTTP Prefer                  October 2012
 
 
 
-Snell                     Expires April 7, 2013                 [Page 3]
+Snell                    Expires April 15, 2013                 [Page 3]
 
 Internet-Draft                 HTTP Prefer                  October 2012
 
@@ -194,17 +194,19 @@ Internet-Draft                 HTTP Prefer                  October 2012
    This specification uses the Augmented Backus-Naur Form (ABNF)
    notation of [RFC5234] and includes, by reference, the "token",
    "word", "OWS", "BWS" rules and the #rule extension as defined within
-   Sections 1.2 and 3.2.4 of [I-D.ietf-httpbis-p1-messaging].
+   Sections 3.2.1 and 3.2.4 of [I-D.ietf-httpbis-p1-messaging].
 
 
 2.  The Prefer Request Header Field
 
-   The Prefer request-header field is used to indicate that particular
+   The Prefer request header field is used to indicate that particular
    server behaviors are preferred by the client, but not required for
    successful completion of the request.  Prefer is similar in nature to
    the Expect header field defined by Section 6.1.2 of
    [I-D.ietf-httpbis-p2-semantics] with the exception that servers are
    allowed to ignore stated preferences.
+
+   ABNF:
 
      Prefer     = "Prefer" ":" 1#preference
      preference = token [ BWS "=" BWS word ]
@@ -215,15 +217,16 @@ Internet-Draft                 HTTP Prefer                  October 2012
    future values included in the Registry of Preferences (Section 5.1).
    A server that does not recognize or is unable to comply with
    particular preference tokens in the Prefer header field of a request
-   MUST ignore those tokens and continue processing instead of
-   signalling an error.
 
 
 
-Snell                     Expires April 7, 2013                 [Page 4]
+Snell                    Expires April 15, 2013                 [Page 4]
 
 Internet-Draft                 HTTP Prefer                  October 2012
 
+
+   MUST ignore those tokens and continue processing instead of
+   signalling an error.
 
    A preference token can contain a value.  Empty, or zero length values
    on both the preference token and within parameters are equivalent to
@@ -239,16 +242,14 @@ Internet-Draft                 HTTP Prefer                  October 2012
    on the definition of each preference token and the server's
    implementation thereof.
 
-   If a particular preference token or parameter is specified multiple
-   times, repeated occurrences MUST be ignored without signaling an
-   error or otherwise altering the processing of the request.
-
    Comparison of preference token names is case-insensitive while values
    are case-sensitive regardless of whether token or quoted-string
    values are used.
 
-   The Prefer request header field is end-to-end and MUST be forwarded
-   by a proxy if the request is forwarded.
+   The Prefer header field is end-to-end and SHOULD be forwarded by a
+   proxy if the request is forwarded unless Prefer is explicitly
+   identified as being hop-by-hop using the Connection header field
+   defined by [I-D.ietf-httpbis-p1-messaging], Section 6.1.
 
    In various situations, a proxy might determine that it is capable of
    honoring a preference independently of the server to which the
@@ -256,9 +257,7 @@ Internet-Draft                 HTTP Prefer                  October 2012
    be capable of providing asynchronous handling of a request using 202
    Accepted responses independently of the origin server.  Such proxies
    can choose to honor the "return-asynch" preference on their own
-   despite whether the origin is capable or willing to do so.  In such
-   cases, however, the proxy is still required to forward the Prefer
-   header on to the origin server.
+   despite whether the origin is capable or willing to do so.
 
    Individual preference tokens MAY define their own requirements and
    restrictions as to whether and how intermediaries can apply the
@@ -276,7 +275,8 @@ Internet-Draft                 HTTP Prefer                  October 2012
 
 
 
-Snell                     Expires April 7, 2013                 [Page 5]
+
+Snell                    Expires April 15, 2013                 [Page 5]
 
 Internet-Draft                 HTTP Prefer                  October 2012
 
@@ -296,8 +296,13 @@ Internet-Draft                 HTTP Prefer                  October 2012
      Prefer: wait=100, return-asynch
      Date: Tue, 20 Dec 2011 12:34:56 GMT
 
-   No significance is given to the order in which preference tokens
-   appear within a request.
+   To avoid possible ambiguity, individual preference tokens SHOULD NOT
+   appear multiple times within a single request.  If any preference is
+   specified more than once, only the first instance is to be
+   considered.  All subsequent occurrences SHOULD be ignored without
+   signaling an error or otherwise altering the processing of the
+   request.  This is the only case in which the ordering of preferences
+   within a request is considered to be significant.
 
    Due to the inherent complexities involved with properly implementing
    server-driven content negotiation, effective caching, and the
@@ -323,19 +328,18 @@ Internet-Draft                 HTTP Prefer                  October 2012
      Prefer: return-asynch, wait=10;
      Prefer: priority=5;
 
-   2.  Use lenient processing:
-
-     Prefer: Lenient
 
 
 
 
-
-
-Snell                     Expires April 7, 2013                 [Page 6]
+Snell                    Expires April 15, 2013                 [Page 6]
 
 Internet-Draft                 HTTP Prefer                  October 2012
 
+
+   2.  Use lenient processing:
+
+     Prefer: Lenient
 
    3.  Use of an optional, undefined parameter on the return-minimal
    preference:
@@ -349,22 +353,22 @@ Internet-Draft                 HTTP Prefer                  October 2012
    response message as an indication as to which Prefer tokens were
    honored by the server and applied to the processing of a request.
 
+   ABNF:
+
      Preference-Applied = "Preference-Applied" ":" 1#token
 
-   Note that the syntax of the Preference-Applied header differs from
-   that of the Prefer header in that token values and parameters are not
-   included.
+   The syntax of the Preference-Applied header differs from that of the
+   Prefer header in that token values and parameters are not included.
 
    Use of the Preference-Applied header is only necessary when it is not
    readily and obviously apparent that a server applied a given
    preference and such ambiguity might have an impact on the client's
-   handling of the response.
-
-   For instance, when using either the "return-representation" or
-   "return-minimal" preferences, a client application might not be
-   capable of reliably determining if the preference was applied simply
-   by examining the payload of the response.  In such case the
-   Preference-Applied header field can be used.
+   handling of the response.  For instance, when using either the
+   "return-representation" or "return-minimal" preferences, a client
+   application might not be capable of reliably determining that the
+   preference was applied simply by examining the payload of the
+   response.  In such case the Preference-Applied header field can be
+   used.
 
    Request:
 
@@ -375,6 +379,20 @@ Internet-Draft                 HTTP Prefer                  October 2012
 
      [{"op": "add", "path": "/a", "value": 1}]
 
+
+
+
+
+
+
+
+
+
+Snell                    Expires April 15, 2013                 [Page 7]
+
+Internet-Draft                 HTTP Prefer                  October 2012
+
+
    Response:
 
      HTTP/1.1 200 OK
@@ -383,14 +401,6 @@ Internet-Draft                 HTTP Prefer                  October 2012
      Content-Location: /my-document
 
      {"a": 1}
-
-
-
-
-
-Snell                     Expires April 7, 2013                 [Page 7]
-
-Internet-Draft                 HTTP Prefer                  October 2012
 
 
 4.  Preference Definitions
@@ -419,8 +429,8 @@ Internet-Draft                 HTTP Prefer                  October 2012
    server to respond asynchronously to a response.  For instance, in the
    case when the length of time it takes to generate a response will
    exceed some arbitrary threshold established by the server, the server
-   can honor the return-asynch preference by returning either a "202
-   Accepted" or "303 See Other" response.
+   can honor the return-asynch preference by returning a "202 Accepted"
+   response.
 
    ABNF:
 
@@ -431,6 +441,14 @@ Internet-Draft                 HTTP Prefer                  October 2012
    the client to indicate to a server its capability and preference for
    handling asynchronous responses.
 
+
+
+
+Snell                    Expires April 15, 2013                 [Page 8]
+
+Internet-Draft                 HTTP Prefer                  October 2012
+
+
    An example request specifying the "return-asynch" preference:
 
      POST /collection HTTP/1.1
@@ -440,47 +458,56 @@ Internet-Draft                 HTTP Prefer                  October 2012
 
      {Data}
 
-
-
-
-
-Snell                     Expires April 7, 2013                 [Page 8]
-
-Internet-Draft                 HTTP Prefer                  October 2012
-
-
    An example asynchronous response using "202 Accepted":
 
      HTTP/1.1 202 Accepted
      Location: http://example.org/collection/123
 
-   An alternative asynchronous response using "303 See Other":
+   While the "202 Accepted" response status is defined by
+   [I-D.ietf-httpbis-p2-semantics], little guidance is given on how and
+   when to use the response code and the process for determining the
+   subsequent final result of the operation is left entirely undefined.
+   Therefore, whether and how any given server supports asynchronous
+   responses is an implementation specific detail that is considered to
+   be out of the scope of this specification.
 
-     HTTP/1.1 303 See Other
-     Location: http://example.org/collection/123
-     Retry-After: 10
-
-4.2.  The "return-representation" Preference
+4.2.  The "return-representation" and "return-minimal" Preferences
 
    The "return-representation" preference indicates that the client
    prefers that the server include an entity representing the current
    state of the resource in the response to a successful request.
 
+   The "return-minimal" preference, on the other hand, indicates that
+   the client wishes the server to return only a minimal response to a
+   successful request.  Typically, such responses would utilize the "204
+   No Content" status, but other codes MAY be used as appropriate, such
+   as a "200" status with a zero-length response entity.  The
+   determination of what constitutes an appropriate minimal response is
+   solely at the discretion of the server.
+
    ABNF:
 
      return-representation = "return-representation"
+     return-minimal        = "return-minimal"
 
    When honoring the "return-representation" preference, the returned
    representation might not be a representation of the effective request
    URI when the request is affecting another resource.  In such cases,
-   the Content-Location header can be used to identity the URI of the
+   the Content-Location header can be used to identify the URI of the
    returned representation.
 
-   The "return-representation" preference is intended primarily to
-   provide a means of optimizing communication between the client and
-   server by eliminating the need for a subsequent GET request to
-   retrieve the current representation of the resource following a
-   modification.
+   The "return-representation" preference is intended to provide a means
+
+
+
+Snell                    Expires April 15, 2013                 [Page 9]
+
+Internet-Draft                 HTTP Prefer                  October 2012
+
+
+   of optimizing communication between the client and server by
+   eliminating the need for a subsequent GET request to retrieve the
+   current representation of the resource following a modification.
 
    Currently, after successfully processing a modification request such
    as a POST or PUT, a server can choose to return either an entity
@@ -491,19 +518,6 @@ Internet-Draft                 HTTP Prefer                  October 2012
    "return-minimal" preference defined below -- allow the server to take
    the client's preferences into consideration while constructing the
    response.
-
-
-
-
-
-
-
-
-
-Snell                     Expires April 7, 2013                 [Page 9]
-
-Internet-Draft                 HTTP Prefer                  October 2012
-
 
    An example request specifying the "return-representation" preference:
 
@@ -527,36 +541,22 @@ Internet-Draft                 HTTP Prefer                  October 2012
 
      BCDFGHJKLMNPQRSTVWXYZ
 
-   The "return-minimal" and "return-representation" preferences are
-   mutually exclusive directives.  A request that contains both
-   preferences can be treated as though neither were specified.
-
-4.3.  The "return-minimal" Preference
-
-   The "return-minimal" preference indicates that the client wishes the
-   server to return a minimal response to a successful request.
-   Typically, such responses would utilize the "204 No Content" status,
-   but other codes MAY be used as appropriate, such as a "200" status
-   with a zero-length response entity.  The determination of what
-   constitutes an appropriate minimal response is solely at the
-   discretion of the server.
-
-   ABNF:
-
-     return-minimal = "return-minimal"
-
-   The "return-minimal" preference is intended to provide a means of
-   optimizing communication between the client and server by reducing
-   the amount of data the server is required to return to the client
-   following a request.  This can be particularly useful, for instance,
-   when communicating with limited-bandwidth mobile devices or when the
+   In contrast, the "return-minimal" preference can reduce the amount of
+   data the server is required to return to the client following a
+   request.  This can be particularly useful, for instance, when
+   communicating with limited-bandwidth mobile devices or when the
    client simply does not require any further information about the
    result of a request beyond knowing if it was successfully processed.
 
 
 
 
-Snell                     Expires April 7, 2013                [Page 10]
+
+
+
+
+
+Snell                    Expires April 15, 2013                [Page 10]
 
 Internet-Draft                 HTTP Prefer                  October 2012
 
@@ -574,75 +574,61 @@ Internet-Draft                 HTTP Prefer                  October 2012
 
      HTTP/1.1 201 Created
      Location: http://example.org/collection/123
-     Content-Length: 0
 
    The "return-minimal" and "return-representation" preferences are
-   mutually exclusive directives that MUST NOT be used in combination
-   within a single request.  If a server receives a request containing
-   both the "return-minimal" and "return-representation" preferences, it
-   MAY choose to ignore either or both of the stated preferences but
-   MUST NOT signal an error or fail to process the request solely on the
-   basis of those preferences.
+   mutually exclusive directives.  A request that contains both
+   preferences can be treated as though neither were specified.
 
-4.4.  The "wait" Preference
+4.3.  The "wait" Preference
 
    The "wait" preference can be used to establish an upper bound on the
-   length of time, in seconds, the client is willing to wait for a
-   response, after which the client might choose to abandon the request.
-   In the case generating a response will take longer than the time
-   specified, the server, or proxy, MAY choose to utilize an
-   asynchronous processing model by returning, for example, "202
-   Accepted" or "303 See Other" responses.
+   length of time, in seconds, the client expects it will take the
+   server to process the request once it has been received.  In the case
+   that generating a response will take longer than the time specified,
+   the server, or proxy, can choose to utilize an asynchronous
+   processing model by returning -- for example -- a "202 Accepted"
+   response.
 
    ABNF:
 
      wait = "wait" BWS "=" BWS delta-seconds
 
-   Clients specifying the "wait" preference SHOULD also use the Date
-   header field, as specified in Section 9.2 of
-   [I-D.ietf-httpbis-p2-semantics], within the request to establish the
-   time at which the client began waiting for the completion of the
-   request.  Failing to include a Date header field in the request would
-   require the server to use the instant it received or began processing
-   the request as the baseline for determining how long the client has
-   been waiting which could yield unintended results.
+   It is important to consider that HTTP messages spend some time
+   traversing the network and being processed by intermediaries.  This
+   increases the length of time that a client will wait for a response
+   in addition to the time the server takes to process the request.  A
+   client that has strict timing requirements can estimate these factors
+   and adjust the wait value accordingly.
 
-   The lack of a Date header in the request, or poor clock
-   synchronization between the client and server makes it impossible to
-
+   As with other preferences, the "wait" preference could be ignored.
+   Clients can abandon requests that take longer than they are prepared
+   to wait.
 
 
-Snell                     Expires April 7, 2013                [Page 11]
+
+
+
+
+
+
+
+Snell                    Expires April 15, 2013                [Page 11]
 
 Internet-Draft                 HTTP Prefer                  October 2012
 
 
-   determine the exact length of time the client has already been
-   waiting when the request is received by the server.  The only
-   reliable information conveyed by the wait preference is that the
-   client is not expecting the server to spend more than the specified
-   time on request processing and can terminate the transaction at any
-   time.
-
-   An example request specifying the "wait" and "return-asynch"
-   preferences to indicate that the client wishes the server to respond
-   asynchronously if processing of the request will take longer than 10
-   seconds:
+   For example, a server receiving the following request might choose to
+   respond asynchronously if processing the request will take longer
+   than 10 seconds:
 
      POST /collection HTTP/1.1
      Host: example.org
      Content-Type: text/plain
      Prefer: return-asynch, wait=10
-     Date: Tue, 20 Dec 2011 12:34:56 GMT
 
      {Data}
 
-   The utility of the "wait" preference in networks with high or
-   unpredictable latency is questionable, at best.  In general,
-   effective use of the preference will require low and predictable
-   latency and good clock synchronization between the client and server.
-
-4.5.  The "strict" and "lenient" Processing Preferences
+4.4.  The "strict" and "lenient" Processing Preferences
 
    The "strict" and "lenient" preferences are mutually-exclusive
    directives indicating, at the server's discretion, how the client
@@ -652,26 +638,15 @@ Internet-Draft                 HTTP Prefer                  October 2012
    the server is still capable of comprehending and successfully
    processing the request, a decision must be made to either reject the
    request with an appropriate "4xx" error response or go ahead with
-   processing.  The "strict" preference can be used by the client to
-   indicate that, in such conditions, it would prefer that the server
-   reject the request, while the "lenient" preference indicates that the
-   client would prefer the server to attempt to process the request.
-   The specific meaning and application of the "strict" and "lenient"
-   directives is specific to each type of resource, the request method
-   and the operation of the server.
+   processing.  The "strict" preference can be used to indicate that,
+   while any particular error may be recoverable, the client would
+   prefer that the server reject the request.  The "lenient" preference,
+   on the other hand, indicates that the client wishes the server to
+   attempt to process the request.
 
    ABNF:
 
      handling = "strict" / "lenient"
-
-
-
-
-
-Snell                     Expires April 7, 2013                [Page 12]
-
-Internet-Draft                 HTTP Prefer                  October 2012
-
 
    An example request specifying the "strict" preference:
 
@@ -679,13 +654,6 @@ Internet-Draft                 HTTP Prefer                  October 2012
      Host: example.org
      Content-Type: text/plain
      Prefer: strict
-
-   An example request specifying the "lenient" preference:
-
-     POST /collection HTTP/1.1
-     Host: example.org
-     Content-Type: text/plain
-     Prefer: lenient
 
 
 5.  IANA Considerations
@@ -695,15 +663,25 @@ Internet-Draft                 HTTP Prefer                  October 2012
    (http://www.iana.org/assignments/message-headers/perm-headers.html).
 
       Header field name: Prefer
+
+
+
+
+
+Snell                    Expires April 15, 2013                [Page 12]
+
+Internet-Draft                 HTTP Prefer                  October 2012
+
+
       Applicable Protocol: HTTP
-      Status:
+      Status: Standard
       Author: James M Snell <jasnell@gmail.com>
       Change controller: IETF
       Specification document: this specification
 
       Header field name: Preference-Applied
       Applicable Protocol: HTTP
-      Status:
+      Status: Standard
       Author: James M Snell <jasnell@gmail.com>
       Change controller: IETF
       Specification document: this specification
@@ -713,7 +691,6 @@ Internet-Draft                 HTTP Prefer                  October 2012
    IANA is asked to create a new registry, "HTTP Preferences", under the
    Hypertext Transfer Protocol (HTTP) Parameters group.  New
    registrations will use the Specification Required policy [RFC5226].
-
    The requirements for registered preferences are described in
    Section 4.
 
@@ -721,18 +698,8 @@ Internet-Draft                 HTTP Prefer                  October 2012
    below, typically published in the required specification.  However,
    to allow for the allocation of values prior to publication, the
    Designated Expert can approve registration based on a separately
-
-
-
-Snell                     Expires April 7, 2013                [Page 13]
-
-Internet-Draft                 HTTP Prefer                  October 2012
-
-
    submitted template once they are satisfied that a specification will
-   be published.
-
-   Note that preferences can be registered by third parties, if the
+   be published.  Preferences can be registered by third parties if the
    Designated Expert determines that an unregistered preference is
    widely deployed and not likely to be registered in a timely manner.
 
@@ -746,13 +713,21 @@ Internet-Draft                 HTTP Prefer                  October 2012
 
    Registration requests should be sent to the ietf-http-wg@w3.org
    mailing list, marked clearly in the subject line (e.g., "NEW
-   PREFERENCE - example" to register an "example" preference).
+   PREFERENCE - example" to register an "example" preference).  Within
+   at most 14 days of the request, the Designated Expert(s) will either
+   approve or deny the registration request, communicating this decision
+   to the review list and IANA.  Denials should include an explanation
+   and, if applicable, suggestions as to how to make the request
+   successful.
 
-   Within at most 14 days of the request, the Designated Expert(s) will
-   either approve or deny the registration request, communicating this
-   decision to the review list and IANA.  Denials should include an
-   explanation and, if applicable, suggestions as to how to make the
-   request successful.
+
+
+
+
+Snell                    Expires April 15, 2013                [Page 13]
+
+Internet-Draft                 HTTP Prefer                  October 2012
+
 
 5.2.  Initial Registry Contents
 
@@ -766,7 +741,7 @@ Internet-Draft                 HTTP Prefer                  October 2012
    o  Preference: return-minimal
    o  Description: Indicates that the client prefers the server return a
       minimal response to a request.
-   o  Reference: [this specification], Section 4.3
+   o  Reference: [this specification], Section 4.2
 
    o  Preference: return-representation
    o  Description: Indicates that the client prefers the server to
@@ -775,32 +750,22 @@ Internet-Draft                 HTTP Prefer                  October 2012
    o  Reference: [this specification], Section 4.2
 
    o  Preference: wait
-
-
-
-
-
-Snell                     Expires April 7, 2013                [Page 14]
-
-Internet-Draft                 HTTP Prefer                  October 2012
-
-
-   o  Description: Indicates an upper bound to the lenght of time the
-      client is willing to wait for a response, after which the request
-      can be aborted.
-   o  Reference: [this specification], Section 4.4
+   o  Description: Indicates an upper bound to the length of time the
+      client expects it will take the server to process the request once
+      it has been received.
+   o  Reference: [this specification], Section 4.3
 
    o  Preference: strict
    o  Description: Indicates that the client wishes the server to apply
       strict validation and error handling to the processing of a
       request.
-   o  Reference: [this specification], Section 4.5
+   o  Reference: [this specification], Section 4.4
 
    o  Preference: lenient
    o  Description: Indicates that the client wishes the server to apply
       lenient validation and error handling to the processing of a
       request.
-   o  Reference: [this specification], Section 4.5
+   o  Reference: [this specification], Section 4.4
 
 
 6.  Security Considerations
@@ -808,9 +773,17 @@ Internet-Draft                 HTTP Prefer                  October 2012
    Specific preferences requested by a client can introduce security
    considerations and concerns beyond those discussed within HTTP/1.1
    [I-D.ietf-httpbis-p1-messaging] and it's additional associated
-   specification documents.  Implementors need to refer to the
+   specification documents.  Implementers need to refer to the
    specifications and descriptions of each preference to determine the
    security considerations relevant to each.
+
+
+
+
+Snell                    Expires April 15, 2013                [Page 14]
+
+Internet-Draft                 HTTP Prefer                  October 2012
+
 
    A server could incur greater costs in attempting to comply with a
    particular preference (for instance, the cost of providing a
@@ -833,14 +806,6 @@ Internet-Draft                 HTTP Prefer                  October 2012
               October 2012.
 
    [I-D.ietf-httpbis-p2-semantics]
-
-
-
-Snell                     Expires April 7, 2013                [Page 15]
-
-Internet-Draft                 HTTP Prefer                  October 2012
-
-
               Fielding, R. and J. Reschke, "Hypertext Transfer Protocol
               (HTTP/1.1): Semantics and Content",
               draft-ietf-httpbis-p2-semantics-21 (work in progress),
@@ -869,6 +834,13 @@ Internet-Draft                 HTTP Prefer                  October 2012
               Protocol", RFC 5023, October 2007.
 
 
+
+
+Snell                    Expires April 15, 2013                [Page 15]
+
+Internet-Draft                 HTTP Prefer                  October 2012
+
+
 Author's Address
 
    James M Snell
@@ -892,5 +864,33 @@ Author's Address
 
 
 
-Snell                     Expires April 7, 2013                [Page 16]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                    Expires April 15, 2013                [Page 16]
 

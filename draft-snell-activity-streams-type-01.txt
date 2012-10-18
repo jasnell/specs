@@ -2,13 +2,13 @@
 
 
 Network Working Group                                           J. Snell
-Internet-Draft                                           October 9, 2012
+Internet-Draft                                          October 11, 2012
 Intended status: Informational
-Expires: April 12, 2013
+Expires: April 14, 2013
 
 
                  The application/stream+json Media Type
-                draft-snell-activity-streams-type-00.txt
+                draft-snell-activity-streams-type-01.txt
 
 Abstract
 
@@ -30,7 +30,7 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 12, 2013.
+   This Internet-Draft will expire on April 14, 2013.
 
 Copyright Notice
 
@@ -52,7 +52,7 @@ Copyright Notice
 
 
 
-Snell                    Expires April 12, 2013                 [Page 1]
+Snell                    Expires April 14, 2013                 [Page 1]
 
 Internet-Draft           application/stream+json            October 2012
 
@@ -61,7 +61,7 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
    2.  IANA Considerations . . . . . . . . . . . . . . . . . . . . . . 3
-   3.  Security Considerations . . . . . . . . . . . . . . . . . . . . 4
+   3.  Security Considerations . . . . . . . . . . . . . . . . . . . . 3
    4.  Normative References  . . . . . . . . . . . . . . . . . . . . . 4
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 4
 
@@ -108,7 +108,7 @@ Table of Contents
 
 
 
-Snell                    Expires April 12, 2013                 [Page 2]
+Snell                    Expires April 14, 2013                 [Page 2]
 
 Internet-Draft           application/stream+json            October 2012
 
@@ -123,12 +123,8 @@ Internet-Draft           application/stream+json            October 2012
 
    This specification defines and registers the "application/
    stream+json" Content Type to represent JSON document resources that
-   conform to the JSON Activity Streams version 1.0 Specification,
-   Section 4.
-
-   In this document, the key words "MUST", "MUST NOT", "REQUIRED",
-   "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
-   and "OPTIONAL" are to be interpreted as described in [RFC2119].
+   conform to the JSON Activity Streams Version 1.0 Specification
+   [asms].
 
 
 2.  IANA Considerations
@@ -161,24 +157,19 @@ Internet-Draft           application/stream+json            October 2012
       Change controller: IESG
 
 
-
-
-
-Snell                    Expires April 12, 2013                 [Page 3]
-
-Internet-Draft           application/stream+json            October 2012
-
-
 3.  Security Considerations
 
    Security considerations for JSON Activity Stream documents are
    discussed in Section 11 of [asms].
 
 
-4.  Normative References
 
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, March 1997.
+Snell                    Expires April 14, 2013                 [Page 3]
+
+Internet-Draft           application/stream+json            October 2012
+
+
+4.  Normative References
 
    [RFC4627]  Crockford, D., "The application/json Media Type for
               JavaScript Object Notation (JSON)", RFC 4627, July 2006.
@@ -220,5 +211,14 @@ Author's Address
 
 
 
-Snell                    Expires April 12, 2013                 [Page 4]
+
+
+
+
+
+
+
+
+
+Snell                    Expires April 14, 2013                 [Page 4]
 

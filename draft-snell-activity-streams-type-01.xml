@@ -1,6 +1,5 @@
 <?xml version="1.0"?> 
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
-  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
   <!ENTITY rfc4627 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4627.xml'>
   <!ENTITY jsonpatch PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-appsawg-json-patch-05.xml'>
 ]>
@@ -9,7 +8,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-activity-streams-type-00.txt"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-activity-streams-type-01.txt"> 
   <front> 
     <title abbrev="application/stream+json"> 
       The application/stream+json Media Type
@@ -49,12 +48,8 @@
       
       <t>This specification defines and registers the "application/stream+json" 
       Content Type to represent JSON document resources that conform to the 
-      JSON Activity Streams version 1.0 Specification, Section 4.</t>
-      
-      <t>In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
-      "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
-      are to be  interpreted as described in <xref target="RFC2119" />.</t> 
- 
+      <xref target="asms">JSON Activity Streams Version 1.0 Specification</xref>.</t>
+    
     </section> 
     
     <section title="IANA Considerations"> 
@@ -98,9 +93,7 @@
   </middle> 
   <back>
     <references title="Normative References"> 
-      &rfc2119;
       &rfc4627;
-
 <reference anchor="asms" target="http://activitystrea.ms/specs/json/1.0/">
   <front>
     <title>JSON Activity Streams 1.0</title>
@@ -131,7 +124,6 @@
     <date month="May" year="2011"/>
   </front>
 </reference>
-
     </references>
   </back>
 </rfc> 
