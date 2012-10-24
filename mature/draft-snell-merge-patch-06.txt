@@ -2,13 +2,13 @@
 
 
 Network Working Group                                           J. Snell
-Internet-Draft                                          October 18, 2012
+Internet-Draft                                          October 19, 2012
 Intended status: Informational
-Expires: April 21, 2013
+Expires: April 22, 2013
 
 
               The application/json-merge-patch Media Type
-                       draft-snell-merge-patch-05
+                       draft-snell-merge-patch-06
 
 Abstract
 
@@ -31,7 +31,7 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 21, 2013.
+   This Internet-Draft will expire on April 22, 2013.
 
 Copyright Notice
 
@@ -52,7 +52,7 @@ Copyright Notice
 
 
 
-Snell                    Expires April 21, 2013                 [Page 1]
+Snell                    Expires April 22, 2013                 [Page 1]
 
 Internet-Draft           application/merge-patch            October 2012
 
@@ -62,7 +62,7 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
    2.  The "application/json-merge-patch" Media Type . . . . . . . . . 3
    3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . . . 6
-   4.  Security Considerations . . . . . . . . . . . . . . . . . . . . 6
+   4.  Security Considerations . . . . . . . . . . . . . . . . . . . . 7
    5.  Normative References  . . . . . . . . . . . . . . . . . . . . . 7
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 7
 
@@ -108,7 +108,7 @@ Table of Contents
 
 
 
-Snell                    Expires April 21, 2013                 [Page 2]
+Snell                    Expires April 22, 2013                 [Page 2]
 
 Internet-Draft           application/merge-patch            October 2012
 
@@ -164,7 +164,7 @@ Internet-Draft           application/merge-patch            October 2012
 
 
 
-Snell                    Expires April 21, 2013                 [Page 3]
+Snell                    Expires April 22, 2013                 [Page 3]
 
 Internet-Draft           application/merge-patch            October 2012
 
@@ -216,15 +216,17 @@ Internet-Draft           application/merge-patch            October 2012
    determine the specific set of change operations to be performed:
    1.  If either the root of the JSON data provided in the payload or
        the root of the target resource are JSON Arrays, the target
-       resource is to be replaced, in whole, by the provided data.
+       resource is to be replaced, in whole, by the provided data.  Any
 
 
 
-Snell                    Expires April 21, 2013                 [Page 4]
+Snell                    Expires April 22, 2013                 [Page 4]
 
 Internet-Draft           application/merge-patch            October 2012
 
 
+       object member contained in the provided data whose value is
+       explicitly null is to be treated as if the member was undefined.
    2.  If the root of the JSON data provided in the payload is an
        Object, for each distinct member specified within that object:
        *  If the member is currently undefined within the target
@@ -240,7 +242,9 @@ Internet-Draft           application/merge-patch            October 2012
        *  If the value is a JSON object and that member is currently
           defined for the target resource and the existing value is a
           JSON primitive or Array, the existing value is to be replaced
-          in whole by the object provided.
+          in whole by the object provided.  Any object member contained
+          in the provided data whose value is explicitly null is to be
+          treated as if the member was undefined.
        *  If the value is a JSON object and that member is currently
           defined within the target resource and the existing value is
           also a JSON object, then recursively apply Rule #2 to each
@@ -259,6 +263,24 @@ Internet-Draft           application/merge-patch            October 2012
    o  Change the existing value of the "tags" member from
       ["example","sample"] to ["example"].
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                    Expires April 22, 2013                 [Page 5]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
    The resulting JSON document would be similar to the following (the
    specific ordering of members within JSON documents is insigificant):
 
@@ -273,14 +295,6 @@ Internet-Draft           application/merge-patch            October 2012
          }
 
    Once the set of intended modifications is derived from the request,
-
-
-
-Snell                    Expires April 21, 2013                 [Page 5]
-
-Internet-Draft           application/merge-patch            October 2012
-
-
    the server is free to determine the appropriateness of the
    modification based on it's own understanding of the target resource.
    For instance, in the previous example, it is possible that the
@@ -313,6 +327,16 @@ Internet-Draft           application/merge-patch            October 2012
       same encoding considerations specified in Section 6 [RFC4627].
       Security considerations: As defined in this specification
       Published specification: This specification.
+
+
+
+
+
+Snell                    Expires April 22, 2013                 [Page 6]
+
+Internet-Draft           application/merge-patch            October 2012
+
+
       Applications that use this media type: None currently known.
       Additional information:
          Magic number(s): N/A
@@ -329,14 +353,6 @@ Internet-Draft           application/merge-patch            October 2012
 4.  Security Considerations
 
    The "application/json-merge-patch" Media Type allows user agents to
-
-
-
-Snell                    Expires April 21, 2013                 [Page 6]
-
-Internet-Draft           application/merge-patch            October 2012
-
-
    indicate their intention that the server determine the specific set
    of change operations to be applied to a target resource.  As such, it
    is the server's responsibility to determine the appropriateness of
@@ -372,21 +388,5 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Snell                    Expires April 21, 2013                 [Page 7]
+Snell                    Expires April 22, 2013                 [Page 7]
 

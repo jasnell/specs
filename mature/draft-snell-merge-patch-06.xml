@@ -9,7 +9,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-merge-patch-05"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-merge-patch-06"> 
   <front> 
     <title abbrev="application/merge-patch"> 
       The application/json-merge-patch Media Type
@@ -142,7 +142,9 @@
         <list style="numbers">
         <t>If either the root of the JSON data provided in the payload or 
         the root of the target resource are JSON Arrays, the target resource 
-        is to be replaced, in whole, by the provided data.</t>
+        is to be replaced, in whole, by the provided data. Any object 
+        member contained in the provided data whose value is explicitly 
+        null is to be treated as if the member was undefined.</t>
         <t>If the root of the JSON data provided in the payload is an 
         Object, for each distinct member specified within that object:
           <list style="symbols">
@@ -157,7 +159,9 @@
             <t>If the value is a JSON object and that member is currently 
             defined for the target resource and the existing value is a 
             JSON primitive or Array, the existing value is to be replaced
-            in whole by the object provided.</t>
+            in whole by the object provided.  Any object 
+            member contained in the provided data whose value is explicitly 
+            null is to be treated as if the member was undefined.</t>
             <t>If the value is a JSON object and that member is currently
             defined within the target resource and the existing value is also
             a JSON object, then recursively apply Rule #2 to each object.</t>
@@ -267,6 +271,6 @@
       &rfc5789;
       &rfc4627;
     </references>
-  </back>
+  </back>  
 </rfc> 
  

@@ -1,6 +1,13 @@
 <?xml version="1.0"?> 
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
   <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+  <!ENTITY rfc4267 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4267.xml'>  
+  <!ENTITY rfc3339 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3339.xml'>
+  <!ENTITY rfc4646 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4646.xml'>
+  <!ENTITY rfc4647 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4647.xml'>
+  <!ENTITY rfc3987 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3987.xml'>
+  <!ENTITY rfc4627 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4627.xml'>
+
   <!ENTITY jsonpatch PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-appsawg-json-patch-05.xml'>
 ]>
 <?rfc toc="yes"?> 
@@ -8,9 +15,9 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-json-test-00"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-json-test-02"> 
   <front> 
-    <title abbrev="application/merge-patch"> 
+    <title abbrev="JSON Predicate"> 
       JSON Predicate
     </title> 
  
@@ -39,14 +46,14 @@
 
 <section anchor="intro" title="Introduction"> 
 
-  <t>This specification defines JSON Predicates, a JSON-based syntax
-  for the description and serialization of logical boolean predicate 
+  <t>This specification defines JSON Predicates, a JSON-based <xref target="RFC4627"/> 
+  syntax for the description and serialization of logical boolean predicate 
   operations intended to be used in conjunction with other JSON-based 
   mechanisms, such as JSON Patch, as a means of incorporating conditional 
   handling during the processing of a JSON document.</t>
   
-  <t>For example, JSON Predicates can be used to extend a <xref target="I-D.ietf-appsawg-json-patch">JSON Patch</xref> 
-  document to provide a broader range of conditional processing
+  <t>JSON Predicates can be used to extend a <xref target="I-D.ietf-appsawg-json-patch">JSON Patch</xref> 
+  document to provide for a broader range of conditional processing
   options not currently supported by JSON Patch.</t>
   
   <figure><preamble>Example: Given a source JSON document</preamble>
@@ -70,13 +77,13 @@
       "path": "/a/b",
       "apply": [
         {
-          "op": "type-of", 
-          "path": "/a/b/c", 
+          "op": "type", 
+          "path": "/c", 
           "value": "string"
         },
         {
           "op": "contains", 
-          "path": "/a/b/c", 
+          "path": "/c", 
           "value": "ABC"
         }
       ]
@@ -94,8 +101,6 @@
   for JSON Predicates to be used within other JSON-based document
   formats, like JSON Patch.</t>
 
-  <t>TODO: Lots more needs to be said here.</t>
-
   <t>In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
   are to be  interpreted as described in <xref target="RFC2119" />.</t> 
@@ -105,7 +110,7 @@
 <section anchor="predicates" title="Predicate Objects">
 
   <t>A JSON Predicate is a JSON Object whose name value
-  pairs describe a testable conditions that evaluate as either
+  pairs describe testable conditions that evaluate as either
   true or false.</t>
   
   <t>The essential components of a JSON Predicate include:
@@ -118,8 +123,8 @@
 
   <t>Predicate objects MUST have exactly one "op" member whose value
   indicates the type of predicate operation to perform. It's value 
-  MUST be one of: "and", "contains", "defined", "ends", "less", 
-  "matches", "more", "not", "or", "starts", "type", or "undefined". 
+  MUST be one of: "and", "contains", "defined", "ends", "in", "less", 
+  "matches", "more", "not", "or", "starts", "test", "type", or "undefined". 
   The semantics for each are defined in the sections that follow.</t>  
   
   <t>Note that the value of the "op" member is case-sensitive and that
@@ -128,10 +133,10 @@
   
   <t>If the "op" member specifies any value other than one of those 
   listed above, the evaluation of the predicate operation MUST cease
-  and treated as if a boolean value of "false" was returned. The 
-  application processing the predicate operation MAY signal that an 
+  and be treated as if a boolean value of "false" was returned. The 
+  application processing the predicate operation might signal that an 
   error condition has occurred depending on the specific requirements
-  of the domain within which JSON Predicates are being used.</t>
+  of the application within which JSON Predicates are being used.</t>
   
   <t>The remaining structure of each predicate operation depends on it's
   specific type. There are two basic types of predicates.
@@ -144,9 +149,11 @@
   </t>
 
   <t>In addition to the required "op" member, First Order Predicates 
-  MUST have exactly one "path" member whose value MUST be a string 
+  have exactly one "path" member whose value MUST be a string 
   containing a JSON-Pointer value referencing the location of the 
-  name value pair that is to be tested.</t>
+  name value pair that is to be tested. If the "path" member is 
+  not specified within the predicate object, it's value is assumed
+  to be an empty string.</t>
   
   <t>Second Order Predicates MUST have exactly one "apply" member
   whose value is a JSON Array containing one or more First or 
@@ -215,7 +222,7 @@
       <t>By default, character matching MUST be performed in a 
       case-sensitive manner. To override this default behavior, 
       the predicate object MAY contain an "ignore_case" member 
-      whose value is either "true" (to perform case-insensitive
+      whose value is either true (to perform case-insensitive
       matching) or false.</t>
     
       <figure><preamble>For instance, the following will evaluate 
@@ -309,7 +316,44 @@
       </artwork></figure> 
     
     </section>
-  
+      
+    <section anchor="in" title="in">
+      
+      <t>The "in" predicate evaluates as true if the referenced element 
+        specifies a value exactly equal to one of the members of a JSON
+        array provided by the predicate's "value" member. Equality is 
+        determined following the sames rules specified for the JSON 
+        Patch "test" operation in <xref target="I-D.ietf-appsawg-json-patch"/>, Section 4.6,
+        with one exception given for optional case-insensitive comparisons.</t>
+      
+        <figure><preamble>For example, given the JSON document:</preamble>
+        <artwork>
+  {
+    "a": {
+      "b": 10
+    }
+  }
+        </artwork></figure>
+    
+        <figure><preamble>The following will evaluate as 
+          "true":</preamble><artwork>
+  {
+    "op": "in",
+    "path": "/a/b", 
+    "value": [1, "foo", 10, {"z":"y"}]
+  }
+        </artwork></figure>
+        
+        <t>The value specified for the "value" member MUST be a JSON Array.</t>
+        
+        <t>By default, when comparing string values, character matching 
+        MUST be performed in a case-sensitive manner. To override this default 
+        behavior, the predicate object MAY contain an "ignore_case" member 
+        whose value is either "true" (to perform case-insensitive
+        matching) or false.</t>
+      
+    </section>
+      
     <section anchor="less" title="less">
     
       <t>The "less" predicate evaluates
@@ -341,8 +385,8 @@
     
       <t>The "matches" predicate evaluates
       as true if the referenced element is defined and has a value whose 
-      string representation matches the regular expression provided by the 
-      predicate object's "value" member.</t>
+      completely string representation matches the regular expression 
+      provided by the predicate object's "value" member.</t>
     
       <figure><preamble>For example, given the JSON document:</preamble>
       <artwork>
@@ -453,16 +497,51 @@
     
     </section>
     
+    <section anchor="test" title="test">
+      
+      <t>The JSON Patch "test" operation, as defined by <xref target="I-D.ietf-appsawg-json-patch" />, Section 4.6,
+      can be used as a First Order Predicate operation. It evaluates as true if the referenced
+      element exists and specifies a value that is exactly equal to that provided
+      by the predicate's "value" member. The rules for evaluating equality are identical
+      to those defined within <xref target="I-D.ietf-appsawg-json-patch"/>, Section 4.6,
+      with one exception given for optional case-insensitive comparisons.</t>
+      
+      <figure><preamble>For example, given the JSON document:</preamble><artwork>
+{
+  "a": {
+    "b": "this is a test"
+  }
+}
+      </artwork></figure>
+      
+      <figure><preamble>The following predicate would evaluate as 
+        "true"</preamble><artwork>
+{
+  "op": "test",
+  "path": "/a/b", 
+  "value": "this is a test"
+}
+      </artwork></figure>
+      
+      <t>By default, when comparing string values, character matching 
+      MUST be performed in a case-sensitive manner. To override this default 
+      behavior, the predicate object MAY contain an "ignore_case" member 
+      whose value is either "true" (to perform case-insensitive
+      matching) or false.</t>
+      
+    </section>
+    
     <section anchor="type" title="type">
     
       <t>The "type" predicate 
       evaluates as true if the referenced element exists and specifies 
-      a value whose JSON type is equal to that specified by the predicate's 
+      a value whose value type is equal to that specified by the predicate's 
       "value" member.</t>
     
       <t>The "value" member MUST specify one of: "number",
-      "string", "boolean", "object", "array", "null" or 
-      "undefined".</t>
+      "string", "boolean", "object", "array", "null", 
+      "undefined", "date", "date-time", "time", "lang", "lang-range", 
+      "iri" or "absolute-iri".</t>
     
       <figure><preamble>For example, given the JSON document:</preamble><artwork>
 {
@@ -481,17 +560,60 @@
   "value": "string"
 }
       </artwork></figure>
-
-      <t>Note that the "type" predicate
-      is generally identical to JavaScript's built in "typeof" 
-      operator with the exception that JavaScript's operator does 
-      not distinguish between Array and Object types. That is, when 
-      executing the JavaScript code "typeof doc.a.c" 
-      against the example JSON document given above, JavaScript will 
-      report the type as "object" rather than "array". By contrast, the 
-      "type" predicate distinguishes
-      the two types of values.</t>
-        
+      
+      <t>When evaluating the type of a value, the following rules apply:
+        <list style="symbols">
+          <t>If the "value" member specifies "number", the type predicate
+            will evaluate as true if the value referenced by the "path" 
+            member is a JSON number.</t>
+          <t>If the "value" member specifies "string", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON string.</t>
+          <t>If the "value" member specifies "boolean", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON boolean.</t>
+          <t>If the "value" member specifies "object", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON object.</t>
+          <t>If the "value" member specifies "array", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON array.</t>
+          <t>If the "value" member specifies "null", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON null.</t>
+          <t>If the "value" member specifies "undefined", the type predicate
+            will evaluate as true if the member referenced by the "path"
+            member does not exist.</t>
+          <t>If the "value" member specifies "date", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON string conforming to the <xref target="RFC3339"/>
+            "full-date" construct.</t>
+          <t>If the "value" member specifies "time", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON string conforming to the <xref target="RFC3339"/>
+            "full-time" construct.</t>
+          <t>If the "value" member specifies "date-time", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON string conforming to the <xref target="RFC3339"/>
+            "date-time" construct.</t>
+          <t>If the "value" member specifies "lang", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON string conforming to the <xref target="RFC4646"/>
+            "Language-Tag" construct.</t>
+          <t>If the "value" member specifies "lang-range", the type predicate
+            will evaluate as true if the value referenced by the "path"
+            member is a JSON string conforming to the <xref target="RFC4647"/>
+            "language-range" construct.</t>
+          <t>If the "value" member specifies "iri", the type predicate will
+            evaluate as true if the value referenced by the "path" member
+            is a JSON string conforming to the <xref target="RFC3987"/>
+            "IRI-reference" construct.</t>
+          <t>If the "value" member specifies "absolute-iri", the type predicate
+            will evaluate a true if the value referenced by the "path" member
+            is a JSON string conforming to the <xref target="RFC3987"/>
+            "IRI" construct.</t>
+        </list>
+      </t>
     </section>
     
     <section anchor="undefined" title="undefined">
@@ -540,7 +662,8 @@
     
     <t>All Second Order Predicates MAY contain a "path" member whose 
     value specifies a root path prefix for all contained predicates.
-    For example, given the JSON document:</t>
+    If the "path" member is not specified, it's value is assumed to 
+    be an empty string. For example, given the JSON document:</t>
     
     <figure><artwork>
 {
@@ -615,9 +738,8 @@
       </artwork></figure>
     
       <figure><preamble>However, the following would evaluate as 
-      "false" because the while element 
-      "/a/c" exists, the value of that element is not a 
-      string.</preamble><artwork>
+      "false" because while the element "/a/c" exists, the value 
+      of that element is not a string.</preamble><artwork>
 {
   "op": "and",
   "apply": [
@@ -756,33 +878,22 @@
       <figure><artwork>
 {
   "op": "or",
+  "path": "/a/b",
   "apply": [
     {
       "op": "not",
+      "path": "/c",
       "apply": [
-        {
-          "op": "defined",
-          "path": "/a/b/c"
-        },
-        {
-          "op": "starts",
-          "path": "/a/b/c", 
-          "value": "f"
-        }
+        {"op": "undefined"},
+        {"op": "starts", "value": "f"}
       ]
     },
     {
       "op": "not",
+      "path": "/d",
       "apply": [
-        {
-          "op": "defined",
-          "path": "/a/b/d"
-        },
-        {
-          "op": "type",
-          "path": "/a/b/d", 
-          "value": "number"
-        }
+        {"op": "defined"},
+        {"op": "type", "value": "number"}
       ]
     }
   ]
@@ -796,7 +907,9 @@
   <section anchor="error-handling" title="Error Handling">
     
     <t>When an error condition is encounted during the processing of a
-    JSON Predicate, the predicate MUST evaluate as false.</t>
+    JSON Predicate, the predicate MUST evaluate as false. Whether or not
+    the error condition is reported is dependent on the specific requirements
+    of the application within which JSON Predicates are being used.</t>
     
     <t>Error conditions can arise in each of the following conditions:
       <list style="symbols">
@@ -806,11 +919,14 @@
         <t>The Predicate Object specifies a JSON Pointer referencing 
         a value that does not exist and the specified Predicate operation 
         is not specifically intended to test for the absence of a value 
-        (i.e. the "undefined" predicate), or</t>
+        (i.e. the "undefined" and "defined" predicates), or</t>
         <t>A First Order Predicate Object specifies a predicate operation
-        that requires a "value" member
-        providing the condition to test but no "value"
-        member is provided.</t>
+        that requires a "value" member providing the condition to test but 
+        no "value" member is provided.</t>
+        <t>The "value" member given for a given predicate operation is of
+          an unexpected or unsupported type for that operation (e.g.
+          specifying a string value for the "more" and "less" predicate
+          operations).</t>
       </list>
     </t>
     
@@ -824,6 +940,11 @@
     within a JSON Patch Document as tests to evaluate whether or not the 
     application of a set of patch operations should succeed or fail.</t>
     
+    <t>Because of requirements defined by the JSON Patch specification, 
+    when Second Order Predicates are used as patch test operations within 
+    a JSON Patch document, the "path" member MUST be specified. The value 
+    of the "path" member MAY be an empty string.</t>
+    
     <figure><preamble>For example, given the following JSON document:</preamble>
     <artwork>
 {
@@ -836,13 +957,16 @@
     </artwork></figure>
     
     <figure><preamble>The following JSON Patch + JSON Predicates document will 
-      first test that the path "/a/b/c" references a value matching the given 
-      regular expression prior to replacing that value:</preamble><artwork>
+      first test that the path "/a/b/c" references a string value matching the 
+      given regular expression prior to replacing that value:</preamble><artwork>
 [
   {
-    "op": "matches",
+    "op": "and",
     "path": "/a/b/c",
-    "value": "\\d{3}"
+    "apply": [
+      {"op": "type", "value": "string"},
+      {"op": "matches", "value": "\\d{3}"}
+    ]
   },
   {
     "op": "replace",
@@ -859,12 +983,48 @@
     Specifically, processing of the JSON Patch document SHOULD terminate and 
     application of the entire patch document SHALL NOT be deemed successful.</t>
     
-    <t>Note that JSON Patch implementations that do not implement or recognize
-    JSON Predicate objects will treat such objects as unknown patch operations 
+    <t>An implementation SHOULD make consumers of JSON Patch documents aware that 
+    predicate objects are included by appending the optional parameter 
+    "predicates=1" to the "application/patch+json" MIME media type.</t>
+  
+    <t>For example:</t>
+    
+    <figure><artwork>
+  PATCH /some-document HTTP/1.1
+  Host: example.org
+  Content-Type: application/patch+json; predicates=1
+  
+  [
+    {
+      "op": "matches",
+      "path": "/a/b/c",
+      "value": "\\d{3}"
+    },
+    {
+      "op": "replace",
+      "path": "/a/b/c",
+      "value": "ABC"
+    }
+  ] 
+    </artwork></figure>
+    
+    <t>JSON Patch implementations that do not implement or recognize
+    JSON Predicate objects will treat them as unknown patch operations 
     that will cause evaluation of the Patch document to fail.</t>
     
   </section>
   
+</section>
+      
+<section title="IANA Considerations">
+  
+  <t>This specification introduces an additional optional "predicates" 
+    parameter to the "application/patch+json" MIME Media Type. The value
+    of the predicates parameter MUST be "1". The presence of "predicates=1"
+    as a parameter of the "application/patch+json" media type is an 
+    explicit indication that the JSON Patch document contains JSON
+    Predicate objects.</t>
+    
 </section>
       
 <section title="Security Considerations">
@@ -879,9 +1039,15 @@
 <back>
 <references title="Normative References"> 
   &rfc2119;
+  &rfc3987;
+  &rfc4647;
+  &rfc4646;
+  &rfc4627;
+  &rfc3339;
+</references>
+<references title="Informative References">
   &jsonpatch;
 </references>
-  
 </back>
 </rfc> 
  

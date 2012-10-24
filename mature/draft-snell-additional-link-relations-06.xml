@@ -39,7 +39,7 @@
  
       <t>The fundamental model for Web Links and the Registry of Link
       Relations are established by <xref target="RFC5988"/>. This specification 
-      defines and adds the following additional types of link relations to 
+      defines and adds the following additional link relation types to 
       the registry: about, preview, privacy-policy, terms-of-service, and type.</t>
       
     </section> 
