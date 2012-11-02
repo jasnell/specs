@@ -2,13 +2,13 @@
 
 
 Network Working Group                                           J. Snell
-Internet-Draft                                          October 19, 2012
+Internet-Draft                                          November 2, 2012
 Intended status: Informational
-Expires: April 22, 2013
+Expires: May 6, 2013
 
 
               The application/json-merge-patch Media Type
-                       draft-snell-merge-patch-06
+                       draft-snell-merge-patch-07
 
 Abstract
 
@@ -31,7 +31,7 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 22, 2013.
+   This Internet-Draft will expire on May 6, 2013.
 
 Copyright Notice
 
@@ -52,9 +52,9 @@ Copyright Notice
 
 
 
-Snell                    Expires April 22, 2013                 [Page 1]
+Snell                      Expires May 6, 2013                  [Page 1]
 
-Internet-Draft           application/merge-patch            October 2012
+Internet-Draft           application/merge-patch           November 2012
 
 
 Table of Contents
@@ -64,7 +64,8 @@ Table of Contents
    3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . . . 6
    4.  Security Considerations . . . . . . . . . . . . . . . . . . . . 7
    5.  Normative References  . . . . . . . . . . . . . . . . . . . . . 7
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 7
+   Appendix A.  Example JavaScript Implementation  . . . . . . . . . . 7
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 9
 
 
 
@@ -107,10 +108,9 @@ Table of Contents
 
 
 
-
-Snell                    Expires April 22, 2013                 [Page 2]
+Snell                      Expires May 6, 2013                  [Page 2]
 
-Internet-Draft           application/merge-patch            October 2012
+Internet-Draft           application/merge-patch           November 2012
 
 
 1.  Introduction
@@ -164,9 +164,9 @@ Internet-Draft           application/merge-patch            October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 3]
+Snell                      Expires May 6, 2013                  [Page 3]
 
-Internet-Draft           application/merge-patch            October 2012
+Internet-Draft           application/merge-patch           November 2012
 
 
    to be made to a target resource.  When used within an HTTP PATCH
@@ -202,7 +202,7 @@ Internet-Draft           application/merge-patch            October 2012
        "phoneNumber": "+01-123-456-7890",
        "author": {
          "familyName": null
-       }
+       },
        "tags": ["example"]
      }
 
@@ -212,17 +212,17 @@ Internet-Draft           application/merge-patch            October 2012
    target resource, what specific operations will be applied to modify
    the resource.
 
-   A server receiving this patch request apply the following rules to
-   determine the specific set of change operations to be performed:
+   A server receiving this patch request MUST apply the following rules
+   to determine the specific set of change operations to be performed:
    1.  If either the root of the JSON data provided in the payload or
        the root of the target resource are JSON Arrays, the target
        resource is to be replaced, in whole, by the provided data.  Any
 
 
 
-Snell                    Expires April 22, 2013                 [Page 4]
+Snell                      Expires May 6, 2013                  [Page 4]
 
-Internet-Draft           application/merge-patch            October 2012
+Internet-Draft           application/merge-patch           November 2012
 
 
        object member contained in the provided data whose value is
@@ -276,9 +276,9 @@ Internet-Draft           application/merge-patch            October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 5]
+Snell                      Expires May 6, 2013                  [Page 5]
 
-Internet-Draft           application/merge-patch            October 2012
+Internet-Draft           application/merge-patch           November 2012
 
 
    The resulting JSON document would be similar to the following (the
@@ -332,9 +332,9 @@ Internet-Draft           application/merge-patch            October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 6]
+Snell                      Expires May 6, 2013                  [Page 6]
 
-Internet-Draft           application/merge-patch            October 2012
+Internet-Draft           application/merge-patch           November 2012
 
 
       Applications that use this media type: None currently known.
@@ -377,6 +377,100 @@ Internet-Draft           application/merge-patch            October 2012
               RFC 5789, March 2010.
 
 
+Appendix A.  Example JavaScript Implementation
+
+   This code is provided as is, without warranty.  It is provided in the
+   public domain.
+
+     function apply(orig, patch) {
+       if (patch == null)
+         return orig;
+
+
+
+Snell                      Expires May 6, 2013                  [Page 7]
+
+Internet-Draft           application/merge-patch           November 2012
+
+
+       else if (patch instanceof Array)
+         orig = purge_nulls(patch);
+       else if (is_primitive(patch))
+         orig = patch;
+       else if (patch instanceof Object) {
+         for (m in patch) {
+           if (orig.hasOwnProperty(m)) {
+             if (patch[m] == null)
+               delete orig[m];
+             else {
+               if (is_primitive(patch[m]))
+                 orig[m] = patch[m];
+               else {
+                 if (orig[m] instanceof Array)
+                   orig[m] = purge_nulls(patch[m]);
+                 else
+                   orig[m] = apply(orig[m],patch[m]);
+               }
+             }
+           } else if (patch[m] != null)
+             orig[m] = purge_nulls(patch[m]);
+         }
+       }
+       return orig;
+     }
+
+
+     function is_primitive(val) {
+       var m = typeof val;
+       return m == 'string'  ||
+              m == 'number'  ||
+              m == 'boolean';
+     }
+
+     function purge_nulls(obj) {
+       for (m in obj) {
+         if (obj[m] == null) {
+           if (obj instanceof Array)
+             obj.splice(m,1);
+           else
+             delete(obj[m]);
+         } else if (obj[m] instanceof Object)
+           purge_nulls(obj[m]);
+       }
+       return obj;
+     }
+
+     var orig = {
+
+
+
+Snell                      Expires May 6, 2013                  [Page 8]
+
+Internet-Draft           application/merge-patch           November 2012
+
+
+       "a": "b",
+       "c": {
+         "d": [1,2,3],
+         "e": {
+           "f": 1
+         }
+       }
+     }
+
+     var patch = {
+       "c": {
+         "d": [1,2],
+         "e": {
+           "f": null
+         }
+       }
+     }
+
+     var modified = apply(orig,patch);
+
+
+
 Author's Address
 
    James M Snell
@@ -388,5 +482,23 @@ Author's Address
 
 
 
-Snell                    Expires April 22, 2013                 [Page 7]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                      Expires May 6, 2013                  [Page 9]
 
