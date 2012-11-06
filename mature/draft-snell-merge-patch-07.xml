@@ -274,9 +274,13 @@
     
     <section title="Example JavaScript Implementation">
       
-      <t>This code is provided as is, without warranty. It is provided in the public domain.</t>
+      <t>The following example implementation is provided as is, without warranty. 
+      It is provided in the public domain.</t>
       
       <figure><artwork><![CDATA[
+  // Apply the patch to the original, return the 
+  // modified object... this will mutate the 
+  // passed in object in place as well...
   function apply(orig, patch) {
     if (patch == null) 
       return orig;
@@ -327,6 +331,7 @@
     return obj;
   }
 
+  // Define the original object...
   var orig = {
     "a": "b",
     "c": {
@@ -337,6 +342,7 @@
     }
   }
 
+  // Define the patch...
   var patch = {
     "c": {
       "d": [1,2],
@@ -346,8 +352,8 @@
     }
   }
 
+  // Apply the patch...
   var modified = apply(orig,patch);
-
       ]]></artwork></figure>
       
     </section>
