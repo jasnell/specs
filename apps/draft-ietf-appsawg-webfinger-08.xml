@@ -1,0 +1,1041 @@
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+  <!ENTITY rfc2616 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2616.xml'>
+  <!ENTITY rfc5785 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5785.xml'>
+  <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
+  <!ENTITY rfc4627 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4627.xml'>
+  <!ENTITY rfc3986 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3986.xml'>
+  <!ENTITY rfc3987 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3987.xml'>
+  <!ENTITY rfc6068 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6068.xml'>
+  <!ENTITY rfc4288 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4288.xml'>
+  <!ENTITY rfc5646 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5646.xml'>
+  <!ENTITY rfc6350 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6350.xml'>
+  <!ENTITY acct PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-appsawg-acct-uri-01.xml'>
+  <!ENTITY cors PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml4/reference.W3C.WD-cors-20120403.xml'>
+  <!ENTITY ieee1284 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml2/_reference.IEEE.1284-1.1997.xml'>
+]>
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="std" ipr="trust200811" docName="draft-ietf-appsawg-webfinger-08"> 
+  <front> 
+    <title abbrev="draft-ietf-appsawg-webfinger"> 
+      WebFinger
+    </title> 
+ 
+    <author initials="J.M." surname="Snell" fullname="James M Snell" role="editor"> 
+      <organization abbrev="IBM">IBM</organization>
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+    
+    <author initials="P.E." surname="Jones" fullname="Paul E. Jones">
+      <organization abbrev="Cisco">Cisco Systems, Inc.</organization>
+      <address>
+        <postal>
+          <street>7025 Kit Creek Rd.</street>
+          <city>Research Triangle Park, NC 27709</city>
+          <country>USA</country>
+        </postal>
+        <phone>+1 919 476 2048</phone>
+        <email>paulej@packetizer.com</email>
+        <uri>xmpp:paulej@packetizer.com</uri>
+      </address>
+    </author>
+    
+    <author initials="G." surname="Salgueiro" fullname="Gonzalo Salgueiro">
+      <organization abbrev="Cisco">Cisco Systems, Inc.</organization>
+      <address>
+        <postal>
+          <street>7025 Kit Creek Rd.</street>
+          <city>Research Triangle Park, NC 27709</city>
+          <country>USA</country>
+        </postal>
+        <phone>+1 919 392 3266</phone>
+        <email>gsalguei@cisco.com</email>
+        <uri>xmpp:gsalguei@cisco.com</uri>
+      </address>
+    </author>
+    
+    <author initials="J." surname="Smarr" fullname="Joseph Smarr"> 
+      <organization abbrev="Google">Google</organization>
+      <address> 
+        <email>jsmarr@google.com</email> 
+      </address> 
+    </author> 
+    
+    <date month="December" year="2012" /> 
+ 
+    <area>Applications</area> 
+    <workgroup>Applications Area Working Group</workgroup> 
+    <keyword>I-D</keyword> 
+    <keyword>http</keyword>
+ 
+    <abstract> 
+      <t>This specification defines the WebFinger protocol, which can 
+      be used to discover information about people or other entities 
+      on the Internet using standard HTTP methods.</t>      
+    </abstract> 
+ 
+  </front> 
+  
+  <middle> 
+    
+    <section title="Introduction" anchor="introduction">
+      <t>WebFinger is used to discover information about people or other
+      entities on the Internet using standard HTTP <xref target="RFC2616"/> 
+      methods.  The WebFinger server returns a JavaScript Object Notation (JSON) 
+      <xref target="RFC4627"/> object that describes the resource being queried.  
+      The JSON object is referred to as the JSON Resource Descriptor (JRD).  
+      The JRD contains link relations, properties, titles, and other information 
+      that is suitable for automated processing.  For a person, the kinds of
+      information that might be shared via WebFinger include a personal
+      profile address, identity service, telephone number, or preferred
+      avatar.  For other entities on the Internet, the server might return
+      JRDs containing link relations that allow a client to discover the
+      amount of toner in a printer or the physical location of a server.</t>
+
+      <t>Information returned via WebFinger might be for direct human
+      consumption (e.g., looking up someone's phone number), or it might be
+      used by systems to help carry out some operation (e.g., facilitate
+      logging into a web site by determining a user's identity service).</t>
+    </section>
+    
+    <section title="Terminology" anchor="terminology">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref target="RFC2119"/>.</t>
+
+      <t>WebFinger makes heavy use of "Link Relations".  Briefly, a Link
+      Relation is an attribute and value pair used on the Internet wherein
+      the attribute identifies the type of link to which the associated
+      value refers.  In Hypertext Transfer Protocol (HTTP) and Web Linking
+      [4], the attribute is a "rel" and the value is an "href". WebFinger
+      also uses the "rel" attribute, where the "rel" value is either a
+      single IANA-registered link relation type 
+      <eref target="http://www.iana.org/assignments/link-relations/"/>, 
+      absolute URI <xref target="RFC3986"/> or absolute IRI <xref target="RFC3987"/>.</t>
+    </section>
+    
+    <section title="Overview" anchor="overview">
+      <t>WebFinger enables the discovery of information about users, devices,
+      and other entities that are associated with a host.  Discovery
+      involves a single HTTP GET request to the well-known <xref target="RFC5785"/> "webfinger"
+      resource at the target host and receiving back a JavaScript Object
+      Notation (JSON) <xref target="RFC4627"/> Resource Descriptor (JRD) 
+      (see <xref target="jrd"/>) containing link relations, properties, 
+      titles, and other useful information.  The request MUST include the 
+      URI or IRI <xref target="RFC3987"/> for the entity for which information 
+      is sought as a parameter named "resource".</t>
+
+      <t>Use of WebFinger is illustrated in the examples in Section 4, then
+      described more formally in <xref target="webfinger-protocol"/>.</t>
+    </section>
+    
+    <section title="Example Use of WebFinger" anchor="example-use">
+      
+      <t>This non-normative section shows a few sample uses of WebFinger.</t>
+      
+      <section title="Locating a User's Blog" anchor="example-blog">
+        
+        <t>Assume you receive an email from Bob and he refers to something he
+        posted on his blog, but you do not know where Bob's blog is located.
+        It would be simple to discover the address of Bob's blog if he makes
+        that information available via WebFinger.</t>
+
+        <t>Assume your email client can discover the blog for you.  After
+        receiving the message from Bob (bob@example.com), you instruct your
+        email client to perform a WebFinger query.  It does so by issuing the
+        following HTTPS query to example.com:</t>
+
+        <figure><artwork><![CDATA[        
+  GET /.well-known/webfinger?
+    resource=acct%3Abob%40example.com HTTP/1.1
+  Host: example.com
+]]></artwork></figure>
+
+        <t>The server might then respond with a message like this:</t>
+
+        <figure><artwork><![CDATA[
+  HTTP/1.1 200 OK
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json; charset=UTF-8
+
+  {
+    "expires" : "2012-11-16T19:41:35Z",
+    "subject" : "acct:bob@example.com",
+    "aliases" : [
+      "http://www.example.com/~bob/"
+    ],
+    "properties" : {
+      "http://example.com/rel/role/" : "employee"
+    },
+    "links" : [
+      {
+        "rel" : "http://webfinger.net/rel/avatar",
+        "type" : "image/jpeg",
+        "href" : "http://www.example.com/~bob/bob.jpg"
+      },
+      {
+        "rel" : "http://webfinger.net/rel/profile-page",
+        "href" : "http://www.example.com/~bob/"
+      },
+      {
+        "rel" : "blog",
+        "type" : "text/html",
+        "href" : "http://blogs.example.com/bob/",
+        "titles" : {
+          "en-us" : "The Magical World of Bob",
+          "fr" : "Le monde magique de Bob"
+        }
+      },
+      {
+        "rel" : "vcard",
+        "href" : "http://www.example.com/~bob/bob.vcf"
+      }
+    ]
+  }
+]]></artwork></figure>
+
+        <t>The email client would take note of the "blog" link relation in the
+        above JRD that refers to Bob's blog.  This URL would then be
+        presented to you so that you could then visit his blog.  The email
+        client might also note that Bob has published an avatar link relation
+        and use that picture to represent Bob inside the email client.
+        Lastly, the client might consider the vcard <xref target="RFC6350"/> 
+        link relation in order to update contact information for Bob.</t>
+
+        <t>In the above example, an "acct" URI <xref target="I-D.ietf-appsawg-acct-uri"/> 
+        is used in the query, though any valid alias for the user might also be used.  
+        An alias is a URI that is different from the "subject" URI that identifies 
+        the same entity.  In the above example, there is one "http" alias returned,
+        though there might have been more than one.  Had the "http:" URI
+        shown as an alias been used to query for information about Bob, the
+        query would have appeared as:</t>
+
+        <figure><artwork><![CDATA[
+  GET /.well-known/webfinger?
+    resource=http%3A%2F%2Fwww.example.com%2F~bob%2F HTTP/1.1
+  Host: example.com
+]]></artwork></figure>
+
+        <t>The response would have been substantially the same, with the subject
+        and alias information changed as necessary.  Other information, such
+        as the expiration time might also change, but the set of link
+        relations and properties would be the same with either response.</t>
+        
+      </section>
+      
+      <section title="Identity Provider Discovery for OpenID Connect" anchor="example-identity">
+        
+        <t>Suppose Carol wishes to authenticate with a web site she visits using
+        OpenID Connect <xref target="openid-connect-mesages-1_0"/>.  She would provide 
+        the web site with her OpenID Connect identifier, say carol@example.com.  The 
+        visited web site would perform a WebFinger query looking for the OpenID Connect
+        Provider.  Since the site is interested in only one particular link
+        relation, the server might utilize the "rel" parameter as described
+        in section 5.3:</t>
+
+        <figure><artwork><![CDATA[
+  GET /.well-known/webfinger?
+    resource=acct%3Acarol%40example.com&
+    rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer
+    HTTP/1.1
+  Host: example.com
+]]></artwork></figure>
+
+        <t>The server might respond with a JRD like this:</t>
+
+        <figure><artwork><![CDATA[
+          {
+            "expires" : "2012-11-16T19:41:35Z",
+            "subject" : "acct:carol@example.com",
+            "aliases" :
+            [
+              "http://www.example.com/~carol/"
+            ],
+            "properties" :
+            {
+                "http://example.com/rel/role/" : "employee"
+            },
+            "links" :
+            [
+              {
+                "rel" : "http://openid.net/specs/connect/1.0/issuer",
+                "href" : "https://openid.example.com/"
+              }
+            ]
+          }
+]]></artwork></figure>
+          
+        <t>Since the "rel" parameter only filters the link relations returned by
+        the server, other name/value pairs in the response, including any
+        aliases or properties, would be returned.  Also, since support for
+        the "rel" parameter is optional, the client must not assume the
+        "links" array will contain only the requested link relation.</t>
+        
+      </section>
+      
+      <section title="Auto-Configuration of Email Clients" anchor="example-email">
+        
+        <t>WebFinger could be used to auto-provision an email client with basic
+        configuration data.  Suppose that sue@example.com wants to configure
+        her email client.  Her email client might issue the following query:</t>
+
+        <figure><artwork><![CDATA[
+  GET /.well-known/webfinger?
+    resource=mailto%3Asue%40example.com HTTP/1.1
+  Host: example.com
+]]></artwork></figure>
+
+        <t>The response from the server would contain entries for the various
+        protocols, transport options, and security options.  If there are
+        multiple options, the server might return a link relation that for
+        each of the valid options and the client or Sue might select which
+        option to choose.  Since JRDs list link relations in a specific
+        order, then the most-preferred choices could be presented first.
+        Consider this response:</t>
+ 
+        <figure><artwork><![CDATA[
+  {
+    "subject" : "mailto:sue@example.com",
+    "links" : [
+      {
+        "rel" : "http://example.net/rel/smtp-server",
+        "properties" : {
+          "http://example.net/email/host" : "smtp.example.com",
+          "http://example.net/email/port" : "587",
+          "http://example.net/email/login-required" : "yes",
+          "http://example.net/email/transport" : "starttls"
+        }
+      },
+      {
+        "rel" : "http://example.net/rel/imap-server",
+        "properties" : {
+          "http://example.net/email/host" : "imap.example.com",
+          "http://example.net/email/port" : "993",
+          "http://example.net/email/transport" : "ssl"
+        }
+      }
+    ]
+  }
+]]></artwork></figure>
+
+        <t>In this example, you can see that the WebFinger server advertises an
+        SMTP service and an IMAP service.  In this example, the "href"
+        entries associated with the link relation are absent.  This is valid
+        when there is no external reference that needs to be made.</t>
+        
+      </section>
+      
+      <section title="Retrieving Device Information" anchor="example-device">
+        
+        <t>As another example, suppose there are printers on the network and you
+        would like to check the current toner level for a particular printer
+        identified via the URI device:p1.example.com.  While the "device" URI
+        scheme is not presently specified, we use it here for illustrative
+        purposes.</t>
+
+        <t>Following the procedures similar to those above, a query may be
+        issued to get link relations specific to this URI like this:</t>
+
+        <figure><artwork><![CDATA[
+  GET /.well-known/webfinger?
+    resource=device%3Ap1.example.com HTTP/1.1
+  Host: example.com
+]]></artwork></figure>
+
+        <t>The link relations that are returned for a device may be quite
+        different than those for user accounts.  Perhaps we may see a
+        response like this:</t>
+
+        <figure><artwork><![CDATA[
+  HTTP/1.1 200 OK
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json; charset=UTF-8
+
+  {
+    "subject" : "device:p1.example.com",
+    "links" : [
+      {
+        "rel" : "http://example.com/rel/tipsi",
+        "href" : "http://192.168.1.5/npap/"
+      }
+    ]
+  }
+]]></artwork></figure>
+
+        <t>While this example is fictitious, you can imagine that perhaps the
+        Transport Independent, Printer/System Interface <xref target="IEEE.1284-1.1997"/> 
+        may be enhanced with a web interface that allows a device that understands the TIP/SI
+        web interface specification to query the printer for toner levels.</t>
+        
+      </section>
+      
+    </section> <!-- END EXAMPLES -->
+    
+    <section title="WebFinger Protocol" anchor="webfinger-protocol">
+      
+      <t>WebFinger is a simple HTTP-based web service that returns a JSON
+      Resource Descriptor (JRD) to convey information about an entity on
+      the Internet and the Cross-Origin Resource Sharing (CORS) <xref target="W3C.WD-cors-20120403"/>
+      specification to facilitate queries made via a web browser.</t>
+
+      <t>This specification defines URI parameters that are passed from the
+      client to the server when issuing a request.  These parameters,
+      "resource" and "rel", and the parameter values are included in the
+      "query" component of the URI (see Section 3.4 of <xref target="RFC3986"/>).  To
+      construct the "query" component, the client performs the following
+      steps.  First, each parameter value is percent-encoded as per Section
+      2.1 of RFC 3986.  Next, the client constructs a string to be placed
+      in the query component by concatenating the name of the first
+      parameter together with an equal sign ("=") and the percent-encoded
+      parameter value.  For any subsequent parameters, the client appends
+      an ampersand ("&amp;") to the string, the name of the next parameter, an
+      equal sign, and percent-encoded parameter value.  The client MUST NOT
+      insert any spaces while constructing the string.  The order in which
+      the client places each parameter and its corresponding parameter
+      value is unspecified.</t>
+      
+      <section title="Performing a WebFinger Query" anchor="webfinger-query">
+        
+        <t>WebFinger clients issue queries to the well-known resource /.well-
+        known/webfinger.  All queries MUST include the "resource" parameter
+        exactly once and set to the value of the URI for which information is
+        being sought.  If the "resource" parameter is absent or malformed,
+        the WebFinger server MUST return a 400 status code.</t>
+
+        <t>Clients MUST query the server using HTTPS and utilize HTTP only if an
+        HTTPS connection cannot be established, and then only if the client
+        issuing the query will not utilize information in the response in
+        such a way as to compromise user security or privacy.  As an example,
+        a client using WebFinger to facilitate logging into a web site MUST
+        only utilize HTTPS to ensure that a user is not misdirected to a
+        rogue web site that might steal the user's credentials.  If the HTTPS
+        server has an invalid certificate or returns an HTTP status code
+        indicating some error, including a 4xx or 5xx, the client MUST NOT
+        use HTTP in attempt to complete the discovery.</t>
+
+        <t>WebFinger servers MUST return a JRD as the representation for the
+        resource if the client requests no format explicitly via the HTTP
+        "Accept" header.  A client MAY include the "Accept" header to
+        indicate a desired representation, though no other representation is
+        defined in this specification.  The media type used for the JSON
+        Resource Descriptor (JRD) is "application/json" <xref target="RFC4627"/>.</t>
+
+        <t>If the client queries the WebFinger server and provides a URI for
+        which the server has no information, the server MUST return a 404
+        status code.</t>
+
+        <t>WebFinger servers can include cache validators in a response to
+        enable conditional requests by clients and/or expiration times as per
+        RFC 2616 section 13.</t>
+        
+      </section>
+      
+      <section title="The JSON Resource Descriptor (JRD)" anchor="jrd">
+        
+        <t>The JSON Resource Descriptor (JRD) is a JSON object that is comprised
+        of name/value pairs appearing in this RECOMMENDED order:
+          <list style="symbols">
+            <t>expires</t>
+            <t>subject</t>
+            <t>aliases</t>
+            <t>properties</t>
+            <t>links</t>
+          </list>
+        </t>
+
+        <t>The members "expires" and "subject" are name/value pairs whose value
+        are strings, "aliases" is an array of strings, "properties" is an
+        object comprised of name/value pairs whose values are strings, and
+        "links" is an array of objects that contain link relation
+        information.</t>
+
+        <t>When processing a JRD, the client MUST ignore any unknown member and
+        not treat the presence of an unknown member as an error.</t>
+
+        <t>Below, each of these members of the JRD is described in more detail.</t>
+        
+        <section title="expires" anchor="jrd-expires">
+          
+          <t>The value of the "expires" member is a string that indicates the date
+          and time after which the JRD SHOULD be considered expired and no
+          longer utilized.  The format of the date/time string is:</t>
+
+          <figure><artwork><![CDATA[
+  YYYY-MM-DDTHH:MM:SSZ
+]]></artwork></figure>
+
+          <t>Here, "YYYY" indicates the four-digit year, "MM" indicates the two-
+          digit month (in the range of 01 to 12), and "DD" indicates the two-
+          digit day of the month (in the range of 01 to 31).  The "T" is
+          literally an ASCII "T" that exists merely as a separator between the
+          date and the time.  The "HH" indicates the two-digit hour of the day
+          (in the range of 01 to 12), "MM" indicates the two-digit minute of
+          the day (in the range of 00 to 59), and "SS" indicates the two-digit
+          number of seconds (in the range of 00 to 59).  A colon (":")
+          character MUST separate the hours, minutes, and seconds values, and a
+          hyphen ("-") MUST separate the year, month, and day in the string.
+          The "Z" at the end of the string is literally an ASCII "Z" that
+          indicates UTC time and MUST be present.  The "expires" string MUST
+          utilize UTC time.  An example of the "expires" member is:</t>
+
+          <figure><artwork><![CDATA[
+  "expires" : "2012-11-16T19:41:35Z"
+]]></artwork></figure>
+
+          <t>The server MAY include the "expires" header in a JRD and clients
+          SHOULD honor the value if present.</t>
+          
+        </section>
+        
+        <section title="subject" anchor="jrd-subject">
+          
+          <t>The value of the "subject" member is a string that MUST be set to the
+          same value as the "resource" parameter in the client request.  This
+          is a URI that identifies the entity for which the client queried the
+          server.</t>
+
+          <t>The "subject" member MUST be included in the JRD.</t>
+          
+        </section>
+        
+        <section title="aliases" anchor="jrd-aliases">
+          
+          <t>The "aliases" array is an array of zero or more URI strings that
+          identify the same entity as the "subject" URI. Each URI must be an
+          absolute URI.</t>
+
+          <t>The server MAY include the "aliases" array in the JRD.</t>
+          
+        </section>
+        
+        <section title="properties" anchor="jrd-properties">
+          
+          <t>The "properties" object is comprised of zero or more name/value pairs
+          whose names are absolute URIs and whose values are strings or null.
+          Properties are used to convey additional information about the
+          subject of the JRD.  As an example, consider this use of
+          "properties":</t>
+
+          <figure><artwork><![CDATA[
+  "properties" : { "http://webfinger.net/rel/name" : "Bob Smith" }
+]]></artwork></figure>
+
+          <t>The server MAY include the "properties" member in the JRD.</t>
+          
+        </section>
+
+        <section title="links" anchor="jrd-links">
+          
+          <t>The "links" array contains zero or more elements that contain the
+          link relation information.  Each element of the array is an object
+          comprised of the following name/value pairs in this RECOMMENDED
+          order:
+            <list style="symbols">
+              <t>rel</t>
+              <t>type</t>
+              <t>href</t>
+              <t>titles</t>
+              <t>properties</t>
+            </list>
+          </t>
+
+          <t>The members "rel", "type", and "href" are a name/value pairs whose
+          values are strings, "titles" and "properties" are objects comprised
+          of name/value pairs whose values are strings.</t>
+
+          <t>The order of elements in the "links" array indicates an order of
+          preference.  Thus, if there are two or more link relations having the
+          same "rel" value, the first link relation would indicate the user's
+          preferred link relation.</t>
+
+          <t>Servers MAY include the "links" array in the JRD.</t>
+
+          <t>Below, each of the members of the objects found in the "links" array
+          is described in more detail.  Each object in the "links" array,
+          referred to as a "link relation object", is completely independent
+          from any other object in the array; any requirement on the server to
+          include a given member in the link relation object refers only to
+          that particular object.</t>
+          
+          <section title="rel" anchor="jrd-links-rel">
+            
+            <t>The value of the "rel" member is a string that is either an absolute
+            URI or a registered relation type (see <xref target="RFC5988"/>).  The value
+            of the "rel" member MUST contain exactly one URI string or registered
+            relation type and MUST NOT contain a space-separated list of URIs or
+            registered relation types.  The URI or registered relation type
+            identifies the type of the link relation.  The other members of the
+            object have meaning only once the type of link relation is
+            understood.  In some instances, the link relation will have
+            associated semantics that allow a client to query for other resources
+            on the Internet.  In other instances, the link relation will have
+            associated semantics that allow the client to utilize the other
+            members of the link relation object without fetching additional
+            external resources.</t>
+
+            <t>Servers MUST include the "rel" member in the link relation object.</t>
+            
+          </section>
+          
+          <section title="type" anchor="jrd-links-type">
+            
+            <t>The value of the "type" member is a string that indicates the media
+            type of the linked resource (see <xref target="RFC4288"/>).</t>
+
+            <t>Servers MAY include the "type" member in the link relation object.</t>
+            
+          </section>
+          
+          <section title="href" anchor="jrd-links-href">
+            
+            <t>The value of the "href" member is a string that contains a URI
+            pointing to the linked resource.</t>
+
+            <t>Servers MAY include the "href" member in the link relation object.</t>
+            
+          </section>
+          
+          <section title="titles" anchor="jrd-links-titles">
+            
+            <t>The "titles" object is comprised of zero or more name/value pairs
+            whose name is a language tag <xref target="RFC5646"/> or the string 
+            "default".  The string is human-readable and describes the link 
+            relation.  More than one title for the link relation MAY be provided 
+            for the benefit of users who utilize the link relation and, if used, 
+            a language identifier SHOULD be duly used as the name.  If the language is
+            unknown or unspecified, then the name is "default".</t>
+
+            <t>A server SHOULD NOT include more than one title named with the same
+            language tag (or "default") within the link relation object.  The
+            client behavior is undefined if a link relation object includes more
+            than one title named with the same language tag (or "default"),
+            though the client MUST NOT treat this as an error.  The client can
+            select whichever title or titles it wishes to utilize.</t>
+
+            <t>Here is an example of the titles object:</t>
+
+            <figure><artwork><![CDATA[
+  "titles" : {
+    "en-us" : "The Magical World of Bob",
+    "fr" : "Le monde magique de Bob"
+  }
+]]></artwork></figure>
+
+            <t>The server MAY include the "titles" member in the link relation
+            object.</t>
+            
+          </section>
+          
+          <section title="properties" anchor="jrd-links-properties">
+            
+            <t>The "properties" object within the link relation object is comprised
+            of zero or more name/value pairs whose names are absolute URIs and
+            whose values are strings or null.  Properties are used to convey
+            additional information about the link relation.  As an example,
+            consider this use of "properties":</t>
+
+            <figure><artwork><![CDATA[
+  "properties" : { "http://example.net/mail/port" : "993" }
+]]></artwork></figure>
+
+            <t>The server MAY include the "properties" member in the link relation
+            object.</t>
+            
+          </section>
+          
+        </section> <!-- END LINKS -->
+        
+      </section> <!-- END JRD -->
+      
+      <section title="The &quot;rel&quot; Parameter" anchor="rel-parameter">
+        
+        <t>When issuing a request to the server, the client MAY utilize the
+        "rel" parameter to request only a subset of the information that
+        would otherwise be returned without the "rel" parameter.  When the
+        "rel" parameter is used, only the link relations that match the link
+        relations provided via "rel" are included in the array of links
+        returned in the JRD.  All other information normally present in a
+        resource descriptor is present in the resource descriptor, even when
+        "rel" is employed.</t>
+
+        <t>The "rel" parameter MAY be transmitted to the server multiple times
+        in order to request multiple types of link relations.</t>
+
+        <t>The purpose of the "rel" parameter is to return a subset of
+        resource's link relations.  Use of the parameter might reduce
+        processing requirements on either the client or server, and it might
+        also reduce the bandwidth required to convey the partial resource
+        descriptor, especially if there are numerous link relation values to
+        convey for a given resource.</t>
+
+        <t>Support for the "rel" parameter is OPTIONAL, but RECOMMENDED on the
+        server.  Should the server not support the "rel" parameter, it MUST
+        ignore it and process the request as if no "rel" parameter values
+        were present.</t>
+
+        <t>The following example presents the same example as found in section
+        4.1, but uses the "rel" parameter in order to select two link
+        relations:</t>
+
+        <figure><artwork><![CDATA[
+  GET /.well-known/webfinger?
+    resource=acct%3Abob%40example.com&
+    rel=http%3A%2F%2Fwebfinger.net%2Frel%2Fprofile-page&
+    rel=vcard HTTP/1.1
+  Host: example.com
+]]></artwork></figure>
+
+        <t>In this example, the client requests the link relations of type
+        "http://webfinger.net/rel/profile-page" and "vcard".  The server then
+        responds with a message like this:</t>
+
+        <figure><artwork><![CDATA[
+  HTTP/1.1 200 OK
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json; charset=UTF-8
+
+  {
+    "expires" : "2012-11-16T19:41:35Z",
+    "subject" : "acct:bob@example.com",
+    "aliases" : [
+      "http://www.example.com/~bob/"
+    ],
+    "properties" : {
+      "http://example.com/rel/role/" : "employee"
+    },
+    "links" : [
+      {
+        "rel" : "http://webfinger.net/rel/profile-page",
+        "href" : "http://www.example.com/~bob/"
+      },
+      {
+        "rel" : "vcard",
+        "href" : "http://www.example.com/~bob/bob.vcf"
+      }
+    ]
+  }
+]]></artwork></figure>
+
+        <t>As you can see, the server returned only the link relations requested
+        by the client, but also included the other parts of the JRD.</t>
+
+        <t>In the event that a client requests links for link relations that are
+        not defined for the specified resource, a resource descriptor MUST be
+        returned.  In the returned JRD, the "links" array MAY be absent,
+        empty, or contain only links that did match a provided "rel" value.
+        The server MUST NOT return a 404 status code when a particular link
+        relation specified via "rel" is not defined for the resource, as a
+        404 status code is reserved for indicating that the resource itself
+        (e.g., either /.well-known/webfinger or the resource indicated via
+        the "resource" parameter) does not exist.</t>
+        
+      </section>
+      
+      <section title="WebFinger and URIs" anchor="wf-and-uris">
+        
+        <t>WebFinger requests can include a parameter specifying the URI of an
+        account, device, or other entity.  WebFinger is agnostic regarding
+        the scheme of such a URI: it could be an "acct" URI <xref target="I-D.ietf-appsawg-acct-uri"/>, 
+        an "http" or "https" URI, a "mailto" URI, or some other scheme.</t>
+
+        <t>For resources associated with a user account at a host, use of the
+        "acct" URI scheme is RECOMMENDED, since it explicitly identifies an
+        account accessible via WebFinger.  Further, the "acct" URI scheme is
+        not associated with other protocols as, by way of example, the
+        "mailto" URI scheme is associated with email.  Since not every host
+        offers email service, using the "mailto" URI scheme <xref target="RFC6068"/> 
+        is not ideal for identifying user accounts on all hosts.  That said, 
+        use of the "mailto" URI scheme would be ideal for use with WebFinger 
+        to discover mail server configuration information for a user.</t>
+
+        <t>A host MAY utilize one or more URIs that serve as aliases for the
+        user's account, such as URIs that use the "http" URI scheme <xref target="RFC2616"/>.  
+        A WebFinger server MUST return substantially the same response to both
+        an "acct" URI and any alias URI for the account, including the same
+        set of link relations and properties.  The only name/value pairs in
+        the response that MAY be different include "subject", "expires", and
+        "aliases".  In addition, the server SHOULD include the entire list
+        aliases for the user's account in the JRD returned when querying the
+        LRDD resource or when utilizing the "resource" parameter.</t>
+        
+      </section>
+      
+    </section> <!-- END WEBFINGER PROTOCOL -->
+    
+    <section title="Cross-Origin Resource Sharing (CORS)" anchor="wf-and-cors">
+      
+      <t>WebFinger resources might not be accessible from a web browser due to
+      "Same-Origin" policies.  The current best practice is to make
+      resources available to browsers through Cross-Origin Resource Sharing
+      (CORS) <xref target="W3C.WD-cors-20120403"/>, and servers MUST include 
+      the Access-Control-Allow-Origin HTTP header in responses.  Servers 
+      SHOULD support the least restrictive setting by allowing any domain 
+      access to the WebFinger resources:</t>
+
+      <figure><artwork><![CDATA[
+  Access-Control-Allow-Origin: *
+]]></artwork></figure>
+
+      <t>There are cases where defaulting to the least restrictive setting is
+      not appropriate, for example a WebFinger server on an intranet that
+      provides sensitive company information should not allow CORS requests
+      from any domain, as that could allow leaking of that sensitive
+      information.  WebFinger servers that wish to restrict access to
+      information from external entities SHOULD use a more restrictive
+      Access-Control-Allow-Origin header.</t>
+      
+    </section>
+    
+    <section title="Access Control" anchor="access-control">
+      
+      <t>As with all web resources, access to the /.well-known/webfinger
+      resource MAY require authentication.  Further, failure to provide
+      required credentials MAY result in the server forbidding access or
+      providing a different response than had the client authenticated with
+      the server.</t>
+
+      <t>Likewise, a server MAY provide different responses to different
+      clients based on other factors, such as whether the client is inside
+      or outside a corporate network.  As a concrete example, a query
+      performed on the internal corporate network might return link
+      relations to employee pictures, whereas link relations for employee
+      pictures might not be provided to external entities.</t>
+
+      <t>Further, link relations provided in a WebFinger server response MAY
+      point to web resources that impose access restrictions.  For example,
+      the aforementioned corporate server may provide both internal and
+      external entities with URIs to employee pictures, but further
+      authentication might be required in order for the client to access
+      the picture resources if the request comes from outside the corporate
+      network.</t>
+
+      <t>The decisions made with respect to what set of link relations a
+      WebFinger server provides to one client versus another and what
+      resources require further authentication, as well as the specific
+      authentication mechanisms employed, are outside the scope of this
+      document.</t>
+      
+    </section>
+    
+    <section title="Hosted WebFinger Services" anchor="hosted-services">
+      
+      <t>As with most services provided on the Internet, it is possible for a
+      domain owner to utilize "hosted" WebFinger services.  By way of
+      example, a domain owner might control most aspects of their domain,
+      but use a third-party hosting service for email.  In the case of
+      email, mail servers for a domain are identified by MX records.  An MX
+      record points to the mail server to which mail for the domain should
+      be delivered.  It does not matter to the sending mail server whether
+      those MX records point to a server in the destination domain or a
+      different domain.</t>
+
+      <t>Likewise, a domain owner might utilize the services of a third party
+      to provide WebFinger services on behalf of its users.  Just as a
+      domain owner was required to insert MX records into DNS to allow for
+      hosted email serves, the domain owner is required to redirect HTTP(S)
+      queries to its domain to allow for hosted WebFinger services.</t>
+
+      <t>When a query is issued to /.well-known/webfinger, the web server MUST
+      return a 301, 302, or 307 response status code that includes a
+      Location header pointing to the location of the hosted WebFinger
+      service URL.  The WebFinger service URL does not need to point to
+      /.well-known/* on the hosting service provider server.  WebFinger
+      clients MUST follow all 301, 302, or 307 redirection requests.</t>
+
+      <t>As an example, assume that example.com's WebFinger services are
+      hosted by example.net.  Suppose a client issues a query for
+      acct:alice@example.com like this:</t>
+
+      <figure><artwork><![CDATA[
+  GET /.well-known/
+    webfinger?resource=acct%3Aalice%40example.com HTTP/1.1
+  Host: example.com
+]]></artwork></figure>
+
+      <t>The server might respond with this:</t>
+
+      <figure><artwork><![CDATA[
+  HTTP/1.1 307 Temporary Redirect
+  Location: http://wf.example.net/example.com/webfinger?
+    resource=acct%3Aalice%40example.com HTTP/1.1
+]]></artwork></figure>
+    
+      <t>The client MUST follow the redirection, re-issuing the request to the
+      URL provided in the Location header.</t>
+      
+    </section>
+    
+    <section title="Security Considerations">
+
+      <t>Since this specification utilizes Cross-Origin Resource Sharing
+      (CORS) <xref target="W3C.WD-cors-20120403"/>, all of the security 
+      considerations applicable CORS are also applicable to this specification.</t>
+
+      <t>The recommended use of HTTPS is to ensure that information is not
+      modified during transit.  It should be appreciated that in
+      environments where an HTTPS server is normally available, there
+      exists the possibility that a compromised network might have its
+      WebFinger server operating on HTTPS replaced with one operating only
+      over HTTP.  As such, clients that need to ensure data is not
+      compromised SHOULD NOT issue queries over a non-secure connection.
+      While Section 5.1 allows for clients that fail to establish an HTTPS
+      connection to attempt a query using HTTP, a client and any underlying
+      client libraries are not required to re-issue queries using HTTP and
+      SHOULD NOT when security for a given application that uses WebFinger
+      is paramount.</t>
+
+      <t>When using HTTPS, clients MUST verify that the certificate used on an
+      HTTPS connection is valid.</t>
+
+      <t>Service providers and users should be aware that placing information
+      on the Internet accessible through WebFinger means that any user can
+      access that information.  While WebFinger can be an extremely useful
+      tool for allowing quick and easy access to one's avatar, blog, or
+      other personal information, users should understand the risks, too.
+      If one does not wish to share certain information with the world, do
+      not allow that information to be freely accessible through WebFinger
+      and do not use any service supporting WebFinger.  Further, WebFinger
+      servers MUST NOT be used to provide any personal information to any
+      party unless explicitly or implicitly authorized by the person whose
+      information is being shared. Implicit authorization can be determined
+      by the user's voluntary utilization of a service as defined by that
+      service's relevant terms of use or published privacy policy.</t>
+
+      <t>The aforementioned word of caution is perhaps worth emphasizing again
+      with respect to dynamic information one might wish to share, such as
+      the current location of a user.  WebFinger can be a powerful tool
+      used to assemble information about a person all in one place, but
+      service providers and users should be mindful of the nature of that
+      information shared and the fact that it might be available for the
+      entire world to see.  Sharing location information, for example,
+      would potentially put a person in danger from any individual who
+      might seek to inflict harm on that person.</t>
+
+      <t>The easy access to user information via WebFinger was a design goal
+      of the protocol, not a limitation.  If one wishes to limit access to
+      information available via WebFinger, such as a WebFinger server for
+      use inside a corporate network, the network administrator must take
+      measures necessary to limit access from outside the network.  Using
+      standard methods for securing web resources, network administrators
+      do have the ability to control access to resources that might return
+      sensitive information.  Further, WebFinger servers can be employed in
+      such a way as to require authentication and prevent disclosure of
+      information to unauthorized entities.</t>
+
+      <t>Finally, a WebFinger server has no means of ensuring that information
+      provided by a user is accurate.  Likewise, neither the server nor the
+      client can be absolutely guaranteed that information has not been
+      manipulated either at the server or along the communication path
+      between the client and server.  Use of HTTPS helps to address some
+      concerns with manipulation of information along the communication
+      path, but it clearly cannot address issues where the server provided
+      incorrect information, either due to being provided false information
+      or due to malicious behavior on the part of the server administrator.
+      As with any information service available on the Internet, users
+      should wary of information received from untrusted sources.</t>
+
+    </section>
+    
+    <section title="IANA Considerations" anchor="iana">
+      
+      <t>This specification registers the "webfinger" well-known URI in the
+      Well-Known URI Registry as defined by <xref target="RFC5785"/>.
+        <list style="symbols">
+          <t>URI suffix:  webfinger</t>
+          <t>Change controller:  IETF</t>
+          <t>Specification document(s):  RFC QQQ</t>
+          <t>Related information:  The response from WebFinger server will be a
+          JSON Resource Descriptor (JRD) as described in <xref target="jrd"/> of RFC
+          QQQ.</t>
+        </list>
+      </t>
+
+      <t>[RFC EDITOR: Please replace "QQQ" references in this section with the
+      number for this RFC.]</t>
+    </section>
+    
+  </middle> 
+  <back>
+    <references title="Normative References"> 
+      &rfc2119;
+      &rfc2616;
+      &rfc5785;
+      &rfc5988;
+      &rfc4627;
+      &rfc3986;
+      &rfc3987;
+      &rfc4288;
+      &rfc5646;
+      &acct;
+      &cors;
+    </references>
+    
+    <references title="Informative References">
+  &rfc6350;
+  &rfc6068;
+  &ieee1284;
+  <reference anchor="openid-connect-mesages-1_0">
+    <front>
+      <title>OpenID Connect Messages 1.0 - draft 10</title>
+      <author fullname="Nat Sakimura" initials="N." surname="Sakimura">
+        <organization abbrev="NRI">Nomura Research Institute,
+        Ltd.</organization>
+        <address>
+          <email>n-sakimura@nri.co.jp</email>
+        </address>
+      </author>
+      <author fullname="John Bradley" initials="J." surname="Bradley">
+        <organization abbrev="Ping Identity">Ping Identity</organization>
+        <address>
+          <email>ve7jtb@ve7jtb.com</email>
+        </address>
+      </author>
+      <author fullname="Michael B. Jones" initials="M.B." surname="Jones">
+        <organization abbrev="Microsoft">Microsoft</organization>
+        <address>
+          <email>mbj@microsoft.com</email>
+        </address>
+      </author>
+      <author fullname="Breno de Medeiros" initials="B." surname="de Medeiros">
+        <organization abbrev="Google">Google Inc.</organization>
+        <address>
+          <email>breno@google.com</email>
+        </address>
+      </author>
+      <author fullname="Chuck Mortimore" initials="C." surname="Mortimore">
+        <organization abbrev="Salesforce">Salesforce</organization>
+        <address>
+          <email>cmortimore@salesforce.com</email>
+        </address>
+      </author>
+      <author fullname="Edmund Jay" initials="E." surname="Jay">
+        <organization abbrev="Illumila">Illumila</organization>
+        <address>
+          <email>ejay@mgi1.com</email>
+        </address>
+      </author>
+      <date day="25" month="May" year="2012"/>
+    </front>
+  </reference>
+
+    </references>
+    
+    <section title="Acknowledgements" anchor="ack">
+      
+      <t>The authors would like to acknowledge Eran Hammer-Lahav, Blaine Cook,
+      Brad Fitzpatrick, Laurent-Walter Goix, Joe Clarke, Michael B. Jones,
+      Peter Saint-Andre, Dick Hardt, Tim Bray, and Joe Gregorio for their
+      invaluable input.</t>
+      
+    </section>
+    
+  </back>
+</rfc> 
+ 
