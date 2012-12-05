@@ -1,14 +1,14 @@
 
 
 
-Network Working Group                                           J. Snell
-Internet-Draft                                          October 19, 2012
+Individual Submission                                           J. Snell
+Internet-Draft                                          December 5, 2012
 Intended status: Informational
-Expires: April 22, 2013
+Expires: June 8, 2013
 
 
                              JSON Predicate
-                        draft-snell-json-test-02
+                        draft-snell-json-test-03
 
 Abstract
 
@@ -30,7 +30,7 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 22, 2013.
+   This Internet-Draft will expire on June 8, 2013.
 
 Copyright Notice
 
@@ -52,9 +52,9 @@ Copyright Notice
 
 
 
-Snell                    Expires April 22, 2013                 [Page 1]
+Snell                     Expires June 8, 2013                  [Page 1]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
 Table of Contents
@@ -83,10 +83,10 @@ Table of Contents
      2.5.  Using JSON Predicate within JSON Patch Documents . . . . . 21
    3.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 22
    4.  Security Considerations  . . . . . . . . . . . . . . . . . . . 23
-   5.  References . . . . . . . . . . . . . . . . . . . . . . . . . . 23
-     5.1.  Normative References . . . . . . . . . . . . . . . . . . . 23
-     5.2.  Informative References . . . . . . . . . . . . . . . . . . 23
-   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 23
+   5.  References . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+     5.1.  Normative References . . . . . . . . . . . . . . . . . . . 24
+     5.2.  Informative References . . . . . . . . . . . . . . . . . . 24
+   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 24
 
 
 
@@ -108,9 +108,9 @@ Table of Contents
 
 
 
-Snell                    Expires April 22, 2013                 [Page 2]
+Snell                     Expires June 8, 2013                  [Page 2]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
 1.  Introduction
@@ -122,7 +122,7 @@ Internet-Draft               JSON Predicate                 October 2012
    incorporating conditional handling during the processing of a JSON
    document.
 
-   JSON Predicates can be used to extend a JSON Patch
+   JSON Predicates can be used, for instance, to extend a JSON Patch
    [I-D.ietf-appsawg-json-patch] document to provide for a broader range
    of conditional processing options not currently supported by JSON
    Patch.
@@ -164,9 +164,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 3]
+Snell                     Expires June 8, 2013                  [Page 3]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    The following JSON Patch with JSON Predicates document will first
@@ -220,9 +220,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 4]
+Snell                     Expires June 8, 2013                  [Page 4]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    o  A reference to the value that is to be tested, and
@@ -276,9 +276,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 5]
+Snell                     Expires June 8, 2013                  [Page 5]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    {"value": "ABC", "path": "/a/b/c", "op": "contains"}
@@ -332,9 +332,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 6]
+Snell                     Expires June 8, 2013                  [Page 6]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    For instance, the following will evaluate as "true":
@@ -388,9 +388,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 7]
+Snell                     Expires June 8, 2013                  [Page 7]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    For example, given the JSON document:
@@ -444,9 +444,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 8]
+Snell                     Expires June 8, 2013                  [Page 8]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    The following will evaluate as "true":
@@ -500,9 +500,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                 [Page 9]
+Snell                     Expires June 8, 2013                  [Page 9]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    For example, given the JSON document:
@@ -556,9 +556,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 10]
+Snell                     Expires June 8, 2013                 [Page 10]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    The following will evaluate as "true":
@@ -612,9 +612,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 11]
+Snell                     Expires June 8, 2013                 [Page 11]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
 2.2.9.  test
@@ -648,7 +648,7 @@ Internet-Draft               JSON Predicate                 October 2012
    performed in a case-sensitive manner.  To override this default
    behavior, the predicate object MAY contain an "ignore_case" member
    whose value is either "true" (to perform case-insensitive matching)
-   or false.
+   or "false".
 
 2.2.10.  type
 
@@ -668,9 +668,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 12]
+Snell                     Expires June 8, 2013                 [Page 12]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    For example, given the JSON document:
@@ -724,15 +724,15 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 13]
+Snell                     Expires June 8, 2013                 [Page 13]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
       construct.
    o  If the "value" member specifies "lang", the type predicate will
       evaluate as true if the value referenced by the "path" member is a
-      JSON string conforming to the [RFC4646] "Language-Tag" construct.
+      JSON string conforming to the [RFC5646] "Language-Tag" construct.
    o  If the "value" member specifies "lang-range", the type predicate
       will evaluate as true if the value referenced by the "path" member
       is a JSON string conforming to the [RFC4647] "language-range"
@@ -780,9 +780,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 14]
+Snell                     Expires June 8, 2013                 [Page 14]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
 2.3.  Second-Order Predicates
@@ -836,9 +836,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 15]
+Snell                     Expires June 8, 2013                 [Page 15]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
 2.3.1.  and
@@ -892,9 +892,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 16]
+Snell                     Expires June 8, 2013                 [Page 16]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    However, the following would evaluate as "false" because while the
@@ -948,9 +948,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 17]
+Snell                     Expires June 8, 2013                 [Page 17]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    The following would evaluate as "true" because the element "/a/b/e"
@@ -1004,9 +1004,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 18]
+Snell                     Expires June 8, 2013                 [Page 18]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    For example, given the JSON document:
@@ -1060,9 +1060,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 19]
+Snell                     Expires June 8, 2013                 [Page 19]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
 2.3.4.  Nesting Second Order Predicates
@@ -1116,9 +1116,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 20]
+Snell                     Expires June 8, 2013                 [Page 20]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    o  The "value" member given for a given predicate operation is of an
@@ -1172,9 +1172,9 @@ Internet-Draft               JSON Predicate                 October 2012
 
 
 
-Snell                    Expires April 22, 2013                [Page 21]
+Snell                     Expires June 8, 2013                 [Page 21]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
 
 
    When a JSON Predicate object within a JSON Patch document evaluates
@@ -1185,16 +1185,14 @@ Internet-Draft               JSON Predicate                 October 2012
    SHOULD terminate and application of the entire patch document SHALL
    NOT be deemed successful.
 
-   An implementation SHOULD make consumers of JSON Patch documents aware
-   that predicate objects are included by appending the optional
-   parameter "predicates=1" to the "application/patch+json" MIME media
-   type.
+   The MIME media type "application/json-patch-test" is used to identify
+   JSON Patch documents that contain predicates.
 
    For example:
 
      PATCH /some-document HTTP/1.1
      Host: example.org
-     Content-Type: application/patch+json; predicates=1
+     Content-Type: application/json-patch-test
 
      [
        {
@@ -1216,21 +1214,64 @@ Internet-Draft               JSON Predicate                 October 2012
 
 3.  IANA Considerations
 
-   This specification introduces an additional optional "predicates"
-   parameter to the "application/patch+json" MIME Media Type.  The value
-   of the predicates parameter MUST be "1".  The presence of
-   "predicates=1" as a parameter of the "application/patch+json" media
-   type is an explicit indication that the JSON Patch document contains
-   JSON Predicate objects.
+   The Internet media type for a JSON Patch document containing JSON
+   Predicate objects is application/json-patch-test.
 
 
 
 
 
 
-Snell                    Expires April 22, 2013                [Page 22]
+
+
+
+
+
+
+Snell                     Expires June 8, 2013                 [Page 22]
 
-Internet-Draft               JSON Predicate                 October 2012
+Internet-Draft               JSON Predicate                December 2012
+
+
+      Type name:  application
+
+      Subtype name:  json-patch-test
+
+      Required parameters:  none
+
+      Optional parameters:   none
+
+      Encoding considerations:  binary
+
+      Security considerations:
+         See Security Considerations in Section 4
+
+      Interoperability considerations:  N/A
+
+      Published specification:
+         [this memo]
+
+      Applications that use this media type:
+         Applications that manipulate JSON documents.
+
+      Additional information:
+
+         Magic number(s):  N/A
+
+         File extension(s):  .json-patch-test
+
+         Macintosh file type code(s):  TEXT
+
+      Person & email address to contact for further information:
+         James M Snell <jasnell@gmail.com>
+
+      Intended usage:  COMMON
+
+      Restrictions on usage:  none
+
+      Author:  James M Snell <jasnell@gmail.com>
+
+      Change controller:  IETF
 
 
 4.  Security Considerations
@@ -1240,6 +1281,14 @@ Internet-Draft               JSON Predicate                 October 2012
    of an arbitrary number of nested Second Order Predicate objects can
    have a detrimental impact on overall performance and could be
    leveraged by a malicious entity as part of a denial of service
+
+
+
+Snell                     Expires June 8, 2013                 [Page 23]
+
+Internet-Draft               JSON Predicate                December 2012
+
+
    attack.
 
 
@@ -1259,18 +1308,18 @@ Internet-Draft               JSON Predicate                 October 2012
    [RFC4627]  Crockford, D., "The application/json Media Type for
               JavaScript Object Notation (JSON)", RFC 4627, July 2006.
 
-   [RFC4646]  Phillips, A. and M. Davis, "Tags for Identifying
-              Languages", RFC 4646, September 2006.
-
    [RFC4647]  Phillips, A. and M. Davis, "Matching of Language Tags",
               BCP 47, RFC 4647, September 2006.
+
+   [RFC5646]  Phillips, A. and M. Davis, "Tags for Identifying
+              Languages", BCP 47, RFC 5646, September 2009.
 
 5.2.  Informative References
 
    [I-D.ietf-appsawg-json-patch]
               Bryan, P. and M. Nottingham, "JSON Patch",
-              draft-ietf-appsawg-json-patch-05 (work in progress),
-              September 2012.
+              draft-ietf-appsawg-json-patch-07 (work in progress),
+              December 2012.
 
 
 Author's Address
@@ -1284,5 +1333,12 @@ Author's Address
 
 
 
-Snell                    Expires April 22, 2013                [Page 23]
+
+
+
+
+
+
+
+Snell                     Expires June 8, 2013                 [Page 24]
 
