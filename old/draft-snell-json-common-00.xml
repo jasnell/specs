@@ -1,399 +1,74 @@
-<?xml version='1.0'?>
- <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-    <!ENTITY rfc2119 PUBLIC '' 
-      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'> 
-    <!ENTITY rfc4287 PUBLIC '' 
-      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5646.xml'> 
-    <!ENTITY rfc3986 PUBLIC '' 
-      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3339.xml'>  
-    <!ENTITY rfc3023 PUBLIC '' 
-      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3023.xml'>  
-    <!ENTITY rfc3548 PUBLIC '' 
-      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3548.xml'>  
-    <!ENTITY xml PUBLIC ''
-      'http://xml.resource.org/public/rfc/bibxml4/reference.W3C.REC-xml-20040204.xml'> 
-     <!ENTITY xmlnames PUBLIC ''
-      'http://xml.resource.org/public/rfc/bibxml4/reference.W3C.REC-xml-names-19990114.xml'> 
-    <!ENTITY xmlbase PUBLIC ''
-      'http://xml.resource.org/public/rfc/bibxml4/reference.W3C.REC-xmlbase-20010627.xml'>
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
 ]>
-<?rfc compact="yes" ?>
-<?rfc toc="yes" ?>
-<?rfc symrefs="yes" ?>
-<?rfc sortrefs="yes"?>
-<?rfc iprnotified="no" ?>
-<?rfc strict="yes" ?>
-<rfc category="info" ipr="trust200811" docName="draft-snell-json-common-00.txt"> 
-<front> 
-<title abbrev="Common JSON Vocabulary">Common JSON Vocabulary</title> 
-<author initials="J.M." surname="Snell" fullname="James M Snell"> 
-<organization></organization> 
-<address> 
-<postal> 
-<street></street> 
-<city></city> <region></region> <code></code> 
-<country></country> 
-</postal> 
-<phone></phone> 
-<email>jasnell@us.ibm.com</email> 
-<uri>http://ibm.com</uri> 
-</address> 
-</author> 
-<date month="December" year="2010" /> 
-<area>General</area> 
-<keyword>I-D</keyword> 
-<keyword>Internet-Draft</keyword> 
-<keyword>JSON</keyword> 
-<abstract><t>The Common JSON Vocabulary defines a core collection of JSON object
-properties and data structures that can be used as the fundamental building 
-block for JSON-based data formats. The goal of the Common JSON Vocabulary is to
-increase the interoperability of applications that utilize the JSON format to 
-encode and exchange information.</t></abstract> 
-</front> 
-<middle> 
-<section title="Introduction"> 
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-json-common-00"> 
+  <front> 
+    <title abbrev="Common JSON"> 
+      Common JSON Data Structures
+    </title> 
  
-<t>TBD</t>
-  
-</section> 
+    <author initials="J.M." surname="Snell" fullname="James M Snell"> 
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+    
+    <date month="November" year="2012" /> 
  
-<section title="Notational Conventions"> 
+    <area>Applications</area> 
+    <!-- workgroup>Individual Submission</workgroup--> 
+    <keyword>I-D</keyword> 
+    <keyword>http</keyword>
  
-<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", 
-"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be 
-interpreted as described in BCP 14, <xref target="RFC2119" /></t> 
+    <abstract> 
+      <t>TBD</t>      
+    </abstract> 
  
-<t>This specification uses XML Namespaces <xref target="W3C.REC-xml-names-19990114"/> 
-to uniquely identify XML element names.  It uses the following namespace prefix 
-for the indicated namespace URI;</t> 
- 
-<figure><artwork><![CDATA[ 
- "atom": "http://www.w3.org/2005/Atom" 
-]]></artwork></figure> 
- 
-</section> 
-
-<section title="Establishing Language Context">
-
-<t>For the purpose of identifying the natural or formal language of 
-human-readable content contained within a JSON object, the object
-MAY contain a property named "lang" whose value MUST be either a language 
-identifier as defined by <xref target="RFC5646"/> or an empty string. The 
-empty string value is used to explicitly indicate that no language is being 
-specified.</t>
-
-<t>For example:</t>
-<figure><artwork><![CDATA[ 
-  {
-    "lang":"en-US",
-    "title":"In English"
-  }
-]]></artwork></figure> 
-
-<t>The language specified by the "lang" property applies only to the JSON 
-Object directly containing the "lang" property and establishes the language
-context only for the other properties in the same JSON object whose values 
-are human-readable JSON Strings. The following two examples are equivalent 
-in terms of the established language context:</t>
-
-<figure><artwork><![CDATA[
-  {
-    "lang":"en-US",
-    "title":"In English",
-    "child": {
-      "title":"En francais"
-    }
-  }
+  </front> 
   
-  {
-    "lang":"en-US",
-    "title":"In English",
-    "child": {
-      "lang":"",
-      "title":"En francais"
-    }
-  }
-]]></artwork></figure>
+  <middle> 
+    <section anchor="intro" title="Introduction"> 
 
-</section>
-
-<section title="Common Value Types">
-
-  <section title="Date and Time">
-  
-    <t>Date and Time values may be serialized in the form of a JSON Number, 
-    String, or Object.</t>
+      <t>TBD</t>
+       
+      <t>In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
+      "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
+      are to be  interpreted as described in <xref target="RFC2119" />.</t> 
+    </section> 
+          
+    <section anchor="collection" title="Collection Structures">
+    </section>
+          
+    <section anchor="dates" title="Date Structures">
+    </section>
     
-    <t>When serialized in the form of an Number, the value MUST indicate the 
-    the total number of seconds elapsed since 12:00am on January
-    1st, 1970, UTC.</t>
+    <section anchor="geo" title="Geo-location Data">
+    </section>
     
-    <t>When serialized in the form of a String, the value MUST conform to the 
-    "date-time" production in <xref target="RFC3339" />.
-    In addition, an uppercase "T" character MUST be used to separate date
-    and time, and an uppercase "Z" character MUST be present in the absence of
-    a numeric time zone offset.</t>
+    <section anchor="iri" title="IRI's and URI's">
+    </section>
     
-    <t>When serialized in the form of an Object, the value MUST contain 
-    any combination of the following properties:</t>
+    <section anchor="language" title="Language Tags">
+    </section>
     
-    <figure><artwork><![CDATA[
-  year         := Numeric year value conforming to the 
-                  RFC3339 date-fullyear construct 
-  month        := Numeric month value conforming to the 
-                  RFC3339 date-month construct. 
-  day          := Numeric value indicating the day of the 
-                  month conforming to the RFC3339 date-mday
-                  construct.
-  hour         := Numeric value indicating the hour of day
-                  conforming to the RFC3339 time-hour construct.
-  minute       := Numeric value indicating the minutes 
-                  conforming to the RFC3339 time-minute construct.
-  second       := Numeric value indicating the seconds conforming
-                  to the RFC3339 time-second construct.
-  millisecond  := Numeric value indicating the milliseconds
-                  conforming to the RFC3339 time-secfrac construct.
-  offset       := String value indicating the timezone offset
-                  conforming to the RFC3339 time-offset construct.
-]]></artwork</figure>
-
-    <t>For example:</t>
-    
-    <figure><artwork><![CDATA[
-  {
-    "year": 2010,
-    "month": 12,
-    "day": 07,
-    "hour": 12,
-    "minute": 12,
-    "second": 12,
-    "millisecond": 123,
-    "offset": "Z"
-  }
-]]></artwork></figure>
-   
-  </section>
+    <section anchor="links" title="Link Structures">
+    </section>
+          
+    <section title="Security Considerations">
+      <t>TBD</t>
+    </section>
+  </middle> 
   
-  <section title="Time Duration">
-  
-  <t>A Duration of time may be serialized in the form of a JSON Number, 
-  String or Object.</t>
-  
-  <t>When serialized as an Number, the value MUST be non-negative number
-  indicating the total number of seconds.</t>
-  
-  <t>When serialized as a String, the value MUST be encoded as defined by
-  the duration construct from <xref target="RFC3339"/>.</t>
-  
-   <t>When serialized in the form of an Object, the value MUST contain 
-    any combination of the following properties:</t>
-    
-    <figure><artwork><![CDATA[
-  year         := Numeric year value conforming to the 
-                  RFC3339 dur-year construct 
-  month        := Numeric month value conforming to the 
-                  RFC3339 dur-month construct. 
-  day          := Numeric value indicating the day of the 
-                  month conforming to the RFC3339 dur-day
-                  construct.
-  week         := Numeric value indicating the week conforming
-                  to the RFC3339 dur-week construct.
-  hour         := Numeric value indicating the hour of day
-                  conforming to the RFC3339 dur-hour construct.
-  minute       := Numeric value indicating the minutes 
-                  conforming to the RFC3339 dur-minute construct.
-  second       := Numeric value indicating the seconds conforming
-                  to the RFC3339 dur-second construct.
-]]></artwork</figure>
-
-    <t>For example, the following object represents the duration "3 years, 
-    6 months, 7 days, 1 hour, 5 minutes and 30 seconds":</t>
-    
-    <figure><artwork><![CDATA[
-  {
-    "year": 3,
-    "month": 6,
-    "day": 7,
-    "hour": 1,
-    "minute": 5,
-    "second": 30,
-  }
-]]></artwork></figure>
-  
-  </section>
-  
-  <section title="Geolocation">
-  
-    <t>Geolocation data including longitude, latitude and altitude 
-    MAY be serialized as either a JSON Object or String. When serialized
-    as a String, it MUST conform to the ISO 6709 compatible POSITION construct 
-    defined below. For example: "+27.5916+086.5640+8850/".</t>
-    
- <figure><artwork><![CDATA[
-LAT_DEGREE            = ("+" / "-") 2DIGIT
-LON_DEGREE            = ("+" / "-") 3DIGIT
-DEG_FRACTION          = "." 1*DIGIT
-MINUTES               = 2DIGIT
-MIN_FRACTION          = "." 1*DIGIT
-SECONDS               = 2DIGIT
-SEC_FRACTION          = "." 1*DIGIT
-
-LATITUDE_DEG          = LAT_DEGREE [DEG_FRACTION]
-LATITUDE_DEG_MIN      = LAT_DEGREE MINUTES [MIN_FRACTION]
-LATITUDE_DEG_MIN_SEC  = LAT_DEGREE MINUTES SECONDS [SEC_FRACTION]
-
-LONGITUDE_DEG         = LON_DEGREE [DEG_FRACTION]
-LONGITUDE_DEG_MIN     = LON_DEGREE MINUTES [MIN_FRACTION]
-LONGITUDE_DEG_MIN_SEC = LON_DEGREE MINUTES SECONDS [SEC_FRACTION]
-
-ALTITUDE              = ("+" / "-") 1*DIGIT ["." 1*DIGIT]
-
-LATLONALT_DEG         = LATITUDE_DEG LONGITUDE_DEG [ALTITUDE]
-LATLONALT_DEG_MIN     = LATITUDE_DEG_MIN LONGITUDE_DEG_MIN [ALTITUDE]
-LATLONALT_DEG_MIN_SEC = LATITUDE_DEG_MIN_SEC LONGITUDE_DEG_MIN_SEC [ALTITUDE]
-
-POSITION              = (LATLONALT_DEG / LATLONALT_DEG_MIN / 
-                        LATLONALT_DEG_MIN_SEC) "/"
-]]> </artwork</figure>
-  
-   <t>When serialized in the form of an Object, the value MUST contain 
-    any combination of the following properties:</t>
-    
-    <figure><artwork><![CDATA[
-  latitude     :=  JSON String conforming to the LATITUDE_DEG, 
-                   LATITUDE_DEG_MIN or LATITUDE_DEG_MIN_SEC 
-                   constructs defined above.
-  longitude    :=  JSON String conforming to the LONGITUDE_DEG,
-                   LONGITUDE_DEG_MIN and LONGITUDE_DEG_MIN_SEC
-                   constructs defined above.
-  altitude     :=  JSON String conforming to the ALTITUDE 
-                   construct defined above.
-]]></artwork</figure>
-  
-      <t>For example:</t>
-    
-    <figure><artwork><![CDATA[
-  {
-    "latitude" : "+27.5916",
-    "longitude" : "+086.5640",
-    "altitude" : "+8850"
-  }
-]]></artwork></figure>
-  
-  </section>
-  
-  <section title="Links">
-  
-    <t>A Link MAY be serialized as either a JSON String containing a single 
-    Internationalized Resource Identifier (IRI) or as a JSON Object.</t>
-    
-    <t>All Links have a fundamental set of properties that can
-    be implicitly or explicitly specified by the encoding of the Link in
-    JSON document. These include the purpose of the link, known commonly
-    as it's "rel" property, the target of the link known as the "href", 
-    and the MIME media type of the target, known as the "type". The "rel"
-    and "href" properties are required for all links while the "type" is 
-    optional.</t>
-    
-    <t>When encoded as a JSON string, the "rel" property of the Link is 
-    specified by the JSON property name while the "href" is specified by 
-    the JSON string value. The "type" is considered to be unspecified. 
-    For example,</t>
-    
-<figure><artwork><![CDATA[
-  { "alternate" : "http://example.org/foo" }
-]]></artwork></figure>
-
-    <t>In this form, the "rel" property of the Link is "alternate" and the 
-    "href" property is "http://example.org/foo".</t>
-    
-    <t>When serialized as a JSON object, the "rel" property is specified
-    explicitly using a "rel" property value in the JSON object or implicity
-    using the JSON property name as in the string serialization above.</t>
-  
-    <figure><artwork><![CDATA[
-  href         := IRI specifying the target of the link 
-  type         := MIME content type of the link target 
-  rel          := String token identifying the purpose of the link
-]]></artwork</figure>
-  
-    <t>When Link objects are contained within a JSON array, if the "rel"
-    property is not explicitly specified as a property of the object, the 
-    singular form of the JSON property name of the JSON array is assumed 
-    to provide the "rel" value.</t>
-    
-    <t>For example,</t>
-    
-<figure><artwork><![CDATA[
-  // implied "rel" value of "alternate"
-  {
-    "alternate" : {
-      "href" : "http://example.org/foo",
-      "type" : "application/html",
-    }
-  }
-  
-  // explicit "rel" value
-  {
-    "link" : {
-      "href" : "http://example.org/foo",
-      "rel" : "alternate",
-      "type" : "application/html",
-    }
-  }
-  
-  // implied "rel" value of "alternate"
-  {
-    "alternates" : [
-      {
-        "href" : "http://example.org/foo",
-        "type" : "application/html",
-      }
-    ]
-  }
-]]></artwork></figure>
-  
-  </section>
-  
-  <section title="Errors">
-  </section>
-
-  <section title="Typed Collections">
-  </section>
-  
-  <section title="Paged Collections">
-  </section>
-  
-</section>
-
-<section title="Reserved Property Names">
-</section>
-
-
-<section title="Security Considerations"> 
-
-<t>TBD</t>
-
-</section> 
- 
-<section title="IANA Considerations"> 
- 
-<t>There are no IANA considerations for this document.</t>  
-  
-</section> 
- 
-</middle> 
- 
-<back> 
-<references title="Normative References"> 
+  <back>
+    <references title="Normative References"> 
   &rfc2119;
-  &rfc3339;
-  &rfc5646;
-  &rfc3023;
-  &rfc3548;
-  &xml;
-  &xmlbase;
-  &xmlnames;
-</references> 
-</back> 
-</rfc>
+    </references>
+  </back>
+</rfc> 
+ 

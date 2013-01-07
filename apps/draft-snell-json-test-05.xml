@@ -15,7 +15,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-json-test-03"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-json-test-05"> 
   <front> 
     <title abbrev="JSON Predicate"> 
       JSON Predicate
@@ -27,7 +27,7 @@
       </address> 
     </author> 
     
-    <date month="December" year="2012" /> 
+    <date month="January" year="2013" /> 
  
     <area>Applications</area> 
     <workgroup>Individual Submission</workgroup> 
@@ -408,15 +408,16 @@
       </artwork></figure>
     
       <t>The predicate's matching pattern is expressed as a string 
-      value conforming to the JavaScript Regular Expression syntax.</t> 
+      value conforming to the JavaScript Regular Expression syntax (see 
+      <eref target="http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf"/>).</t> 
     
-      <t>By default, character matching MUST be performed in a 
-      case-sensitive manner. To override this default behavior, 
-      the predicate object MAY contain an "ignore_case" member 
-      whose value is either "true" (to perform case-insensitive
-      matching) or false. Setting the value of "ignore_case" to 
-      true is equivalent to using the "i" modifier flag within 
-      the JavaScript Regular Expression syntax (e.g. "/\w\s/*/i").</t>
+      <t>By default, matching against the regular expression 
+      MUST be performed in a case-sensitive manner. To override 
+      this default behavior, the predicate object MAY contain an 
+      "ignore_case" member whose value is either true (to perform 
+      case-insensitive matching) or false. Setting the value of 
+      "ignore_case" to true is equivalent to using the "i" modifier 
+      flag within the JavaScript Regular Expression syntax (e.g. "/\w\s/*/i").</t>
     
       <figure><preamble>For instance:</preamble><artwork>
 {
@@ -1011,6 +1012,105 @@
     <t>JSON Patch implementations that do not implement or recognize
     JSON Predicate objects will treat them as unknown patch operations 
     that will cause evaluation of the Patch document to fail.</t>
+    
+    <section title="Conditional Patch Operations">
+      
+      <t>In addition to being included as top-level operations within
+        a JSON Patch Document, Predicate objects can be used to make
+        conditional JSON Patch Operations through the use of the 
+        optional "if" and "unless" properties.</t>
+        
+      <t>For instance, in the following example, the value at path 
+      "/a/b/0" is only removed if the value at path "/a/b" is an Array.</t>
+      
+      <figure><artwork>
+  PATCH /some-document HTTP/1.1
+  Host: example.org
+  Content-Type: application/json-patch-test
+  
+  [
+    {
+      "op": "remove",
+      "path": "/a/b/0",
+      "if": {
+        "op": "type",
+        "path": "/a/b",
+        "value": "array"
+      }
+    }
+  ]
+      </artwork></figure>
+      
+      <t>Unlike a typical JSON Patch operation, however, the 
+      processing of the complete Patch document does not 
+      fail if the stated condition is not met. The operation
+      is considered to be successful even if the stated
+      modification is not performed and processing will continue.</t>
+      
+      <t>In the next example, the value at path "/a/b/-" is 
+      added unless the value at path "/a/b" is undefined and 
+      missing.</t>
+      
+      <figure><artwork>
+  PATCH /some-document HTTP/1.1
+  Host: example.org
+  Content-Type: application/json-patch-test
+  
+  [
+    {
+      "op": "remove",
+      "path": "/a/b/0",
+      "unless": {
+        "op": "undefined",
+        "path": "/a/b"
+      }
+    }
+  ]
+      </artwork></figure>
+      
+      <t>In a normal JSON Patch document without using predicates, 
+      processing of the "remove" operation would cease and an error
+      would be reported. Using the "if" and "unless" properties, the 
+      error condition can be avoided and compensated for using a 
+      combination of operations. For instance, in the following example
+      the patch document ensures that the "/a/b" path exists and is 
+      an array before attempting to add new items. If the existing 
+      value of "/a/b" is not an array, it's value is changed to an 
+      array prior to adding items, ensuring that the second "add" 
+      operation will succeed.</t>
+      
+      <figure><artwork>
+  PATCH /some-document HTTP/1.1
+  Host: example.org
+  Content-Type: application/json-patch-test
+  
+  [
+    {
+      "op": "add",
+      "path": "/a/b",
+      "value": [],
+      "unless": {
+        "op": "and",
+        "apply": [
+          {"op": "defined"},
+          {"op": "type", "value": "array"}
+        ]
+      }
+    },
+    {
+      "op": "add",
+      "path": "/a/b/-",
+      "value": "ABC"
+    }
+  ]
+      </artwork></figure>
+      
+      <t>The "if" and "unless" properties can be used with any JSON Patch
+      operation in a document using the "application/json-patch-test"
+      content type. However, the "if" and "unless" properties MUST NOT be used in
+      JSON Predicate objects.</t>
+      
+    </section>
     
   </section>
   
