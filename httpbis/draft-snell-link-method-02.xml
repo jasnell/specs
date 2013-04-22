@@ -3,16 +3,16 @@
   <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
   <!ENTITY rfc2068 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2068.xml'>
   <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
-  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p2-semantics-21.xml'>
-  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p4-conditional-21.xml'>
-  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p6-cache-21.xml'>
+  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p2-semantics-22.xml'>
+  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p4-conditional-22.xml'>
+  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p6-cache-22.xml'>
 ]>
 <?rfc toc="yes"?> 
 <?rfc strict="yes"?> 
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-link-method-01"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-link-method-02"> 
   <front> 
     <title abbrev="HTTP Link and Unlink Methods"> 
       HTTP Link and Unlink Methods
@@ -24,7 +24,7 @@
       </address> 
     </author> 
     
-    <date month="October" year="2012" /> 
+    <date month="April" year="2013" /> 
  
     <area>Applications</area> 
     <!-- workgroup>Individual Submission</workgroup--> 
@@ -76,7 +76,7 @@
     single relationship of any given type can exist. However, multiple relationships 
     of different types can be established between the same pair of resources.</t>
     
-    <t>LINK request messages are not safe, however, in that establishing a relationship
+    <t>LINK request messages are not safe, however. Establishing a relationship
     causes an inherent change to the state of the target resource.</t>
     
     <t>Responses to LINK requests are not cacheable. If a LINK
@@ -128,7 +128,7 @@
 
     <t>UNLINK request messages are idempotent.</t>
     
-    <t>UNLINK request messages are not safe, however, in that removing a relationship
+    <t>UNLINK request messages are not safe, however. Removing a relationship
     causes an inherent change to the state of the target resource.</t>
     
     <t>Responses to UNLINK requests are not cacheable. If an UNLINK

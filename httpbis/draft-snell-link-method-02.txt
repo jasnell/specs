@@ -1,21 +1,22 @@
 
 
 
-Network Working Group                                           J. Snell
-Internet-Draft                                           October 9, 2012
+
+Network Working Group                                         J.M. Snell
+Internet-Draft                                            April 22, 2013
 Intended status: Informational
-Expires: April 12, 2013
+Expires: October 24, 2013
 
 
                       HTTP Link and Unlink Methods
-                       draft-snell-link-method-01
+                       draft-snell-link-method-02
 
 Abstract
 
    This specification defines the semantics of the Link and Unlink HTTP
    methods.
 
-Status of this Memo
+Status of This Memo
 
    This Internet-Draft is submitted to IETF in full conformance with the
    provisions of BCP 78 and BCP 79.
@@ -30,11 +31,11 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 12, 2013.
+   This Internet-Draft will expire on October 24, 2013.
 
 Copyright Notice
 
-   Copyright (c) 2012 IETF Trust and the persons identified as the
+   Copyright (c) 2013 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -42,76 +43,27 @@ Copyright Notice
    (http://trustee.ietf.org/license-info) in effect on the date of
    publication of this document.  Please review these documents
    carefully, as they describe your rights and restrictions with respect
-   to this document.  Code Components extracted from this document must
-   include Simplified BSD License text as described in Section 4.e of
-   the Trust Legal Provisions and are provided without warranty as
-   described in the Simplified BSD License.
-
-
-
-
-
-
-Snell                    Expires April 12, 2013                 [Page 1]
-
-Internet-Draft        HTTP Link and Unlink Methods          October 2012
-
+   to this document.
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
-   2.  LINK  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
-   3.  UNLINK  . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
-   4.  Relationship to other HTTP Methods and Discoverability of
-       Links . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
-   5.  Example . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . . . 7
-   7.  Normative References  . . . . . . . . . . . . . . . . . . . . . 7
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 8
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  LINK  . . . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  UNLINK  . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Snell                    Expires April 12, 2013                 [Page 2]
+Snell                   Expires October 24, 2013                [Page 1]
 
-Internet-Draft        HTTP Link and Unlink Methods          October 2012
+Internet-Draft        HTTP Link and Unlink Methods            April 2013
 
+
+   4.  Relationship to other HTTP Methods and Discoverability of
+       Links . . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Example . . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
+   7.  Normative References  . . . . . . . . . . . . . . . . . . . .   6
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
 
 1.  Introduction
 
@@ -126,7 +78,6 @@ Internet-Draft        HTTP Link and Unlink Methods          October 2012
    In this document, the key words "MUST", "MUST NOT", "REQUIRED",
    "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
    and "OPTIONAL" are to be interpreted as described in [RFC2119].
-
 
 2.  LINK
 
@@ -150,9 +101,18 @@ Internet-Draft        HTTP Link and Unlink Methods          October 2012
    multiple relationships of different types can be established between
    the same pair of resources.
 
-   LINK request messages are not safe, however, in that establishing a
+   LINK request messages are not safe, however.  Establishing a
    relationship causes an inherent change to the state of the target
    resource.
+
+
+
+
+
+Snell                   Expires October 24, 2013                [Page 2]
+
+Internet-Draft        HTTP Link and Unlink Methods            April 2013
+
 
    Responses to LINK requests are not cacheable.  If a LINK request
    passes through a cache that has one or more stored responses for the
@@ -161,14 +121,6 @@ Internet-Draft        HTTP Link and Unlink Methods          October 2012
 
    A single LINK request message can contain multiple Link header
    fields, each of which establishes a separate relationship with the
-
-
-
-Snell                    Expires April 12, 2013                 [Page 3]
-
-Internet-Draft        HTTP Link and Unlink Methods          October 2012
-
-
    target resource.  In such cases, the server MUST accept the entire
    set of relationships atomically.  If any of the specified
    relationships cannot be created, the server MUST NOT create any of
@@ -197,7 +149,6 @@ Internet-Draft        HTTP Link and Unlink Methods          October 2012
    server can return a 304 (Not Modified) response to indicate that no
    modifications have been made.
 
-
 3.  UNLINK
 
    The UNLINK method is used to remove one or more relationships between
@@ -211,20 +162,20 @@ Internet-Draft        HTTP Link and Unlink Methods          October 2012
    if the request message includes an If-Modified-Since, If-Unmodified-
    Since, If-Match, If-None-Match, or If-Range header field
    ([I-D.ietf-httpbis-p4-conditional]).  A conditional UNLINK requests
+
+
+
+Snell                   Expires October 24, 2013                [Page 3]
+
+Internet-Draft        HTTP Link and Unlink Methods            April 2013
+
+
    that the relationship be removed only under the circumstances
    described by the conditional header field(s).
 
    UNLINK request messages are idempotent.
 
-   UNLINK request messages are not safe, however, in that removing a
-
-
-
-Snell                    Expires April 12, 2013                 [Page 4]
-
-Internet-Draft        HTTP Link and Unlink Methods          October 2012
-
-
+   UNLINK request messages are not safe, however.  Removing a
    relationship causes an inherent change to the state of the target
    resource.
 
@@ -259,8 +210,21 @@ Internet-Draft        HTTP Link and Unlink Methods          October 2012
    server error, the server can return a 304 (Not Modified) response to
    indicate that no modifications have been made.
 
-
 4.  Relationship to other HTTP Methods and Discoverability of Links
+
+
+
+
+
+
+
+
+
+
+Snell                   Expires October 24, 2013                [Page 4]
+
+Internet-Draft        HTTP Link and Unlink Methods            April 2013
+
 
    The use of the LINK and UNLINK request methods to manage
    relationships between resources has no direct bearing on the use or
@@ -273,18 +237,9 @@ Internet-Draft        HTTP Link and Unlink Methods          October 2012
    Whether and how to represent relationships managed using LINK and
    UNLINK is left solely at the discretion of the server implementation.
 
-
-
-
-Snell                    Expires April 12, 2013                 [Page 5]
-
-Internet-Draft        HTTP Link and Unlink Methods          October 2012
-
-
    This specification does not define a means of discovering or
    enumerating the relationships that have been established using the
    LINK request method.
-
 
 5.  Example
 
@@ -295,54 +250,56 @@ Internet-Draft        HTTP Link and Unlink Methods          October 2012
    Example 1: Creating two separate links between an image and the
    profiles of two people associated with the image:
 
-     LINK /images/my_dog.jpg HTTP/1.1
-     Host: example.org
-     Link: <http://example.com/profiles/joe>; rel="tag"
-     Link: <http://example.com/profiles/sally>; rel="tag"
+   LINK /images/my_dog.jpg HTTP/1.1
+   Host: example.org
+   Link: <http://example.com/profiles/joe>; rel="tag"
+   Link: <http://example.com/profiles/sally>; rel="tag"
+
 
    Example 2: Removing an existing Link relationship between two
    resources:
 
-     UNLINK /images/my_dog.jpg HTTP/1.1
-     Host: example.org
-     Link: <http://example.com/profiles/sally>; rel="tag"
+   UNLINK /images/my_dog.jpg HTTP/1.1
+   Host: example.org
+   Link: <http://example.com/profiles/sally>; rel="tag"
+
 
    Example 3: Establish a "pingback" or "trackback" style link to a blog
    entry about an article
 
-     LINK /articles/an_interesting_article HTTP/1.1
-     Host: example.org
-     Link: <http://example.com/my_blog_post>; rel="about"
+   LINK /articles/an_interesting_article HTTP/1.1
+   Host: example.org
+   Link: <http://example.com/my_blog_post>; rel="about"
+
 
    Example 4: Establish a link between two semantically related
    resources:
 
-     LINK /some-resource HTTP/1.1
-     Host: example.org
-     Link: <http://example.com/schemas/my_schema>; rel="describedBy"
+
+
+Snell                   Expires October 24, 2013                [Page 5]
+
+Internet-Draft        HTTP Link and Unlink Methods            April 2013
+
+
+   LINK /some-resource HTTP/1.1
+   Host: example.org
+   Link: <http://example.com/schemas/my_schema>; rel="describedBy"
+
 
    Example 5: Add an existing resource to a collection:
 
-     LINK /some-collection-resource HTTP/1.1
-     Host: example.org
-     Link: <http://example.com/my-member-resource>; rel="item"
-
-
-
-
-
-
-Snell                    Expires April 12, 2013                 [Page 6]
-
-Internet-Draft        HTTP Link and Unlink Methods          October 2012
+   LINK /some-collection-resource HTTP/1.1
+   Host: example.org
+   Link: <http://example.com/my-member-resource>; rel="item"
 
 
    Example 6: Link one resource to another that monitors its current
-   state (e.g. pub/sub)
+   state (e.g.  pub/sub)
 
-     LINK /my-resource HTTP/1.1
-     Host: example.org
-     Link: <http://example.com/my-monitor>; rel="monitor"
+   LINK /my-resource HTTP/1.1
+   Host: example.org
+   Link: <http://example.com/my-monitor>; rel="monitor"
 
 
 6.  Security Considerations
@@ -360,44 +317,40 @@ Internet-Draft        HTTP Link and Unlink Methods          October 2012
    state, the server is responsible for determining the client's
    authorization to make such changes.
 
-
 7.  Normative References
 
    [I-D.ietf-httpbis-p2-semantics]
               Fielding, R. and J. Reschke, "Hypertext Transfer Protocol
-              (HTTP/1.1): Semantics and Content",
-              draft-ietf-httpbis-p2-semantics-21 (work in progress),
-              October 2012.
+              (HTTP/1.1): Semantics and Content", draft-ietf-
+              httpbis-p2-semantics-22 (work in progress), February 2013.
 
    [I-D.ietf-httpbis-p4-conditional]
               Fielding, R. and J. Reschke, "Hypertext Transfer Protocol
-              (HTTP/1.1): Conditional Requests",
-              draft-ietf-httpbis-p4-conditional-21 (work in progress),
-              October 2012.
+              (HTTP/1.1): Conditional Requests", draft-ietf-
+              httpbis-p4-conditional-22 (work in progress), February
+              2013.
+
+
+
+
+Snell                   Expires October 24, 2013                [Page 6]
+
+Internet-Draft        HTTP Link and Unlink Methods            April 2013
+
 
    [I-D.ietf-httpbis-p6-cache]
               Fielding, R., Nottingham, M., and J. Reschke, "Hypertext
-              Transfer Protocol (HTTP/1.1): Caching",
-              draft-ietf-httpbis-p6-cache-21 (work in progress),
-              October 2012.
+              Transfer Protocol (HTTP/1.1): Caching", draft-ietf-
+              httpbis-p6-cache-22 (work in progress), February 2013.
 
    [RFC2068]  Fielding, R., Gettys, J., Mogul, J., Nielsen, H., and T.
               Berners-Lee, "Hypertext Transfer Protocol -- HTTP/1.1",
               RFC 2068, January 1997.
 
-
-
-
-Snell                    Expires April 12, 2013                 [Page 7]
-
-Internet-Draft        HTTP Link and Unlink Methods          October 2012
-
-
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
 
    [RFC5988]  Nottingham, M., "Web Linking", RFC 5988, October 2010.
-
 
 Author's Address
 
@@ -435,14 +388,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-Snell                    Expires April 12, 2013                 [Page 8]
-
+Snell                   Expires October 24, 2013                [Page 7]
