@@ -1,13 +1,14 @@
 <?xml version="1.0"?> 
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
   <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+  <!ENTITY rfc6265 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6265.xml'>
 ]>
 <?rfc toc="yes"?> 
 <?rfc strict="yes"?> 
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-httpbis-bohe-05"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-httpbis-bohe-07"> 
   <front> 
     <title abbrev="Stored Header Encoding"> 
       HTTP/2.0 Discussion: Stored Header Encoding
@@ -412,18 +413,23 @@
       <section title="Numeric Values">
         
         <t>Numeric values are encoded as unsigned variable-length integers (uvarint) of 
-        up to a maximum of 10-octets. Unsigned values larger than 64-bits (0xFFFFFFFF) 
-        MUST NOT be used. Negative values cannot be represented using this syntax.
-        The uvarint syntax is described below.</t>
+        up to a maximum of 10-octets. Unsigned values larger than 64-bits 
+        (0xFFFFFFFFFFFFFFFF) are supported by this format but SHOULD NOT be used. 
+        Negative values cannot be represented using this syntax. The uvarint 
+        syntax is described below.</t>
         
       </section>
       
       <section title="Timestamp Values">
         
         <t>Timestamp values are encoded as unsigned variable-length integers specifying
-        the number of seconds that have passed since the standard Epoch. The syntax
-        is identical that used for Numeric Values. Dates prior to the epoch cannot
-        be represented using this syntax.</t>
+        the number of milliseconds that have passed since the standard Epoch
+        (1970-01-01T00:00:00 GMT). The syntax is identical that used for Numeric 
+        Values. Dates prior to the epoch cannot be represented using this syntax.</t>
+        
+        <t>Representing timestamps in this manner ensures that timestamps will 
+          always encode using six bytes up and until 2109-05-15T07:35:00 GMT, 
+          then as seven bytes up to and until 19809-03-05T11:03:41 GMT.</t>
         
       </section>
       
@@ -534,8 +540,12 @@
 
   <back>
     <references title="Normative References"> 
-  &rfc2119;
+      &rfc2119;
     </references>    
+    
+    <references title="Informational References">
+      &rfc6265;
+    </references>
     
     <section title="Huffman Tables">
       
@@ -1040,6 +1050,206 @@
       
     </section>
     
+    <section title="Updated Standard Header Definitions">
+      
+      <t>In order to properly deal with the backwards compatibility concerns
+      for HTTP/1, there are several important rules for use of Typed Codecs
+      in HTTP headers:
+      <list style="symbols">
+        <t>All header fields MUST be explicitly defined to use the new header 
+          types. All existing HTTP/1 header fields, then, will continue to be
+          represented as ISO-8859-1 Text unless their standard definitions are
+          updated. The HTTP/2 specification would update the definition of
+          specific known header fields (e.g. content-length, date, if-modified-since,
+          etc).</t>
+        <t>Extension header fields that use the typed codecs will have specific
+          normative transformations to ISO-8859-1 defined.
+          <list style="symbols">
+            <t>UTF-8 Text will be converted to ISO-8859-1 with extended
+               characters pct-encoded</t>
+            <t>Numbers will be converted to their ASCII equivalent values.</t>
+            <t>Date Times will be converted to their HTTP-Date equivalent values.</t>
+            <t>Binary fields will be Base64-encoded.</t>
+          </list>
+        </t>
+        <t>There will be no normative transformation from ISO-8859-1 values
+        into the typed codecs. Implementations are free to apply
+        transformation where those impls determine it is appropriate, but it
+        will be perfectly legal for an implementation to pass a text value
+        through even if it is known that a given header type has a typed codec
+        equivalent (for instance, Content-Length may come through as a number
+        or a text value, either will be valid). This means that when
+        translating from HTTP/1 -> HTTP/2, receiving implementations need to
+        be prepared to handle either value form.</t>
+      </list>
+      </t>
+      
+      <t>A Note of warning: Individual header fields MAY be defined such 
+        that they can be represented using multiple types. Numeric fields, 
+        for instance, can be represented using either the uvarint encoding 
+        or using the equivalent sequence of ASCII numbers. Implementers will 
+        need to be capable of supporting each of the possible variations. 
+        Designers of header field definitions need to be aware of the 
+        additional complexity and possible issues that allowing for 
+        such alternatives can introduce for implementers.</t>
+      
+      <t>Based on an initial survey of header fields currently defined by
+        the HTTPbis specification documents, the following header field 
+        definitions can be updated to make use of the new types</t>
+        
+      <texttable>
+        <ttcol>Field</ttcol>
+        <ttcol>Type</ttcol>
+        <ttcol>Description</ttcol>
+        
+        <c>content-length</c>
+        <c>Numeric or Text</c>
+        <c>Can be represented as either an unsigned, variable-length
+          integer or a sequence of ASCII numbers.</c>
+          
+        <c>date</c>
+        <c>Timestamp or Text</c>
+        <c>Can be represented as either a uvarint encoded timestamp
+          or as text (HTTP-date).</c>
+          
+        <c>max-forwards</c>
+        <c>Numeric or Text</c>
+        <c>Can be represented as either an unsigned, variable-length
+          integer or a sequence of ASCII numbers.</c>
+        
+        <c>retry-after</c>
+        <c>Timestamp, Numeric or Text</c>
+        <c>Can be represented as either a uvarint encoded timestamp,
+          an unsigned, variable-length integer, or the text equivalents
+          of either (HTTP-date or sequence of ASCII numbers)</c>
+          
+        <c>if-modified-since</c>
+        <c>Timestamp or Text</c>
+        <c>Can be represented as either a uvarint encoded timestamp
+          or as text (HTTP-date).</c>
+        
+        <c>if-unmodified-since</c>
+        <c>Timestamp or Text</c>
+        <c>Can be represented as either a uvarint encoded timestamp
+          or as text (HTTP-date).</c>
+        
+        <c>last-modified</c>
+        <c>Timestamp or Text</c>
+        <c>Can be represented as either a uvarint encoded timestamp
+          or as text (HTTP-date).</c>
+        
+        <c>age</c>
+        <c>Numeric or Text</c>
+        <c>Can be represented as either an unsigned, variable-length
+          integer or a sequence of ASCII numbers.</c>
+
+        <c>expires</c>
+        <c>Timestamp or Text</c>
+        <c>Can be represented as either a uvarint encoded timestamp
+          or as text (HTTP-date).</c>
+        
+      </texttable>
+      
+    </section>
+    
+    <section title="State Management Alternatives">
+      
+      <t>In the current design, dynamic cache storage slots are assigned
+        by the decompressor in "encounter order". While this is effective,
+        it requires that all compressor and decompressor implementations 
+        utilize the exact same algorithm for assigning storage slots, 
+        precluding any implementation from experimenting with more efficient
+        algorithms. An alternative approach is to allow the compressor
+        to assign the slots and communicate the assigned slots with each
+        header. This would require a single additional byte per header 
+        instance in the Literal and Cloned Header Groups.</t>
+        
+      <t>The serialization syntax for Cloned and Literal Header Groups
+        would change to:</t>
+        
+        <figure><artwork>
+  ; Cloned-Index Header Group
+  cloned-index-header-group  = cloned-index-header-prefix 
+                               1*32(cache-index cache-index value)
+
+  ; Literal Header Group
+  literal-header-group       = literal-header-prefix 
+                               1*32(cache-index name value)
+        </artwork></figure>
+      
+        <t>The decompressor would used the specified storage index 
+          locations to store header values rather than relying on 
+          the encounter order, increasing the general efficiency of
+          the algorithm with a minimal impact on transmission size.</t>
+          
+        <t>On the downside, this puts the compressor in greater 
+          control over the decompressor-maintained state because the 
+          decompressor would not know how long it needs to hold 
+          on to stored items. This opens the decompressor up to
+          possible abuse from malicious compressors. The current 
+          least-recently-written cache approach allows the decompressor
+          to reliably drop items as space fills without fear of 
+          falling out of sync with the compressor.</t>
+      
+    </section>
+    
+    <section title="Alternative Timestamp encodings">
+      
+      <t>This specification currently uses the number of milliseconds from
+        the UNIX Epoch to represent timestamps. This 64-bit number is encoded
+        using the same uvarint encoding as Numeric fields. This means that 
+        the timestamp is encoded using a variable width that, right now
+        (for about the next 100 years or so), will encode in six bytes, 
+        then seven bytes for the reasonable future.</t>
+        
+      <t>One possible alternative approach we can take is similar to 
+        NTP's handling of Era's. We can take the current timestamp
+        and generate an Era value, with a maximum of 255 (0xFF). This
+        is used as a multiplier for the timestamp value. The two 
+        values are calculated using the following formula:</t>
+        
+        <figure><artwork>
+ m   = 4294967296000
+ now = milliseconds since UNIX Epoch
+ era = now / m
+ ts  = now % m
+        </artwork></figure>
+      
+      <t>The allowable values for "era" would be capped at 255. This value 
+        is encoded as a single byte, followed by a uvarint encoding of
+        ts. This ensures that the timestamp will never be encoded using
+        more than 7-bytes total, though it may be encoded in as few as 
+        two bytes on extremely rare occasions (specifically, immediately
+        following each era rollover).</t>
+        
+      <figure><preamble>Wire Syntax:</preamble><artwork>
+  era       = %x00-FF
+  ts        = uvarint
+  date-time = era ts
+      </artwork></figure>
+        
+      <t>To convert back to the Epoch, the formula is equally simple:</t>
+      
+      <figure><artwork>
+  now = era * m + ts
+      </artwork></figure>
+      
+      <t>The largest date we can encode using this format is 
+       "36812-02-20T00:36:15.999Z". Dates prior to the epoch 
+       cannot be represented.</t>
+      
+      <t>The significant drawback with this approach is that current dates
+      would encode in 7-bytes until the next era rollover, which will 
+      occur at approximately 2106-02-07T06:28:15.999Z (give or take a 
+      few leap seconds thrown in here and there).</t>
+      
+      <t>Note: The byte lengths assume we want millisecond precision. 
+        If we opted to keep the second precision currently in HTTP/1, 
+        then this alternative encoding ensures that our timestamps 
+        never exceed six-bytes in length.</t>
+      
+    </section>
+    
     <section title="Alternative uvarint encodings">
       
       <t>The uvarint encoding currently specified by this specification is 
@@ -1049,6 +1259,14 @@
         used as drop-in replacements for the current approach. Below are 
         just a couple alternatives. There are plenty others. We just need
         to pick the one that we feel will work the best.</t>
+        
+      <t>It ought to be noted that while each of these schemes vary 
+        in details such as endianess, specific wire-format, etc, each
+        will typically encode the same numbers using the same number
+        of bytes with variations of only a single byte only in the edge 
+        cases. Processing time for each is also equivalent when dealing
+        with any number less or equal to 64-bits in length. This means
+        that the choice is largely a matter of style than substance.</t>
       
       <section title="Option 1:">
         
@@ -1124,12 +1342,115 @@
             binary as 10010101 00010100 01110010, can be encoded using four 
             bytes: 11100000 10010101 00010100 01110010</t>
 
-          <t>The integer value 0xFFFFFFFFFFFFFFFF is encoded as:
-            11111111 11111111 11111111 11111111 11111111 11111111 
-            11111111 11111111 11111111</t>
+          <t>This format is not capable of encoding any number requiring more 
+            than 64-bits.</t>
 
       </section>
       
+    </section>
+        
+    <section title="Set-Cookie and Cookie Alternatives">
+      
+      <t>The Cookie and Set-Cookie header fields are interesting in that they
+        establish a subordinate layer of key+value pairs exchanged within an
+        HTTP dialog. Up to this point, Cookies have been handled largely as
+        blobs of text, which is generally inefficient and inflexible. Even 
+        though it works, the design is not optimum.</t>
+        
+      <t>The introduction of a new header serialization mechanism and HTTP/2's
+        new framing provides us with an interesting opportunity to make 
+        significant improvements to the way cookies work.</t>
+        
+      <t>Consider, for example, rather than defining Set-Cookie as a header
+        field, we could create a modified Headers Frame that contains 
+        header fields that ought to be persisted and returned by the client.</t>
+        
+      <t>The new Headers Frame flags would be:
+        <list style="symbols">
+          <t>P (0x1)  - Persist. If set, the headers in this frame are to be 
+            persistently stored and returned in subsequent streams.</t>
+          <t>C (0x2)  - Clear. If set, any existing stored state is cleared.</t>
+          <t>E (0x4)  - Ephemeral. If set, state is only stored for the duration of
+            this connection.</t>
+          <t>H (0x8)  - HttpOnly. Equivalent to Set-Cookie HttpOnly parameter.</t>
+          <t>S (0x10) - Secure. Equivalent to Set-Cookie Secure parameter.</t>
+        </list>
+      </t>
+      
+      <t>These flags would pertain only to the header fields contained by the 
+        one Headers frame.</t>
+
+       <t>Within the header block, similar to how special ':' prefixed 
+        HTTP header fields are handled, there would be a handful of 
+        special ':' fields:
+        <list style="symbols">
+          <t>:host    - text, equivalent to the Set-Cookie domain parameter</t>
+          <t>:path    - text, equivalent to the Set-Cookie path parameter</t>
+          <t>:expires - timestamp or text</t>
+          <t>:max-age - uvarint or text</t>
+        </list>
+      </t> 
+
+      <t>When the Server wishes to send Cookies to the client, rather than 
+        sending a separate Set-Cookie header for every individual name+value
+        pair it wishes the client to persist, it would send a Stateful Header
+        Frame. The client would receive this, persist the contained set of 
+        name+value pairs just as it would persist cookies today, then return
+        those to the server in a separate Headers Frame in all appropriate
+        subsequent streams.</t>
+
+      <t>This approach has a number of distinct advantages of the current
+        Set-Cookies mechanism:
+        <list style="symbols">
+          <t>Currently, handling Set-Cookie requires it's own separate 
+            parsing logic. With this new approach, we would leverage the 
+            same header block encoding as all other types of headers,
+            without the need for problematic and error-prone text parsing
+            logic.</t>
+          <t>Currently, the Set-Cookie Expires and Max-Age parameters use
+            inefficient ASCII encodings, with this new approach, those 
+            fields are encoded using efficient variable-length encodings
+            and allow multiple key+value pairs to be stored with the same
+            expiration to eliminate redundancy.</t>
+          <t>Currently, cookie values are limited to a specific ASCII subset.
+            With this new approach, Cookie values can take advantage of the 
+            exact same value type codecs described in this document. Cookie
+            values could be text, numeric, timestamps or raw binary, providing
+            significant new options.</t>
+        </list>
+      </t>
+   
+      <t>For example, suppose the server wishes the client to store two cookies
+      for 10 seconds with the HttpOnly and Secure flags set. The server wishes
+      the client to also clear any previous cookies it had stored. To accomplish 
+      this, the server would send a Stateful Headers Frame to the client with 
+      bit flags P, C, H and S set to 1 and the following key-value pairs encoded 
+      in the serialized header block:</t>
+      
+      <figure><artwork>
+ :host    = "example.com"
+ :path    = "/" 
+ :max-age = 10
+ foo      = "bar"
+ baz      = 123
+      </artwork></figure> 
+
+      <t>Upon creating a new streams for the domain "example.com" and path "/",
+        the client would include the "foo" and "baz" header fields in the set of 
+        headers encoded in the request:</t>
+        
+        <figure><artwork>
+ :method = GET
+ :path   = "/foo"
+ :host   = "example.com"
+ foo     = "bar"
+ baz     = 123
+        </artwork></figure>
+        
+        <t>Note that this approach is backwards compatible with Set-Cookie
+          and Cookie in that those header fields could continue to be used
+          by existing implementations.</t>
+
     </section>
         
   </back>
