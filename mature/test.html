@@ -1,0 +1,91 @@
+<script>
+  // Apply the patch to the original, return the 
+  // modified object... this will mutate the 
+  // passed in object in place as well...
+  function apply(orig, patch) {
+    if (patch == null) 
+      return orig;
+    else if (patch instanceof Array)
+      orig = purge_nulls(patch);
+    else if (is_primitive(patch))
+      orig = patch;
+    else if (patch instanceof Object) {
+      if (orig instanceof Array) {
+        orig = purge_nulls(patch);
+      } else {
+        for (m in patch) {
+          if (orig.hasOwnProperty(m)) {
+            if (patch[m] == null)
+              delete orig[m];
+            else {
+              if (is_primitive(patch[m])) 
+                orig[m] = patch[m];
+              else {
+                if (orig[m] instanceof Array)
+                  orig[m] = purge_nulls(patch[m]);
+                else 
+                  orig[m] = apply(orig[m],patch[m]);
+              }
+            }
+          } else if (patch[m] != null)
+            orig[m] = purge_nulls(patch[m]);
+        }
+      }
+    }
+    return orig;
+  }
+
+
+  function is_primitive(val) {
+    var m = typeof val;
+    return m == 'string'  || 
+           m == 'number'  ||
+           m == 'boolean';
+  }
+
+  function purge_nulls(obj) {
+    var ret = obj;
+    if (!is_primitive(obj)) {
+      if (obj instanceof Array) {
+        var ret = [];
+        for (m in obj)
+          if (obj[m] != null) 
+            ret.push(purge_nulls(obj[m]));
+      } else if (obj instanceof Object) {
+        var ret = {};
+        for (m in obj) {
+          if (obj[m])
+            ret[m] = purge_nulls(obj[m]);
+        }
+      }
+    }
+    return ret;    
+  }
+
+  // Define the original object...
+  var orig = {
+    "a": "b",
+    "c": {
+      "d": [1,2,3],
+      "e": {
+        "f": 1
+      }
+    }
+  }
+  
+  // Define the patch...
+  var patch = {
+    "c": {
+      "d": [1,2],
+      "e": {
+        "f": null
+      }
+    }
+  }
+  
+  // Apply the patch...
+  var modified = apply(orig,patch);
+  
+  alert(JSON.stringify(modified));
+  
+</script>
