@@ -8,7 +8,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-httpbis-bohe-07"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-httpbis-bohe-08"> 
   <front> 
     <title abbrev="Stored Header Encoding"> 
       HTTP/2.0 Discussion: Stored Header Encoding
@@ -20,7 +20,7 @@
       </address> 
     </author> 
     
-    <date month="April" year="2013" /> 
+    <date month="May" year="2013" /> 
  
     <keyword>I-D</keyword> 
     <keyword>http</keyword>
@@ -54,6 +54,7 @@
         <t>The "Binary Optimized Header Encoding" proposed by James Snell (me) in 
           http://tools.ietf.org/html/draft-snell-httpbis-bohe-03</t>
       </list></t>
+      
       <t>The Stored Header Encoding seeks to find an elegant, efficient and simple
       marriage of the best concepts from each of these separate proposals.</t>
 
@@ -110,6 +111,8 @@
       only the size of the value is considered. Duplicate values MUST be counted 
       individually.</t>
       
+      <t>Header names MUST NOT exceed 255 octets in length.</t>
+      
     </section>
     
     <section title="Header Serialization">
@@ -118,7 +121,7 @@
       two-bit identifier. These groups are serialized sequentially. A serialized
       header block can contain, at most 256 header groups. The first byte of the
       serialized block is an unsigned, 0-based counter indicating the number of
-      groups. A serialized block MUST contain at least one header group.</t>
+      groups.</t>
 
       <figure><artwork>
   00 -- Index Header Group
@@ -133,6 +136,11 @@
 
       <t>Each header group contains a single 8-bit prefix and up to 32 distinct header 
       instances. </t>
+      
+      <t>If a particular serialization block contains more than 32 intances of a given 
+      type, then multiple instances of the Header Group Type can be included in 
+      the serialized block. For instance, if a given message contains 33 index 
+      references, the serialized block may contain two separate Index Header Groups.</t>
       
       <figure><preamble>Wire Format</preamble><artwork><![CDATA[
   header-block               = OCTET *(index-header-group  /
@@ -233,19 +241,28 @@
       pieces of information:</t>
 
       <figure><artwork>
-  00 0 00000
+    0  1   2   3  4  5  6  7
+  +------+---+---------------+
+  | TYPE |EPH|   COUNTER     |
+  +------+---+---------------+
       </artwork></figure>
       
-      <t>The two most significant bits of the header group prefix identify the 
-      group type.</t> 
-
-      <t>The next bit is the "ephemeral flag" and is used only for Cloned
-      and Literal group types. This bit indicates whether or not the group alters
-      the stored compression state.</t>
-
-      <t>The remaining five bits specify the number of header instances in the group, 
-      with 00000 indicating that the group contains 1 instance and 11111 contains 32. 
-      A header group MUST contain at least one instance.</t>
+      <t>
+        <list style="hanging">
+          <t hangText="TYPE">
+            The two most significant bits of the header group prefix identify the 
+            group type.</t> 
+          <t hangText="EPH">
+            The next bit is the "ephemeral flag" and is used only for Cloned
+            and Literal group types. This bit indicates whether or not the 
+            group alters the stored compression state.</t>
+          <t hangText="COUNTER">
+            The remaining five bits specify the number of header instances 
+            in the group, with 00000 indicating that the group contains 1 
+            instance and 11111 contains 32. A header group MUST contain at 
+            least one instance.</t>
+        </list>
+      </t>
 
       <t>The remaining serialization of the header group depends entirely on the 
       group type.</t>
@@ -345,25 +362,16 @@
       length integer (uvarint). The length prefix SHOULD NOT be longer than five
       octets and SHOULD NOT specify a value larger than 0xFFFF. </t>
 
-      <t>The Literal Heaer Group affects the stored compression state if, and only if,
+      <t>The Literal Header Group affects the stored compression state if, and only if,
       the "ephemeral" flag in the Header Group Prefix is NOT set. If the header
       group is not marked as being ephemeral, then the specified key name and value
-      is stored in the next available storage index.</t>
+      are stored in the next available storage index.</t>
 
       <figure><preamble>For instance:</preamble><artwork>
   11000000 00000011 01100110 01101111
   01101111 00000000 00000010 10111000
   01000100 11010010
       </artwork></figure>
-
-      <t>Stores a new header with name "foo" and value "baz" in the dynamic cache.</t>
-
-      <t>Each Header Group consists of up to 32 distinct Header Instances. If a 
-      particular serialization block contains more than 32 intances of a given 
-      type, then multiple instances of the Header Group Type can be included in 
-      the serialized block. For instance, if a given message contains 33 index 
-      references, the serialized block may contain two separate Index Header Groups.
-      While this is allowed, it is expected to be rare.</t>
       
     </section>
       
@@ -388,18 +396,29 @@
       <t>Each serialized value is preceded by an 8-bit Value Prefix.</t>
 
       <figure><artwork>
-  00 0 00000
+    0  1   2   3  4  5  6  7
+  +------+---+---------------+
+  | TYPE |RSV|   COUNTER     |
+  +------+---+---------------+
       </artwork></figure>
  
-      <t>The two most significant bits specifies the value type.</t>
-
-      <t>The next significant bit is a reserved flag. Future iterations of 
-       this specification might make use of this bit.</t>
-
-      <t>The remaining bits specify the number of discreet instances in the value. 
-      00000 indicates that one instance is included, 11111 indicates 
-      that 32 instances are included. The value MUST contain at least one instance.</t>
- 
+      <t>
+        <list style="hanging">
+          <t hangText="TYPE">
+            The two most significant bits specifies the value type.
+          </t>
+          <t hangText="RSV">
+            The next significant bit is a reserved flag. Future iterations of 
+            this specification might make use of this bit.
+          </t>
+          <t hangText="COUNTER">
+            The remaining bits specify the number of discreet instances in the value. 
+            00000 indicates that one instance is included, 11111 indicates 
+            that 32 instances are included. The value MUST contain at least one instance.
+          </t>
+        </list>
+      </t>
+    
       <t>The remaining serialization depends entirely on the type.</t>
       
       <section title="UTF-8 Text Values">
@@ -412,20 +431,19 @@
       
       <section title="Numeric Values">
         
-        <t>Numeric values are encoded as unsigned variable-length integers (uvarint) of 
-        up to a maximum of 10-octets. Unsigned values larger than 64-bits 
-        (0xFFFFFFFFFFFFFFFF) are supported by this format but SHOULD NOT be used. 
-        Negative values cannot be represented using this syntax. The uvarint 
-        syntax is described below.</t>
+        <t>Numeric values are encoded as <xref target="uvarint">unsigned variable-length 
+        integers (uvarint)</xref> of up to a maximum of 10-octets. Negative values 
+        cannot be represented using this syntax.</t>
         
       </section>
       
       <section title="Timestamp Values">
         
-        <t>Timestamp values are encoded as unsigned variable-length integers specifying
-        the number of milliseconds that have passed since the standard Epoch
-        (1970-01-01T00:00:00 GMT). The syntax is identical that used for Numeric 
-        Values. Dates prior to the epoch cannot be represented using this syntax.</t>
+        <t>Timestamp values are encoded as <xref target="uvarint">unsigned variable-length 
+        integers</xref> specifying the number of milliseconds that have passed 
+        since the standard Epoch (1970-01-01T00:00:00 GMT). The syntax is 
+        identical that used for Numeric Values. Dates prior to the epoch cannot 
+        be represented using this syntax.</t>
         
         <t>Representing timestamps in this manner ensures that timestamps will 
           always encode using six bytes up and until 2109-05-15T07:35:00 GMT, 
@@ -440,7 +458,7 @@
         
       </section>
       
-      <section title="Unsigned Variable Length Integer Syntax">
+      <section title="Unsigned Variable Length Integer Syntax" anchor="uvarint">
         
         <t>The uvarint syntax is identical to that used by Google's protobufs. They 
         are serialized with the least-significant bytes first in batches of 7-bits, 
@@ -514,7 +532,7 @@
   11000100 01010010 10010000
         </artwork></figure>
 
-        <t>The first 8-bits represents the huffman-table prefix, the first six most 
+        <t>The first 8-bits represents the huffman-table prefix, the six most 
         significant bytes of the second octet are taken directly from the six least
         significant bits of the second UTF-8 byte (0x94). Following those six bits 
         are the six bits of the HUFFMAN_EOF 101001, followed by four unset padding 
@@ -529,6 +547,18 @@
         that require greater than four bytes to encode cannot be represented.</t>
         
       </section>
+      
+    </section>
+    
+    <section title="Implementation Considerations">
+      
+      <t>When implementing the Stored Header Encoding, it is important to 
+        note that the compression state is managed in encounter order. This
+        means that the compressor must delay storing items in the 
+        compression state until the order in which frames are to be 
+        serialized out to the network has been determined. This is a 
+        potential performance bottleneck that needs to be fully tested out
+        to determine its impact.</t>
       
     </section>
     
@@ -1191,6 +1221,17 @@
           to reliably drop items as space fills without fear of 
           falling out of sync with the compressor.</t>
       
+      <t>A second alternative is to utilize separate stored "header groups"
+        the way the current Delta Compression proposal does. Each of these
+        represents a separate storage bucket where headers are stored 
+        persistently by the compressor and decompressor. The advantage of
+        such buckets is that it simplifies and optimizes serialization of
+        frames by the compressor. However, it incurs the cost of a 
+        potentially significant increase in managed state on the decompressor 
+        (rather than a single bucket of stored items with max capacity N, 
+        there are multiple buckets of stored items with max capacity N/number 
+        of buckets).</t>
+      
     </section>
     
     <section title="Alternative Timestamp encodings">
@@ -1347,110 +1388,6 @@
 
       </section>
       
-    </section>
-        
-    <section title="Set-Cookie and Cookie Alternatives">
-      
-      <t>The Cookie and Set-Cookie header fields are interesting in that they
-        establish a subordinate layer of key+value pairs exchanged within an
-        HTTP dialog. Up to this point, Cookies have been handled largely as
-        blobs of text, which is generally inefficient and inflexible. Even 
-        though it works, the design is not optimum.</t>
-        
-      <t>The introduction of a new header serialization mechanism and HTTP/2's
-        new framing provides us with an interesting opportunity to make 
-        significant improvements to the way cookies work.</t>
-        
-      <t>Consider, for example, rather than defining Set-Cookie as a header
-        field, we could create a modified Headers Frame that contains 
-        header fields that ought to be persisted and returned by the client.</t>
-        
-      <t>The new Headers Frame flags would be:
-        <list style="symbols">
-          <t>P (0x1)  - Persist. If set, the headers in this frame are to be 
-            persistently stored and returned in subsequent streams.</t>
-          <t>C (0x2)  - Clear. If set, any existing stored state is cleared.</t>
-          <t>E (0x4)  - Ephemeral. If set, state is only stored for the duration of
-            this connection.</t>
-          <t>H (0x8)  - HttpOnly. Equivalent to Set-Cookie HttpOnly parameter.</t>
-          <t>S (0x10) - Secure. Equivalent to Set-Cookie Secure parameter.</t>
-        </list>
-      </t>
-      
-      <t>These flags would pertain only to the header fields contained by the 
-        one Headers frame.</t>
-
-       <t>Within the header block, similar to how special ':' prefixed 
-        HTTP header fields are handled, there would be a handful of 
-        special ':' fields:
-        <list style="symbols">
-          <t>:host    - text, equivalent to the Set-Cookie domain parameter</t>
-          <t>:path    - text, equivalent to the Set-Cookie path parameter</t>
-          <t>:expires - timestamp or text</t>
-          <t>:max-age - uvarint or text</t>
-        </list>
-      </t> 
-
-      <t>When the Server wishes to send Cookies to the client, rather than 
-        sending a separate Set-Cookie header for every individual name+value
-        pair it wishes the client to persist, it would send a Stateful Header
-        Frame. The client would receive this, persist the contained set of 
-        name+value pairs just as it would persist cookies today, then return
-        those to the server in a separate Headers Frame in all appropriate
-        subsequent streams.</t>
-
-      <t>This approach has a number of distinct advantages of the current
-        Set-Cookies mechanism:
-        <list style="symbols">
-          <t>Currently, handling Set-Cookie requires it's own separate 
-            parsing logic. With this new approach, we would leverage the 
-            same header block encoding as all other types of headers,
-            without the need for problematic and error-prone text parsing
-            logic.</t>
-          <t>Currently, the Set-Cookie Expires and Max-Age parameters use
-            inefficient ASCII encodings, with this new approach, those 
-            fields are encoded using efficient variable-length encodings
-            and allow multiple key+value pairs to be stored with the same
-            expiration to eliminate redundancy.</t>
-          <t>Currently, cookie values are limited to a specific ASCII subset.
-            With this new approach, Cookie values can take advantage of the 
-            exact same value type codecs described in this document. Cookie
-            values could be text, numeric, timestamps or raw binary, providing
-            significant new options.</t>
-        </list>
-      </t>
-   
-      <t>For example, suppose the server wishes the client to store two cookies
-      for 10 seconds with the HttpOnly and Secure flags set. The server wishes
-      the client to also clear any previous cookies it had stored. To accomplish 
-      this, the server would send a Stateful Headers Frame to the client with 
-      bit flags P, C, H and S set to 1 and the following key-value pairs encoded 
-      in the serialized header block:</t>
-      
-      <figure><artwork>
- :host    = "example.com"
- :path    = "/" 
- :max-age = 10
- foo      = "bar"
- baz      = 123
-      </artwork></figure> 
-
-      <t>Upon creating a new streams for the domain "example.com" and path "/",
-        the client would include the "foo" and "baz" header fields in the set of 
-        headers encoded in the request:</t>
-        
-        <figure><artwork>
- :method = GET
- :path   = "/foo"
- :host   = "example.com"
- foo     = "bar"
- baz     = 123
-        </artwork></figure>
-        
-        <t>Note that this approach is backwards compatible with Set-Cookie
-          and Cookie in that those header fields could continue to be used
-          by existing implementations.</t>
-
     </section>
         
   </back>
