@@ -33,7 +33,7 @@
  
     <abstract> 
       <t>This specification defines the application/json-merge-patch media 
-      type and it's intended use with the HTTP PATCH method defined 
+      type and its intended use with the HTTP PATCH method defined 
       by RFC 5789.</t> 
     </abstract> 
  
