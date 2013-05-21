@@ -1,0 +1,280 @@
+
+
+
+Activity Streams Working Group                                  J. Snell
+                                                                     IBM
+                                                            May 21, 2013
+
+
+               Action Extension for JSON Activity Streams
+
+Abstract
+
+   This specification describes an Action extension for JSON Activity
+   Streams.
+
+
+Table of Contents
+
+   1.  The "handler" property  . . . . . . . . . . . . . . . . . . . . 2
+   2.  The "handles" property  . . . . . . . . . . . . . . . . . . . . 2
+   3.  The "action" property . . . . . . . . . . . . . . . . . . . . . 3
+   4.  The "status" property . . . . . . . . . . . . . . . . . . . . . 4
+   5.  Normative References  . . . . . . . . . . . . . . . . . . . . . 5
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 1]
+
+                             ActivityStreams                    May 2013
+
+
+1.  The "handler" property
+
+   Within an Activity object, the "handler" property is used to describe
+   an object that is capable of performing or completing the activity.
+   The value of the "handler" property is an Object of any objectType.
+   The meaning of the "handler" property is only defined when used
+   within an Activity object.
+
+   For example:
+
+     {
+       "verb": "watch",
+       "object": {
+         "objectType": "video",
+         "displayName": "Skyfall",
+         "url": "http://skyfallmovie.com"
+       },
+       "handler": {
+         "objectType": "application",
+         "displayName": "Movie Service",
+         "platform": "Android",
+         "platformVersion": "2.1",
+         "appId": "123456abcdef",
+         "url": "movie://play?movie=skyfall"
+       }
+     }
+
+
+2.  The "handles" property
+
+   Within an object of any objectType, the "handles" property describes
+   Activities or Tasks the object is capable of acting as a "handler"
+   for.  The value of the "handles" property is a JSON array containing
+   one or more JSON objects that describe, at a minimum, a possible
+   combination of verb, actor, object and target values.
+
+   +--------+-----------------------+----------------------------------+
+   | Field  | Type                  | Description                      |
+   +--------+-----------------------+----------------------------------+
+   | actor  | JSON Array of Strings | Specifies one or more            |
+   |        |                       | objectTypes.                     |
+   | object | JSON Array of Strings | Specifies one or more            |
+   |        |                       | objectTypes.                     |
+   | target | JSON Array of Strings | Specifies one or more            |
+   |        |                       | objectTypes.                     |
+   | verb   | JSON Array of Strings | Specifies one or more Verbs      |
+   +--------+-----------------------+----------------------------------+
+
+
+
+
+Snell                                                           [Page 2]
+
+                             ActivityStreams                    May 2013
+
+
+   The example below decribes a fictional media player application for
+   Android that can be used to complete "watch" and "rent" activities
+   for "video" and "audio" objects.
+
+     {
+       "objectType": "application",
+       "displayName": "Media Player for Android",
+       "platform": "Android",
+       "platformVersion": "2.1",
+       "appId": "123456abcdef",
+       "handles": [
+         {
+           "verb": ["watch","rent"],
+           "object": ["video","audio"]
+         }
+       ]
+     }
+
+
+3.  The "action" property
+
+   Used within objects of any objectType, the "action" property
+   describes one or more tasks (pending activities) for which the
+   containing object can be an "object".  The value is represented as a
+   JSON array of one or more Task objects.  Each contained task object
+   is one possible pending activity that could occur.
+
+   For example, the following describes a video object with multiple
+   associated possible actions:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 3]
+
+                             ActivityStreams                    May 2013
+
+
+     {
+       "objectType": "video",
+       "displayName": "Skyfall",
+       "url": "http://skyfallmovie.com",
+       "action": [
+         {
+           "verb": "watch",
+           "handler": {
+             "objectType": "application",
+             "displayName": "Movie Service",
+             "platform": "Android",
+             "platformVersion": "2.1",
+             "appId": "123456abcdef"
+           },
+           "url": "movie://play?movie=skyfall"
+         },
+         {
+           "verb": "review",
+           "handler": {
+             "objectType": "application",
+             "displayName": "Rating Service",
+             "platform": "Android",
+             "platformVersion": "2.1",
+             "appId": "abcdef123456"
+           },
+           "url": "rating://movie?id=skyfall"
+         }
+       ]
+     }
+
+
+4.  The "status" property
+
+   Within an Activity or Task object, the "status" property specifies
+   the current status of the activity.  The value is a JSON string
+   specifying one of:
+
+   tentative  The activity or task has been proposed.
+
+   pending  The activity or task is in progress but has not yet
+      concluded.
+
+   completed  The activity or task has been completed.
+
+   canceled  The activity or task has been canceled.
+
+
+
+
+
+
+Snell                                                           [Page 4]
+
+                             ActivityStreams                    May 2013
+
+
+5.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+
+Author's Address
+
+   James M Snell
+   IBM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 5]
+
