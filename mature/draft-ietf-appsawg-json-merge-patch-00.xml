@@ -111,7 +111,7 @@
   }
       </artwork></figure>
       
-      <t>If the intent is to change the value of the "title" member to 
+      <t>If the intent is to change the value of the "title" member 
       from "Goodbye!" to the value "Hello!", add a new "phoneNumber" 
       member, remove the "familyName" member from the "author" object,
       and remove the word sample from the "tags" Array, the user-agent would
