@@ -1,0 +1,224 @@
+
+
+
+Activity Streams Working Group                                  J. Snell
+                                                                     IBM
+                                                            May 24, 2013
+
+
+               Action Extension for JSON Activity Streams
+
+Abstract
+
+   This specification describes an Action extension for JSON Activity
+   Streams.
+
+
+Table of Contents
+
+   1.  The "handler" property  . . . . . . . . . . . . . . . . . . . . 2
+   2.  The "handles" property  . . . . . . . . . . . . . . . . . . . . 2
+   3.  The "action" property . . . . . . . . . . . . . . . . . . . . . 3
+   4.  Normative References  . . . . . . . . . . . . . . . . . . . . . 4
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 1]
+
+                             ActivityStreams                    May 2013
+
+
+1.  The "handler" property
+
+   Within an Activity object, the "handler" property provides a Link
+   value referencing an object capable of performing or completing the
+   activity.
+
+   For example:
+
+     {
+       "@type": "watch",
+       "object": {
+         "@id": "http://skyfallmovie.com",
+         "@type": "video",
+         "name": "Skyfall"
+       },
+       "handler": {
+         "@type": "application",
+         "name": "Movie Service",
+         "platform": "Android",
+         "platformVersion": "2.1",
+         "appId": "123456abcdef",
+         "url": "movie://play?movie=skyfall"
+       }
+     }
+
+
+2.  The "handles" property
+
+   Within an object, the "handles" property describes the activities the
+   object is capable of handling.  The value of the "handles" property
+   is a JSON array containing one or more JSON objects that describe, at
+   a minimum, a possible combination of verb, actor, object and target
+   values.
+
+    +--------+------------------+-------------------------------------+
+    | Field  | Type             | Description                         |
+    +--------+------------------+-------------------------------------+
+    | actor  | Array of Strings | Specifies one or more object types. |
+    | object | Array of Strings | Specifies one or more object types. |
+    | target | Array of Strings | Specifies one or more object types. |
+    | verb   | Array of Strings | Specifies one or more verbs         |
+    +--------+------------------+-------------------------------------+
+
+   The example below decribes a fictional media player application for
+   Android that can be used to complete "watch" and "rent" activities
+   for "video" and "audio" objects.
+
+
+
+
+
+Snell                                                           [Page 2]
+
+                             ActivityStreams                    May 2013
+
+
+     {
+       "@type": "application",
+       "name": "Media Player for Android",
+       "platform": "Android",
+       "platformVersion": "2.1",
+       "appId": "123456abcdef",
+       "handles": [
+         {
+           "verb": ["watch","rent"],
+           "object": ["video","audio"]
+         }
+       ]
+     }
+
+
+3.  The "action" property
+
+   Used within objects, the "action" property is a Link value that
+   references one or more pending activities for which the containing
+   object can be an "object".
+
+   For example, the following describes a video object with multiple
+   associated possible actions:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 3]
+
+                             ActivityStreams                    May 2013
+
+
+     {
+       "@type": "video",
+       "name": "Skyfall",
+       "url": "http://skyfallmovie.com",
+       "action": [
+         {
+           "@type": "watch",
+           "url": "movie://play?movie=skyfall",
+           "handler": {
+             "@type": "application",
+             "name": "Movie Service",
+             "platform": "Android",
+             "platformVersion": "2.1",
+             "appId": "123456abcdef"
+           }
+         },
+         {
+           "@type": "review",
+           "url": "rating://movie?id=skyfall",
+           "handler": {
+             "@type": "application",
+             "name": "Rating Service",
+             "platform": "Android",
+             "platformVersion": "2.1",
+             "appId": "abcdef123456"
+           }
+         }
+       ]
+     }
+
+
+4.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+
+Author's Address
+
+   James M Snell
+   IBM
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 4]
+

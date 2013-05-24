@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<?xml-stylesheet type='text/xsl' href='./rfc2629.xslt' ?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'> 
+  <!ENTITY rfc3987 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3987.xml'>
+  <!ENTITY rfc3986 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3986.xml'>
+  <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
+  <!ENTITY astreams PUBLIC '' 'http://docs.opensocial.org/download/attachments/4358254/astreams.xml'>
+]>
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<?rfc private="Activity Streams Working Group"?>
+<rfc>
+  <front>
+    <title abbrev="ActivityStreams">Action Extension for JSON Activity Streams</title>
+    <author fullname="James M Snell" initials="J.M." surname="Snell">
+      <organization>IBM</organization>
+      <address></address>
+    </author>
+    <date month="May" year="2013" />
+    <abstract>
+      <t>
+        This specification describes an Action extension for 
+        JSON Activity Streams.
+      </t>
+    </abstract>
+  </front>
+
+  <middle>
+    
+    <section title="The &quot;handler&quot; property" anchor="handler">
+      
+      <t>
+        Within an Activity object, the "handler" property provides 
+        a Link value referencing an object capable of performing or 
+        completing the activity.
+      </t>
+      
+      <t>For example:</t>
+      
+      <figure><artwork>
+  {
+    "@type": "watch",
+    "object": {
+      "@id": "http://skyfallmovie.com",
+      "@type": "video",
+      "name": "Skyfall"
+    },
+    "handler": {
+      "@type": "application",
+      "name": "Movie Service",
+      "platform": "Android",
+      "platformVersion": "2.1",
+      "appId": "123456abcdef",
+      "url": "movie://play?movie=skyfall"
+    }
+  }
+</artwork></figure>
+      
+    </section>
+
+    
+    <section title="The &quot;handles&quot; property" anchor="handles">
+      
+      <t>
+        Within an object, the "handles" property describes the activities
+        the object is capable of handling. The value of the "handles" property 
+        is a JSON array containing one or more JSON objects that describe, at a 
+        minimum, a possible combination of verb, actor, object and target 
+        values.
+      </t>
+  
+      <texttable>
+        <ttcol>Field</ttcol>
+        <ttcol>Type</ttcol>
+        <ttcol>Description</ttcol>
+        <c>actor</c>
+        <c>Array of Strings</c>
+        <c>Specifies one or more object types.</c>
+        <c>object</c>
+        <c>Array of Strings</c>
+        <c>Specifies one or more object types.</c>
+        <c>target</c>
+        <c>Array of Strings</c>
+        <c>Specifies one or more object types.</c>
+        <c>verb</c>
+        <c>Array of Strings</c>
+        <c>Specifies one or more verbs</c>
+      </texttable>
+      
+      <t>
+        The example below decribes a fictional media player 
+        application for Android that can be used to complete
+        "watch" and "rent" activities for "video" and "audio"
+        objects.
+      </t>
+      
+      <figure><artwork>
+  {
+    "@type": "application",
+    "name": "Media Player for Android",
+    "platform": "Android",
+    "platformVersion": "2.1",
+    "appId": "123456abcdef",
+    "handles": [
+      {
+        "verb": ["watch","rent"],
+        "object": ["video","audio"]
+      }
+    ]
+  }
+      </artwork></figure>
+      
+    </section>
+    
+    <section title="The &quot;action&quot; property" anchor="action">
+      
+      <t> 
+        Used within objects, the "action" property is a Link value that 
+        references one or more pending activities for which the 
+        containing object can be an "object".
+      </t>
+
+      <t>
+        For example, the following describes a video object with 
+        multiple associated possible actions:
+      </t>
+      
+      <figure><artwork>
+  {
+    "@type": "video",
+    "name": "Skyfall",
+    "url": "http://skyfallmovie.com",
+    "action": [
+      {
+        "@type": "watch",
+        "url": "movie://play?movie=skyfall",
+        "handler": {
+          "@type": "application",
+          "name": "Movie Service",
+          "platform": "Android",
+          "platformVersion": "2.1",
+          "appId": "123456abcdef"
+        }
+      },
+      {
+        "@type": "review",
+        "url": "rating://movie?id=skyfall",
+        "handler": {
+          "@type": "application",
+          "name": "Rating Service",
+          "platform": "Android",
+          "platformVersion": "2.1",
+          "appId": "abcdef123456"
+        }
+      }
+    ]
+  }
+      </artwork></figure>
+      
+    </section>
+    
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      &rfc2119;
+    </references>
+  </back>
+</rfc>
