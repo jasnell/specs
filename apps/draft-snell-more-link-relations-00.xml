@@ -1,0 +1,188 @@
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+  <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
+]>
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-more-link-relations-00"> 
+  <front> 
+    <title abbrev="Even More Link Relations"> 
+      Even More Link Relation Types
+    </title> 
+ 
+    <author initials="J.M." surname="Snell" fullname="James M Snell"> 
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+    
+    <date month="May" year="2012" /> 
+ 
+    <area>Applications</area> 
+    <keyword>I-D</keyword> 
+    <keyword>http</keyword> 
+    <keyword>link</keyword> 
+    <keyword>rel</keyword>
+ 
+    <abstract> 
+      <t>
+        This specification defines a number of additional 
+        Link Relation Types that can used for a variety of 
+        purposes..</t> 
+    </abstract> 
+ 
+  </front> 
+  
+  <middle> 
+    <section anchor="intro" title="Introduction"> 
+ 
+      <t>
+        This specification defines and adds the following additional 
+        link relation types to the IANA Registry of Link Relations
+        established by <xref target="RFC5988"/>: to, bto, cc, bcc, 
+        from, bfrom, source, generator, provider, location.
+      </t>
+      
+    </section> 
+        
+    <section anchor="audience" title="Audience Targeting Links">
+
+      <texttable>
+        <ttcol>Link Relation</ttcol>
+        <ttcol>Description</ttcol>
+        <c>to</c>
+        <c>
+          Refers to a resource that is considered to be part of the
+          public primary audience of the link's context. 
+        </c>
+        <c>bto</c>
+        <c>
+          Refers to a resource that is considered to be part of the
+          private primary audience of the link's context.
+        </c>
+        <c>cc</c>
+        <c>
+          Refers to a resource that is considered to be part of the 
+          public secondary audience of the link's context.
+        </c>
+        <c>bcc</c>
+        <c>
+          Refers to a resource that is considered to be part of the 
+          private secondary audience of the link's context.
+        </c>
+        <c>from</c>
+        <c>
+          Refers to a resource that is publicly considered to be the originator
+          of the link's context.
+        </c>
+        <c>bfrom</c>
+        <c>
+          Refers to a resource that is privately considered to be the orignator
+          of the link's context.
+        </c>
+      </texttable>    
+
+    </section>
+    
+    <section anchor="publishing" title="Republication Links">
+      
+      <texttable>
+        <ttcol>Link Relation</ttcol>
+        <ttcol>Description</ttcol>
+        
+        <c>source</c>
+        <c>
+          Refers to the original source of the context resource. 
+        </c>
+        
+        <c>provider</c>
+        <c>
+          Refers to the entity publishing the context resource. Generally,
+          this would be used to identity the service providing the 
+          resource.
+        </c>
+        
+        <c>generator</c>
+        <c>
+          Refers to the entity that generated the context resource. 
+          Generally, this would be used to identify the software 
+          application used.
+        </c>
+        
+      </texttable>
+      
+    </section>
+    
+    <section anchor="location" title="Geo-location Links">
+      
+      <texttable>
+        <ttcol>Link Relation</ttcol>
+        <ttcol>Description</ttcol>
+        
+        <c>location</c>
+        <c></c>
+        
+      </texttable>
+      
+    </section>
+              
+    <section title="IANA Considerations"> 
+      
+      <t>The Registry of Link Relations should be updated with the following
+      entries:</t>
+      
+      <t><list style="symbols">
+        <t>Relation Name: about</t>
+        <t>Description: Refers to a resource that is the subject of the link's
+        context.</t>
+        <t>Reference: This specification, <xref target="about"/></t>
+      </list></t>
+      
+      <t><list style="symbols">
+        <t>Relation Name: preview</t>
+        <t>Description: Refers to a resource that provides a preview of the 
+        link's context.</t>
+        <t>Reference: This specification, <xref target="preview"/></t>
+      </list></t>
+      
+      <t><list style="symbols">
+        <t>Relation Name: privacy-policy</t>
+        <t>Description: Refers to a Privacy Policy associated with the link's
+        context.</t>
+        <t>Reference: This specification, <xref target="privacy-policy"/></t>
+      </list></t>
+      
+      <t><list style="symbols">
+        <t>Relation Name: terms-of-service</t>
+        <t>Description: Refers to the Terms of Service associated with the 
+        link's context.</t>
+        <t>Reference: This specification, <xref target="terms-of-service"/></t>
+      </list></t>
+      
+      <t><list style="symbols">
+        <t>Relation Name: type</t>
+        <t>Description: Refers to a resource identifying the abstract semantic
+        type the link's context is considered to be an instance of.</t>
+        <t>Reference: This specification, <xref target="type"/></t>
+      </list></t>
+      
+    </section> 
+ 
+    <section title="Security Considerations"> 
+    
+      <t>There are no additional security concerns introduced by this
+      document.</t>
+    
+    </section> 
+  </middle> 
+ 
+  <back>
+    <references title="Informative References">
+      &rfc5988;
+    </references>
+  </back>
+</rfc> 
+ 
