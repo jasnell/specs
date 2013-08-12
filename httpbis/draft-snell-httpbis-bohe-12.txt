@@ -4,12 +4,12 @@
 
 Network Working Group                                           J. Snell
 Internet-Draft
-Intended status: Informational                             July 10, 2013
-Expires: January 11, 2014
+Intended status: Informational                           August 06, 2013
+Expires: February 07, 2014
 
 
               HTTP/2.0 Discussion: Stored Header Encoding
-                      draft-snell-httpbis-bohe-11
+                      draft-snell-httpbis-bohe-12
 
 Abstract
 
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 11, 2014.
+   This Internet-Draft will expire on February 07, 2014.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Snell                   Expires January 11, 2014                [Page 1]
+Snell                   Expires February 07, 2014               [Page 1]
 
-Internet-Draft           Stored Header Encoding                July 2013
+Internet-Draft           Stored Header Encoding              August 2013
 
 
 Table of Contents
@@ -64,59 +64,38 @@ Table of Contents
    2.  Model . . . . . . . . . . . . . . . . . . . . . . . . . . . .   2
    3.  Header Encoding and Decoding  . . . . . . . . . . . . . . . .   3
      3.1.  Literal (name,value) Representation . . . . . . . . . . .   5
+       3.1.1.  Dealing with invalid name or value encodings  . . . .   7
      3.2.  Indexed Representation  . . . . . . . . . . . . . . . . .   7
-     3.3.  Non-Indexed Literal Representation  . . . . . . . . . . .   7
-     3.4.  Indexed Literal Representation  . . . . . . . . . . . . .   7
-     3.5.  Indexed Literal Replacement Representation  . . . . . . .   8
-   4.  Unsigned Variable Length Integer Syntax . . . . . . . . . . .   8
+     3.3.  Non-Indexed Literal Representation  . . . . . . . . . . .   8
+     3.4.  Indexed Literal Representation  . . . . . . . . . . . . .   8
+     3.5.  Indexed Literal Replacement Representation  . . . . . . .   9
+   4.  Unsigned Variable Length Integer Syntax . . . . . . . . . . .   9
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
      6.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
-     6.2.  Informational References  . . . . . . . . . . . . . . . .   9
-   Appendix A.  Initial Header Table Entries . . . . . . . . . . . .   9
-   Appendix B.  Updated Standard Header Definitions  . . . . . . . .  11
-   Appendix C.  Example  . . . . . . . . . . . . . . . . . . . . . .  13
-     C.1.  First Header Set: . . . . . . . . . . . . . . . . . . . .  13
-     C.2.  Second Header Set:  . . . . . . . . . . . . . . . . . . .  14
+     6.2.  Informational References  . . . . . . . . . . . . . . . .  10
+   Appendix A.  Initial Header Table Entries . . . . . . . . . . . .  10
+   Appendix B.  Updated Standard Header Definitions  . . . . . . . .  12
+   Appendix C.  Example  . . . . . . . . . . . . . . . . . . . . . .  14
+     C.1.  First Header Set: . . . . . . . . . . . . . . . . . . . .  14
+     C.2.  Second Header Set:  . . . . . . . . . . . . . . . . . . .  15
      C.3.  Third Header Set: . . . . . . . . . . . . . . . . . . . .  15
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Stored Header Encoding
 
-   The Stored Header Encoding is an alternative "binary header encoding"
-   for HTTP/2.0 that combines the best elements from three other
-   proposed encodings, including:
-
-   o  The "Header Delta Compression" scheme proposed by Roberto Peon in
-      http://tools.ietf.org/html/draft-rpeon-httpbis-header-
-      compression-03
-
-   o  The "Header Diff" encoding proposed by Herve Reullan, Jun
-      Fujisawa, Romain Bellessort, and Youenn Fablet in http://
-      tools.ietf.org/html/draft-ruellan-headerdiff-00
-
-   o  The "Binary Optimized Header Encoding" proposed by James Snell
-      (me) in http://tools.ietf.org/html/draft-snell-httpbis-bohe-03
-
-   The Stored Header Encoding seeks to find an elegant, efficient and
-   simple marriage of the best concepts from each of these separate
-   proposals.
+   The Stored Header Encoding is a proposed alternative "compressed
+   header encoding" for HTTP/2.0 that offers reasonably good compression
+   ratios, support for a range of compressor strategies, efficient value
+   type codecs, constrained state requirements, routing-friendly header
+   value ordering, and easier implementation relative to the current
+   header compression proposal.
 
 2.  Model
 
-
-
-
-
-
-Snell                   Expires January 11, 2014                [Page 2]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
    A "header" is a (name,value) pair.  The name is a sequence of lower-
    case ASCII characters.  The value is either a UTF-8 string, an
-   integer, a Date-Time, or an arbitrary sequence of binary octets.
+   integer, a date-time, or an arbitrary sequence of binary octets.
 
    The compressor and decompressor each maintain a synchronized cache of
    up to 256 headers.  Every header in the cache is referenced by an
@@ -128,6 +107,13 @@ Internet-Draft           Stored Header Encoding                July 2013
    stored byte size, the least recently written items are cleared and
    their index positions are reused.
 
+
+
+Snell                   Expires February 07, 2014               [Page 2]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
+
    Index positions from the cache are assigned in "encounter order",
    beginning from 0x00 and increasing monotonically to 0xFF.  That is to
    say, the positions are assigned in precisely the same order that they
@@ -137,16 +123,24 @@ Internet-Draft           Stored Header Encoding                July 2013
    The available size of the stored compression state can be capped by
    the decompressor using the SETTINGS_MAX_BUFFER_SIZE setting.  Each
    stored header contributes to the accumulated size of the storage
-   state.  As new haeder pairs are assigned positions in the cache, the
+   state.  As new header pairs are assigned positions in the cache, the
    least-recently assigned items must be cleared, if necessary, to free
    up the required space.  Clearing existing items does not change the
-   index positions of the other items in the cache.
+   index positions of the remaining items in the cache.
 
-   The size of a header is calculated as: The number of ASCII octets
-   required for the name plus the number of octets required for the
-   value plus 32-bytes to account for any internal storage overhead.
-   The number of octets required for the value depends on the value
-   type:
+   The SETTINGS_MAX_BUFFER_SIZE setting has an initial default value of
+   4096 bytes.  The decompressor can establish a new maximum buffer size
+   at any time, possibly causing header (name,value) pairs to be evicted
+   from the cache.
+
+   The decompressor can disable use of the storage cache completely by
+   setting the SETTINGS_MAX_BUFFER_SIZE setting to 0, forcing the cache
+   to empty completely.
+
+   The size of a header is calculated as: The number of octets required
+   for the name plus the number of octets required for the value plus
+   32-bytes to account for any internal storage overhead.  The number of
+   octets required for the value depends on the value type:
 
    o  String values are measured by the number of UTF-8 encoded octets
       required to represent the character sequence.
@@ -154,6 +148,9 @@ Internet-Draft           Stored Header Encoding                July 2013
    o  Number and Date-Time values are measured by the number of unsigned
       variable length integer (uvarint) encoded bytes required to
       represent the value using a 5-bit prefix.
+
+   o  Legacy (HTTP/1.1) values are measured by the number of octets
+      required to represent the value.
 
    o  Binary values are measured by the number of octets contained by
       the sequence.
@@ -163,15 +160,15 @@ Internet-Draft           Stored Header Encoding                July 2013
    The set of headers is encoded for transmission using the following
    process:
 
-
-
-Snell                   Expires January 11, 2014                [Page 3]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
    1.  For each header, determine if the (name,value) pair already
        exists in the table.
+
+
+
+Snell                   Expires February 07, 2014               [Page 3]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
 
        *  If an exact match is found in the header table, encode the
           indexed position of the header as an Indexed Reference and
@@ -185,7 +182,7 @@ Internet-Draft           Stored Header Encoding                July 2013
        step #3.
 
    3.  Determine whether the new header (name,value) pair ought to be
-       added to the header table or not.
+       added to the header table.
 
        *  If the header is not to be added to the header table, encode
           the header as a Non-Indexed Literal Representation and
@@ -208,30 +205,29 @@ Internet-Draft           Stored Header Encoding                July 2013
    representation types, each represented by a two-bit prefix code.  The
    types and their codes are:
 
-   o  Indexed - 10
+   o  10 - Indexed
 
-   o  Non-Indexed Literal - 00
+   o  00 - Non-Indexed Literal
 
-   o  Indexed Literal Replacement - 01
+   o  01 - Indexed Literal
 
-   o  Indexed Literal - 10
+   o  11 - Indexed Literal Replacement
 
    Each representation type is encoded into groups of up to 64
    instances.  Each group is prefixed by a single octet prefix.  The two
-
-
-
-Snell                   Expires January 11, 2014                [Page 4]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
    most significant bits identify the representation type, the six least
    significant bits specify the number of instances in the group, with
    000000 indicating a single instance and 111111 indicating 64.
 
-   If a particular serialization block requires more than 64 intances of
-   a given type, then multiple instances of the group type can be
+
+
+Snell                   Expires February 07, 2014               [Page 4]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
+
+   If a particular serialization block requires more than 64 instances
+   of a given type, then multiple occurrences of the group type can be
    encoded.  For instance, if a given message contains 65 Indexed
    Representations, the encoded block would contain two separate Indexed
    Representation groups.
@@ -264,6 +260,11 @@ Internet-Draft           Stored Header Encoding                July 2013
    3.  Continue with each representation group until the complete block
        has been decoded.
 
+   When a single header name is used multiple times with different
+   values, the order in which those values are serialized and processed
+   is significant.  The working set created by the decoding process
+   above MUST preserve the ordering of those values as received.
+
 3.1.  Literal (name,value) Representation
 
    The structure of an encoded (name,value) pair consists of:
@@ -276,10 +277,9 @@ Internet-Draft           Stored Header Encoding                July 2013
 
 
 
-
-Snell                   Expires January 11, 2014                [Page 5]
+Snell                   Expires February 07, 2014               [Page 5]
 
-Internet-Draft           Stored Header Encoding                July 2013
+Internet-Draft           Stored Header Encoding              August 2013
 
 
    o  The encoded value.
@@ -287,9 +287,9 @@ Internet-Draft           Stored Header Encoding                July 2013
    The three most-sigificant bits of the first octet identify the value
    type.
 
-   This design allows for a maximum of 7 value types, only four of which
-   are defined by this specification.  The three remaining value types
-   are reserved for future use.  The currently defined value types are:
+   This design allows for a maximum of 7 value types, five of which are
+   defined by this specification.  The two remaining types are reserved
+   for future use.  The currently defined value types are:
 
       UTF-8 Text (000)
 
@@ -297,29 +297,55 @@ Internet-Draft           Stored Header Encoding                July 2013
 
       Timestamp (010)
 
+      Legacy (100)
+
       Raw Binary (111)
+
+   Of the five types, the Legacy type is reserved for encoding header
+   values conforming to the field-value construct defined by
+   [I-D.ietf-httpbis-p1-messaging], and is used specifically for
+   backwards compatibility with header fields that have not yet been
+   updated to use a more specific type value (see Appendix B).
 
    If the name is encoded using an index reference to another existing
    (name,value) pair in the header table, the remaining five least
    significant bits of the first octet are set to zero and the next byte
    identifies the referenced header table index position.
 
-   If the name is encoded as a literal string, the number of ASCII bytes
+   If the name is encoded as a literal string, the number of octets
    required to represent the name is encoded as a unsigned variable
    length integer with a five-bit prefix, filling the 5-remaining least
-   significant bits of the first octet.
+   significant bits of the first octet, followed by the sequence of
+   ASCII octets conforming to the following header-name construct:
+
+   Header name ABNF:
+
+    LOWERALPHA = %x61-7A
+
+    header-name = "!" / "#" / "$" / "%" / "&" / "'" /
+                  "*" / "+" / "-" / "." / "^" / "_" /
+                  "`" / "|" / "~" / DIGIT / LOWERALPHA
+
 
    The encoding of the value depends on the value type.
 
    UTF-8 Text:
+
+
+
+Snell                   Expires February 07, 2014               [Page 6]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
+
       First, the number of UTF-8 encoded bytes required to represent the
       value is encoded as an unsigned variable length integer with a
       0-bit prefix, followed by the full sequence of UTF-8 bytes.
 
    Integer
-      The integer's value is encoded as an unsigned variable length
-      integer with a 0-bit prefix.  Negative or fractional numbers
-      cannot be represented.
+      Integer values ranging from 0 to 2^64-1 are encoded as unsigned
+      variable length integers with a 0-bit prefix.  Negative or
+      fractional numbers cannot be represented.
 
    Timestamp
       The timestamp is represented as the number of milliseconds
@@ -327,26 +353,46 @@ Internet-Draft           Stored Header Encoding                July 2013
       encoded as an unsigned variable length integer with a 0-bit
       prefix.  Timestamps that predate the Epoch cannot be represented.
 
+   Legacy
+      First, the number of octets required to represent the value is
+      encoded as an unsigned variable length integer with a 0-bit
+      prefix, followed by the full sequence of octets.
+
    Raw Binary
-
-
-
-
-
-Snell                   Expires January 11, 2014                [Page 6]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
       The number of octets in the sequence is encoded as an unsigned
       variable length integer with a 0-bit prefix, followed by the full
       sequence of octets.
+
+3.1.1.  Dealing with invalid name or value encodings
+
+   Implementations encountering invalid name or value encodings MUST
+   signal an error and terminate processing of the header block.
+   Examples of such errors include:
+
+   o  Header names that include any octets not explicitly permitted by
+      the above header-name ABNF construction;
+
+   o  UTF-8 values that include a byte order mark, over-long or invalid
+      octet sequences, or octets representing invalid Unicode
+      codepoints;
+
+   o  Integer or Date-Time values that encode numbers strictly larger
+      than 2^64-1;
 
 3.2.  Indexed Representation
 
    The serialization of an Indexed Representation group consists of the
    one-octet header group prefix followed by up to 64 single-octet
    header table index references.
+
+
+
+
+
+Snell                   Expires February 07, 2014               [Page 7]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
 
    +--------+--------+--------+--------+---+
    |10xxxxxx| Index positions (1...64)  ...|
@@ -386,14 +432,6 @@ Internet-Draft           Stored Header Encoding                July 2013
 
 3.4.  Indexed Literal Representation
 
-
-
-
-Snell                   Expires January 11, 2014                [Page 7]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
    The serialization of a group of Indexed Literal representations
    consists of the one-octet header prefix followed by up to 64 Literal
    (name,value) Representations.
@@ -404,6 +442,13 @@ Internet-Draft           Stored Header Encoding                July 2013
 
 
    For instance:
+
+
+
+Snell                   Expires February 07, 2014               [Page 8]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
 
    0x40 0x01 0x61 0x01 0x62
       Specifies a single header with name "a" and a UTF-8 String value
@@ -442,14 +487,6 @@ Internet-Draft           Stored Header Encoding                July 2013
 
 4.  Unsigned Variable Length Integer Syntax
 
-
-
-
-Snell                   Expires January 11, 2014                [Page 8]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
    Unsigned integers are encoded as defined in
    [I-D.ietf-httpbis-header-compression].
 
@@ -461,6 +498,14 @@ Internet-Draft           Stored Header Encoding                July 2013
 
 6.1.  Normative References
 
+
+
+
+Snell                   Expires February 07, 2014               [Page 9]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
+
    [I-D.ietf-httpbis-header-compression]
               Peon, R. and H. Ruellan, "HTTP/2.0 Header Compression",
               draft-ietf-httpbis-header-compression-01 (work in
@@ -470,6 +515,11 @@ Internet-Draft           Stored Header Encoding                July 2013
               Requirement Levels", BCP 14, RFC 2119, March 1997.
 
 6.2.  Informational References
+
+   [I-D.ietf-httpbis-p1-messaging]
+              Fielding, R. and J. Reschke, "Hypertext Transfer Protocol
+              (HTTP/1.1): Message Syntax and Routing", draft-ietf-
+              httpbis-p1-messaging-23 (work in progress), July 2013.
 
    [RFC6265]  Barth, A., "HTTP State Management Mechanism", RFC 6265,
               April 2011.
@@ -498,20 +548,20 @@ Appendix A.  Initial Header Table Entries
          | 16    | authorization               |       |         |
          | 17    | allow                       |       |         |
          | 18    | cache-control               |       |         |
-
-
-
-Snell                   Expires January 11, 2014                [Page 9]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
          | 19    | connection                  |       |         |
          | 20    | content-length              |       |         |
          | 21    | content-md5                 |       |         |
          | 22    | content-type                |       |         |
          | 23    | date                        |       |         |
          | 24    | expect                      |       |         |
+
+
+
+Snell                   Expires February 07, 2014              [Page 10]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
+
          | 25    | from                        |       |         |
          | 26    | if-match                    |       |         |
          | 27    | if-none-match               |       |         |
@@ -554,39 +604,41 @@ Internet-Draft           Stored Header Encoding                July 2013
          | 64    | pragma                      |       |         |
          | 65    | proxy-authenticate          |       |         |
          | 66    | refresh                     |       |         |
-
-
-
-Snell                   Expires January 11, 2014               [Page 10]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
          | 67    | retry-after                 |       |         |
          | 68    | strict-transport-security   |       |         |
          | 69    | trailer                     |       |         |
          | 70    | transfer-encoding           |       |         |
          | 71    | warning                     |       |         |
          | 72    | www-authenticate            |       |         |
+
+
+
+Snell                   Expires February 07, 2014              [Page 11]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
+
          | 73    | user-agent                  |       |         |
          +-------+-----------------------------+-------+---------+
 
 
 Appendix B.  Updated Standard Header Definitions
 
-   In order to properly deal with the backwards compatibility concerns
-   for HTTP/1, there are several important rules for use of Typed Codecs
-   in HTTP headers:
+   To properly deal with the backwards compatibility concerns for HTTP/
+   1, there are several important rules for use of Typed Codecs in HTTP
+   headers:
 
    o  All header fields MUST be explicitly defined to use the new header
-      types.  All existing HTTP/1 header fields, then, will continue to
-      be represented as ISO-8859-1 Text unless their standard
-      definitions are updated.  The HTTP/2 specification would update
-      the definition of specific known header fields (e.g. content-
-      length, date, if-modified-since, etc).
+      types.  All existing HTTP/1 header fields will continue to be
+      represented in conformance to the field-value construct defined by
+      [I-D.ietf-httpbis-p1-messaging] unless their specific definitions
+      are updated.  Such fields MUST specify the Legacy value type when
+      serialized.  The HTTP/2 specification would update the definitions
+      of specific known header fields (e.g. content-length, date, if-
+      modified-since, etc).
 
-   o  Extension header fields that use the typed codecs will have
-      specific normative transformations to ISO-8859-1 defined.
+   o  For translation to HTTP/1.1, header fields that use the typed
+      codecs will have specific normative transformations defined.
 
       *  UTF-8 Text will be converted to ISO-8859-1 with extended
          characters pct-encoded
@@ -598,26 +650,32 @@ Appendix B.  Updated Standard Header Definitions
 
       *  Binary fields will be Base64-encoded.
 
-   o  There will be no normative transformation from ISO-8859-1 values
-      into the typed codecs.  Implementations are free to apply
-      transformation where those impls determine it is appropriate, but
-      it will be perfectly legal for an implementation to pass a text
-      value through even if it is known that a given header type has a
-      typed codec equivalent (for instance, Content-Length may come
-      through as a number or a text value, either will be valid).  This
-      means that when translating from HTTP/1 -> HTTP/2, receiving
-      implementations need to be prepared to handle either value form.
+      *  Legacy fields are passed through untranslated.
+
+   o  There will be no normative transformation from legacy values into
+      the typed codecs.  Implementations are free to apply
+      transformation where they determine it to be appropriate, but it
+      will be perfectly acceptable for an implementation to pass a text
+      value through as a Legacy type even if it is known that a given
+      header has a typed codec equivalent.
+
+
+
+
+
+
+
+
+
+
+
+Snell                   Expires February 07, 2014              [Page 12]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
 
    A Note of warning: Individual header fields MAY be defined such that
    they can be represented using multiple types.  Numeric fields, for
-
-
-
-Snell                   Expires January 11, 2014               [Page 11]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
    instance, can be represented using either the uvarint encoding or
    using the equivalent sequence of ASCII numbers.  Implementers will
    need to be capable of supporting each of the possible variations.
@@ -664,16 +722,16 @@ Internet-Draft           Stored Header Encoding                July 2013
    | last-modified       | Timestamp or  | Can be represented as       |
    |                     | Text          | either a uvarint encoded    |
    |                     |               | timestamp or as text (HTTP- |
+
+
+
+Snell                   Expires February 07, 2014              [Page 13]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
+
    |                     |               | date).                      |
    | age                 | Numeric or    | Can be represented as       |
-
-
-
-Snell                   Expires January 11, 2014               [Page 12]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
    |                     | Text          | either an unsigned,         |
    |                     |               | variable-length integer or  |
    |                     |               | a sequence of ASCII         |
@@ -683,9 +741,9 @@ Internet-Draft           Stored Header Encoding                July 2013
    |                     |               | timestamp or as text (HTTP- |
    |                     |               | date).                      |
    | etag                | Binary or     | Can be represented as       |
-   |                     | Text          | either a sequence of binary |
-   |                     |               | octets or using the         |
-   |                     |               | currently defined text      |
+   |                     | Text          | either an opaque sequence   |
+   |                     |               | of binary octets or using   |
+   |                     |               | the currently defined text  |
    |                     |               | format. When represented as |
    |                     |               | binary octets, the Entity   |
    |                     |               | Tag MUST be considered to   |
@@ -720,15 +778,15 @@ C.1.  First Header Set:
    64 65 72 05 66 69 72 73 74
 
 
-   Three new entries are added to the header table:
 
 
 
-
-Snell                   Expires January 11, 2014               [Page 13]
+Snell                   Expires February 07, 2014              [Page 14]
 
-Internet-Draft           Stored Header Encoding                July 2013
+Internet-Draft           Stored Header Encoding              August 2013
 
+
+   Three new entries are added to the header table:
 
              +-------+-------------+------------------------+
              | Index | Name        | Value                  |
@@ -773,20 +831,16 @@ C.2.  Second Header Set:
          +-------+-------------+---------------------------------+
 
 
-
-
-
-
-
-
-
-
-Snell                   Expires January 11, 2014               [Page 14]
-
-Internet-Draft           Stored Header Encoding                July 2013
-
-
 C.3.  Third Header Set:
+
+
+
+
+
+Snell                   Expires February 07, 2014              [Page 15]
+
+Internet-Draft           Stored Header Encoding              August 2013
+
 
    Let's suppose a third header set that is identical to the second is
    sent:
@@ -837,4 +891,6 @@ Author's Address
 
 
 
-Snell                   Expires January 11, 2014               [Page 15]
+
+
+Snell                   Expires February 07, 2014              [Page 16]
