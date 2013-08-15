@@ -2,6 +2,7 @@
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
   <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
   <!ENTITY rfc6265 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.6265.xml'>
+  <!ENTITY rfc3629 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3629.xml'>
   <!ENTITY comp PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-header-compression-01.xml'>
   <!ENTITY http1 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p1-messaging-23.xml'>
 ]>
@@ -10,7 +11,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200902" docName="draft-snell-httpbis-bohe-12"> 
+<rfc category="info" ipr="trust200902" docName="draft-snell-httpbis-bohe-13"> 
   <front> 
     <title abbrev="Stored Header Encoding"> 
       HTTP/2.0 Discussion: Stored Header Encoding
@@ -29,10 +30,9 @@
     <keyword>spdy</keyword>
  
     <abstract> 
-      <t>This memo describes a proposed alternative encoding for
-      headers that combines the best concepts from the proposed
-      Delta and HeaderDiff options with the typed value codecs
-      introduced by previous versions of this draft.</t> 
+      <t>This memo describes a proposed alternative optimized encoding for
+      ordered sets of header field (name,value) pairs in HTTP/2 HEADERS
+      and PUSH_PROMISE frames.</t> 
     </abstract> 
  
   </front> 
@@ -56,58 +56,61 @@
       
       <t>
         A "header" is a (name,value) pair. The name is a sequence of 
-        lower-case ASCII characters. The value is either a UTF-8 string, 
-        an integer, a date-time, or an arbitrary sequence of binary octets.
+        lower-case ASCII characters. The value is either an HTTP 1.1 defined
+        field-value (see <xref target="I-D.ietf-httpbis-p1-messaging" />), 
+        a sequence of UTF-8 encoded octets, an integer, a timestamp, or an 
+        opaque sequence of binary octets.
       </t>
       
       <t>
         The compressor and decompressor each maintain a synchronized cache 
-        of up to 256 headers. Every header in the cache is referenced by an 
-        8-bit identifier. Note that the Nil byte (0x00) is a valid identifier.
+        of up to 256 headers. Every header stored in the cache is referenced 
+        by an 8-bit identifier ranging from 0x00-FF (inclusive).
       </t>
 
       <t>
         The cache is managed in a "least recently written" 
-        style, that is, as the cache fills to capacity in both number of 
+        manner, that is, as the cache fills to capacity in both number of 
         entries and maximum stored byte size, the least recently written items 
-        are cleared and their index positions are reused.
+        are cleared and their index positions can be reused.
       </t>
 
       <t>
-        Index positions from the cache are assigned in "encounter order", 
-        beginning from 0x00 and increasing monotonically to 0xFF. That is to 
-        say, the positions are assigned in precisely the same order that they 
-        are serialized, and thereby encountered by the decompressor upon 
-        reading and processing the block.
+        The specific index position to which a header is assigned is determined
+        by the encoder using any algorithm the encoder determines to be 
+        appropriate. If a specific index position already has an assigned 
+        header, the existing header is replaced.
       </t>
 
       <t>
-        The available size of the stored compression state can be capped by the 
-        decompressor using the SETTINGS_MAX_BUFFER_SIZE setting. Each stored 
-        header contributes to the accumulated size of the storage state. 
-        As new header pairs are assigned positions in the cache, the 
-        least-recently assigned items must be cleared, if necessary, to free 
-        up the required space. Clearing existing items does not change the 
-        index positions of the remaining items in the cache.
+        The maximum total size of the cache can be limited by the decompressor 
+        using the SETTINGS_MAX_BUFFER_SIZE setting. Each stored header 
+        contributes a certain number of octets to the total accumulated size 
+        of the cache. If adding a new header to the cache will cause the total 
+        size to grow beyond the set limit, the least-recently written items are 
+        removed in the order written until enough space is available to add the 
+        new item. Clearing existing items does not change the index positions of 
+        the remaining items in the cache.
       </t>
       
       <t>
         The SETTINGS_MAX_BUFFER_SIZE setting has an initial default value of
         4096 bytes. The decompressor can establish a new maximum buffer size
         at any time, possibly causing header (name,value) pairs to be 
-        evicted from the cache.
+        evicted from the cache if the newly established limit is less than
+        the current total size.
       </t>
       
       <t>
         The decompressor can disable use of the storage cache completely by
         setting the SETTINGS_MAX_BUFFER_SIZE setting to 0, forcing the cache
-        to empty completely.
+        to empty completely and making it impossible to add new headers.
       </t>
 
       <t>
         The size of a header is calculated as: The number of
         octets required for the name plus the number of octets required for
-        the value plus 32-bytes to account for any internal storage overhead.
+        the value plus 32-octets to account for any internal storage overhead.
         The number of octets required for the value depends on the value 
         type:
         <list style="symbols">
@@ -117,7 +120,7 @@
           </t>
           <t>
             Number and Date-Time values are measured by the number of 
-            unsigned variable length integer (uvarint) encoded bytes 
+            unsigned variable length integer (uvarint) encoded octets 
             required to represent the value using a 5-bit prefix.
           </t>
           <t>
@@ -141,54 +144,38 @@
         <list style="numbers">
           <t><!-- #1 -->
             For each header, determine if the (name,value) pair
-            already exists in the table.
+            already exists in the cache.
             <list style="symbols">
               <t>
-                If an exact match is found in the header table, 
+                If an exact match is found in the cache, 
                 encode the indexed position of the header as an
                 Indexed Reference and advance to the next header
                 (name,value) pair.
               </t>
               <t>
-                Otherwise, move to the step #2.
+                Otherwise, move to step #2.
               </t>
             </list>
           </t>
           <t><!-- #2 -->
             Determine if a header (name,value) pair with the 
-            same name already exists in the table. If a matching
+            same name already exists in the cache. If a matching
             name is found, make note of the indexed position of 
             the matching name and continue to step #3.
           </t>
           <t><!-- #3 -->
             Determine whether the new header (name,value) pair 
-            ought to be added to the header table.
+            ought to be assigned to the cache.
             <list style="symbols">
               <t>
-                If the header is not to be added to the header table, 
-                encode the header as a Non-Indexed Literal Representation
-                and continue to the next header (name,value) pair.
+                If the header is not to be cached, encode the header as a 
+                Non-Indexed Literal Representation and continue to the next 
+                header (name,value) pair.
               </t>
               <t>
-                Otherwise, continue to step #4. 
-              </t>
-            </list>
-          </t>
-          <t><!-- #4 -->
-            If an existing indexed header using the same name was 
-            found in the header table in step #2, determine if the
-            new header (name,value) pair ought to replace that 
-            existing entry or if it ought to be added as a new 
-            entry.
-            <list style="symbols">
-              <t>
-                If the header is to replace the existing entry,
-                encode the header as an Indexed Literal Replacement 
-                Representation.
-              </t>
-              <t>
-                Otherwise encode the header as an Indexed Literal 
-                Representation.
+                Otherwise, assign an index position for the header 
+                (name,value) pair and encode the header as an 
+                Indexed Literal Representation.
               </t>
             </list>
           </t>
@@ -203,27 +190,17 @@
           <t>10 - Indexed</t>
           <t>00 - Non-Indexed Literal</t>
           <t>01 - Indexed Literal</t>
-          <t>11 - Indexed Literal Replacement</t>
         </list>
       </t>
      
       <t>
-        Each representation type is encoded into groups of up to 64
-        instances. Each group is prefixed by a single octet prefix.
-        The two most significant bits identify the representation type,
-        the six least significant bits specify the number of instances
-        in the group, with 000000 indicating a single instance and 111111 
-        indicating 64. 
+        Headers can be encoded into groups of up to 64 instances. Each group 
+        is prefixed by a single octet. The two most 
+        significant bits of this prefix identify the representation type, the 
+        six remaining bits specify the number of instances, with 000000 
+        indicating a single instance and 111111 indicating 64. 
       </t>
-      
-      <t>
-        If a particular serialization block requires more than 64 instances of 
-        a given type, then multiple occurrences of the group type can be  
-        encoded. For instance, if a given message contains 65 Indexed 
-        Representations, the encoded block would contain two separate 
-        Indexed Representation groups.
-      </t>
-      
+  
       <t>
         Decoding simply reverses the encoding steps:
         <list style="numbers">
@@ -236,7 +213,7 @@
               <t>
                 If it is an Indexed group, iterate through
                 each index included in the group, look up the corresponding
-                (name,value) pair in the header table and add that 
+                (name,value) pair in the cache and add that 
                 to the working set. If no matching (name,value) is 
                 found, terminate and report an error.
               </t>
@@ -247,21 +224,13 @@
               </t>
               <t>
                 If it's an Indexed Literal group, iterate through each
-                (name,value) pair included in the group and 
-                add that to both the header table and the working set.
-              </t>
-              <t>
-                If it's an Indexed Literal Replacement group, iterate 
-                through each (name,value) pair included in the group,
-                replace the existing entry in the header table at the
-                identified index, and add the new (name,value) to 
-                the working set. If no matching (name,value) is found,
-                terminate and report an error.
+                (name,value) pair, assign it to the specified position in
+                the cache and add it to the working set.
               </t>
             </list>
           </t>
           <t>
-            Continue with each representation group until the complete
+            Continue with each representation group until the full
             block has been decoded.
           </t>
         </list>
@@ -283,8 +252,8 @@
             A 3-bit value type identifier,
           </t>
           <t>
-            The name, encoded either as a literal string or as the header
-            table index position of another existing header sharing the 
+            The name, encoded either as a literal sequence of ASCII octets or 
+            as the cache index position of another existing header sharing the 
             same name, and
           </t>
           <t>
@@ -304,11 +273,11 @@
         remaining types are reserved for future use. The 
         currently defined value types are:
         <list>
-          <t>UTF-8 Text (000)</t>
+          <t>UTF-8 (000)</t>
           <t>Integer (001)</t>
           <t>Timestamp (010)</t>
           <t>Legacy (100)</t>
-          <t>Raw Binary (111)</t>
+          <t>Opaque Binary (111)</t>
         </list>
       </t>
       
@@ -323,14 +292,15 @@
       
       <t>
         If the name is encoded using an index reference to another 
-        existing (name,value) pair in the header table, the remaining
+        existing (name,value) pair in the cache, the remaining
         five least significant bits of the first octet are set to 
-        zero and the next byte identifies the referenced header table
-        index position.
+        zero and the next octet identifies the referenced cache
+        index position. This octet MUST NOT reference a cache index
+        position that is not currently assigned.
       </t>
             
       <t>
-        If the name is encoded as a literal string, the number of 
+        If the name is encoded as a sequence of ASCII octets, the number of 
         octets required to represent the name is encoded as a 
         unsigned variable length integer with a five-bit prefix,
         filling the 5-remaining least significant bits of the 
@@ -339,22 +309,24 @@
       </t>
       
       <figure><preamble>Header name ABNF:</preamble><artwork><![CDATA[
- LOWERALPHA = %x61-7A
-      
- header-name = "!" / "#" / "$" / "%" / "&" / "'" / 
+ header-name = [":"] 1*header-char
+ 
+ header-char = "!" / "#" / "$" / "%" / "&" / "'" / 
                "*" / "+" / "-" / "." / "^" / "_" / 
                "`" / "|" / "~" / DIGIT / LOWERALPHA
+ 
+ LOWERALPHA = %x61-7A              
       ]]></artwork></figure>
       
       <t>
         The encoding of the value depends on the value type.
         <list style="hanging">
-          <t hangText="UTF-8 Text:">
+          <t hangText="UTF-8:">
             <vspace />
             First, the number of UTF-8 encoded bytes required to 
             represent the value is encoded as an unsigned variable
             length integer with a 0-bit prefix, followed by the
-            full sequence of UTF-8 bytes.
+            full sequence of UTF-8 octets.
           </t>
           <t hangText="Integer">
             <vspace />
@@ -364,7 +336,7 @@
           </t>
           <t hangText="Timestamp">
             <vspace />
-            The timestamp is represented as the number of milliseconds 
+            Timestamps is represented as the number of milliseconds 
             ellapsed since the standard Epoch (1970-01-01T00:00:00 GMT), 
             encoded as an unsigned variable length integer with a 0-bit
             prefix. Timestamps that predate the Epoch cannot be 
@@ -377,7 +349,7 @@
             with a 0-bit prefix, followed by the full sequence of 
             octets.
           </t>
-          <t hangText="Raw Binary">
+          <t hangText="Opaque">
             <vspace />
             The number of octets in the sequence is encoded as an
             unsigned variable length integer with a 0-bit prefix, 
@@ -416,15 +388,15 @@
     <section title="Indexed Representation" anchor="indexed-representation">
       
       <t>
-        The serialization of an Indexed Representation group consists of the 
-        one-octet header group prefix followed by up to 64 single-octet 
-        header table index references.
+        The serialization of an Indexed Representation consists of a 
+        single octet prefix followed by up to 64 single-octet cache 
+        index position references.
       </t>
       
       <figure><artwork><![CDATA[
-  +--------+--------+--------+--------+---+
-  |10xxxxxx| Index positions (1...64)  ...|
-  +--------+--------------------------+---+
+  +--------+--------+     +---------+
+  |10xxxxxx| IDX[1] | ... | IDX[64] |
+  +--------+---------     +---------+
       ]]></artwork></figure>
 
       <t>
@@ -432,19 +404,19 @@
         <list style="hanging">
           <t hangText="0x80 0x00">
             <vspace />
-            References item #0 from the header table.
+            References item #0 from the cache.
           </t>
           <t hangText="0x81 0x00 0x01">
             <vspace />
-            References items #0 and #1 from the header table.
+            References items #0 and #1 from the cache.
           </t>
         </list>
       </t>
                               
       <t>
-        Indexed Representations do not modify the header table state in any 
-        way. If an Indexed References specifies a header index that has not 
-        yet been allocated or whose value has been cleared, decoding MUST 
+        Indexed Representations do not cause the cache state to be modified in 
+        any way. If an Indexed References specifies an index position that has not 
+        yet been assigned or whose value has been cleared, decoding MUST 
         terminate with an error.
       </t>
       
@@ -454,14 +426,14 @@
       
       <t>
         The serialization of a group of Non-Indexed Literal representations
-        consists of the one-octet header prefix followed by up to 64 
+        consists of a single-octet prefix followed by up to 64 
         Literal (name,value) Representations.
       </t>
       
       <figure><artwork><![CDATA[
-  +--------+--------+--------+--------+---+
-  |00xxxxxx| (name,value)'s (1...64)    ...
-  +--------+--------------------------+---+
+  +--------+-----------------+     +------------------+
+  |00xxxxxx| (name,value)[1] | ... | (name,value)[64] |
+  +--------+-----------------+     +------------------+
       ]]></artwork></figure>
       
       <t>
@@ -469,79 +441,41 @@
         <list style="hanging">
           <t hangText="0x00 0x01 0x61 0x01 0x62">
             <vspace />
-            Specifies a single header with name "a" and a UTF-8 String
+            Specifies a single header with name "a" and a UTF-8
             value of "b" is to be handled as a Non-Indexed header (it
-            is not added to the header table).
+            is not added to the cache).
           </t>
         </list>
       </t>
       
     </section>
-    
+        
     <section title="Indexed Literal Representation" anchor="indexed-literal">
       
       <t>
         The serialization of a group of Indexed Literal representations
-        consists of the one-octet header prefix followed by up to 64 
-        Literal (name,value) Representations.
+        consists of a single-octet prefix followed by up to 64 
+        (index position, Literal (name,value) representation) pairs.
       </t>
       
       <figure><artwork><![CDATA[
-  +--------+--------+--------+--------+---+
-  |01xxxxxx| (name,value)'s (1...64)    ...
-  +--------+--------------------------+---+
+  +--------+------+---------------+     +-------+----------------+
+  |01xxxxxx|IDX[1]|(name,value)[1]| ... |IDX[64]|(name,value)[64]|
+  +--------+------+---------------+     +-------+----------------+
       ]]></artwork></figure>
       
       <t>
         For instance:
         <list style="hanging">
-          <t hangText="0x40 0x01 0x61 0x01 0x62">
-            <vspace />
-            Specifies a single header with name "a" and a UTF-8 String
-            value of "b" is to be handled as an Indexed header (it
-            will be added to the header table).
-          </t>
-          <t hangText="0x40 0x21 0x61 0x03">
-            <vspace />
-            Specifies a single header with name "a" and Integer
-            value of 3 is to be handled as an Indexed header (it
-            will be added to the header table).
-          </t>
-        </list>
-      </t>
-      
-    </section>
-    
-    <section title="Indexed Literal Replacement Representation" anchor="indexed-literal-replacement">
-      
-      <t>
-        The serialization of a group of Indexed Literal representations
-        consists of the one-octet header prefix followed by up to 64 
-        single octet index references identifying an existing header table
-        entry followed by the new Literal (name,value) representation meant
-        to replace it.
-      </t>
-      
-      <figure><artwork><![CDATA[
-  +--------+--------+--------+--------+--------+
-  |11xxxxxx| (INDEX | (name,value)(1...64))  ...
-  +--------+--------------------------+--------+
-      ]]></artwork></figure>
-      
-      <t>
-        For instance:
-        <list style="hanging">
-          <t hangText="0xC0 0x03 0x01 0x61 0x01 0x62">
+          <t hangText="0x40 0x03 0x01 0x61 0x01 0x62">
             <vspace />
             Specifies that a single header with name "a" and a UTF-8 String
-            value of "b" is to replace the existing (name,value) entry
-            in the header table located at index position #3.
+            value of "b" is to be assigned to the cache at index position #3.
           </t>
-          <t hangText="0xC0 0x03 0x21 0x61 0x03">
+          <t hangText="0x40 0x03 0x21 0x61 0x04">
             <vspace />
             Specifies that a single header with name "a" and Integer
-            value of 3 is to replace the existing (name,value) entry
-            in the header table located at index position #3.
+            value of 3 is to be assigned to the cache at index position #4.
           </t>
         </list>
       </t>
@@ -568,6 +502,7 @@
   <back>
     <references title="Normative References"> 
       &rfc2119;
+      &rfc3629;
       &comp;
     </references>    
     
@@ -576,7 +511,7 @@
       &http1;
     </references>
     
-    <section title="Initial Header Table Entries" anchor="prefilled">
+    <section title="Initial Cache Entries" anchor="prefilled">
       
       <texttable>
         <ttcol>Index</ttcol>
@@ -678,11 +613,11 @@
         <t>For translation to HTTP/1.1, header fields that use the typed codecs 
           will have specific normative transformations defined.
           <list style="symbols">
-            <t>UTF-8 Text will be converted to ISO-8859-1 with extended
+            <t>UTF-8 will be converted to ISO-8859-1 with extended
                characters pct-encoded</t>
             <t>Numbers will be converted to their ASCII equivalent values.</t>
             <t>Date Times will be converted to their HTTP-Date equivalent values.</t>
-            <t>Binary fields will be Base64-encoded.</t>
+            <t>Opaque fields will be Base64-encoded.</t>
             <t>Legacy fields are passed through untranslated.</t>
           </list>
         </t>
@@ -806,25 +741,26 @@
         </artwork></figure>
   
         <t>
-          The header table is prefilled as defined in 
+          The cache is prefilled as defined in 
           <xref target="prefilled" />, however, none of 
           the values represented in the initial set 
-          can be found in the header table. All headers, 
+          can be found in the cache. All headers, 
           then, are encoding using the Indexed Literal
           Representation:
         </t>
         
         <figure><artwork>
-  43 00 03 16 2f 6d 79 2d 65 78 
-  61 6d 70 6c 65 2f 69 6e 64 65 
-  78 2e 68 74 6d 6c 00 49 6d 79 
-  2d 75 73 65 72 2d 61 67 65 6e 
-  74 0b 78 2d 6d 79 2d 68 65 61 
-  64 65 72 05 66 69 72 73 74 
+  43 4a 00 03 16 2f 6d 79 2d 65 
+  78 61 6d 70 6c 65 2f 69 6e 64 
+  65 78 2e 68 74 6d 6c 4B 00 49 
+  6d 79 2d 75 73 65 72 2d 61 67 
+  65 6e 74 4c 0b 78 2d 6d 79 2d 
+  68 65 61 64 65 72 05 66 69 72 
+  73 74 
         </artwork></figure>
         
         <t>
-          Three new entries are added to the header table:
+          Three new entries are added to the cache:
         </t>
         
         <texttable>
@@ -863,18 +799,15 @@
         <t>
           Comparing this second header set to the first, we see that the 
           :path and x-my-header headers have new values, while the user-agent
-          value remains unchanged. For the sake of the example let's encode the 
-          :path and x-my-header headers using Indexed Literal Replacement
-          representations. The user-agent header will be encoded as an
-          Indexed Representation.
+          value remains unchanged.
         </t>
         
         <figure><artwork>
-  80 4b a3 4a 00 4a 1f 2f 6d 79 
+  80 4b 41 4a 00 4a 1f 2f 6d 79 
   2d 65 78 61 6d 70 6c 65 2f 72 
   65 73 6f 75 72 63 65 73 2f 73 
-  63 72 69 70 74 2e 6a 73 00 4c
-  06 73 65 63 6f 6e 64
+  63 72 69 70 74 2e 6a 73 4c 00
+  4c 06 73 65 63 6f 6e 64
         </artwork></figure>
         
         <t>
