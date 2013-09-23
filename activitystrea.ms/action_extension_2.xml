@@ -25,149 +25,63 @@
       <organization>IBM</organization>
       <address></address>
     </author>
-    <date month="May" year="2013" />
+    <date month="September" year="2013" />
     <abstract>
       <t>
         This specification describes an Action extension for 
-        JSON Activity Streams.
+        JSON Activity Streams 2.0
       </t>
     </abstract>
   </front>
 
   <middle>
     
-    <section title="The &quot;handler&quot; property" anchor="handler">
+    <section title="The &quot;action&quot; property" anchor="action">
       
       <t>
-        Within an Activity object, the "handler" property provides 
-        a Link value referencing an object capable of performing or 
-        completing the activity.
+        Within any Activity Streams object, the "action" property can be 
+        used to describe potential actions that can be performed on the 
+        object. The value of the "action" property is a JSON Object whose
+        keys are Activity Stream verbs with Link values that reference 
+        objects capable of performing the specified verb.
       </t>
       
       <t>For example:</t>
       
       <figure><artwork>
   {
-    "@type": "watch",
-    "object": {
-      "@id": "http://skyfallmovie.com",
-      "@type": "video",
-      "name": "Skyfall"
-    },
-    "handler": {
-      "@type": "application",
-      "name": "Movie Service",
-      "platform": "Android",
-      "platformVersion": "2.1",
-      "appId": "123456abcdef",
-      "url": "movie://play?movie=skyfall"
+    "objectType": "video",
+    "id": "http://skyfallmovie.com",
+    "displayName": "Skyfall",
+    "action": {
+      "watch": "movie://play?movie=skyfall",
+      "share": {
+        "objectType": "service",
+        "displayName": "My Share Service",
+        "url": "http://api.example.org/sharing"
+      },
+      "embed": [
+        {
+          "objectType": "inline-html",
+          "content": "&lt;video ... &gt;"
+        },
+        "http://example.org/video-gadget.xml"
+      ]
     }
   }
 </artwork></figure>
-      
-    </section>
-
-    
-    <section title="The &quot;handles&quot; property" anchor="handles">
-      
-      <t>
-        Within an object, the "handles" property describes the activities
-        the object is capable of handling. The value of the "handles" property 
-        is a JSON array containing one or more JSON objects that describe, at a 
-        minimum, a possible combination of verb, actor, object and target 
-        values.
-      </t>
-  
-      <texttable>
-        <ttcol>Field</ttcol>
-        <ttcol>Type</ttcol>
-        <ttcol>Description</ttcol>
-        <c>actor</c>
-        <c>Array of Strings</c>
-        <c>Specifies one or more object types.</c>
-        <c>object</c>
-        <c>Array of Strings</c>
-        <c>Specifies one or more object types.</c>
-        <c>target</c>
-        <c>Array of Strings</c>
-        <c>Specifies one or more object types.</c>
-        <c>verb</c>
-        <c>Array of Strings</c>
-        <c>Specifies one or more verbs</c>
-      </texttable>
-      
-      <t>
-        The example below decribes a fictional media player 
-        application for Android that can be used to complete
-        "watch" and "rent" activities for "video" and "audio"
-        objects.
-      </t>
-      
-      <figure><artwork>
-  {
-    "@type": "application",
-    "name": "Media Player for Android",
-    "platform": "Android",
-    "platformVersion": "2.1",
-    "appId": "123456abcdef",
-    "handles": [
-      {
-        "verb": ["watch","rent"],
-        "object": ["video","audio"]
-      }
-    ]
-  }
-      </artwork></figure>
-      
-    </section>
-    
-    <section title="The &quot;action&quot; property" anchor="action">
-      
-      <t> 
-        Used within objects, the "action" property is a Link value that 
-        references one or more pending activities for which the 
-        containing object can be an "object".
-      </t>
 
       <t>
-        For example, the following describes a video object with 
-        multiple associated possible actions:
+        In this hypothetical example, the verbs "watch", "share" and "embed" are 
+        associated with the video object. For the "watch" verb, an IRI to view
+        the video is provided. For the "share" verb, a link to 
+        "My Share Service" is provided. For the "embed" verb, both an 
+        "inline-html" object and the IRI to an "embeddable gadget" are 
+        provided.
       </t>
-      
-      <figure><artwork>
-  {
-    "@type": "video",
-    "name": "Skyfall",
-    "url": "http://skyfallmovie.com",
-    "action": [
-      {
-        "@type": "watch",
-        "url": "movie://play?movie=skyfall",
-        "handler": {
-          "@type": "application",
-          "name": "Movie Service",
-          "platform": "Android",
-          "platformVersion": "2.1",
-          "appId": "123456abcdef"
-        }
-      },
-      {
-        "@type": "review",
-        "url": "rating://movie?id=skyfall",
-        "handler": {
-          "@type": "application",
-          "name": "Rating Service",
-          "platform": "Android",
-          "platformVersion": "2.1",
-          "appId": "abcdef123456"
-        }
-      }
-    ]
-  }
-      </artwork></figure>
-      
-    </section>
     
+    </section>
+            
   </middle>
 
   <back>
