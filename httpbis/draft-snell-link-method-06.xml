@@ -3,15 +3,16 @@
   <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
   <!ENTITY rfc2068 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2068.xml'>
   <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
-  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p2-semantics-23.xml'>
-  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p6-cache-23.xml'>
+  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p2-semantics-24.xml'>
+  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p6-cache-24.xml'>
+  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p4-conditional-24.xml'>
 ]>
 <?rfc toc="yes"?> 
 <?rfc strict="yes"?> 
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-04"> 
+<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-06"> 
   <front> 
     <title abbrev="HTTP Link and Unlink Methods"> 
       HTTP Link and Unlink Methods
@@ -23,7 +24,7 @@
       </address> 
     </author> 
     
-    <date month="September" year="2013" /> 
+    <date month="October" year="2013" /> 
  
     <area>Applications</area> 
     <workgroup>Individual Submission</workgroup> 
@@ -72,8 +73,9 @@
     
     <t>
       LINK requests are idempotent. For any pair of resources, exactly one 
-      relationship of any given type can exist. However, multiple relationships 
-      of different types can be established between the same pair of resources.
+      relationship of any given link relation type can exist. However, multiple 
+      relationships of different types can be established between the same pair 
+      of resources.
     </t>
     
     <t>
@@ -93,6 +95,15 @@
       of which establishes a separate, independent relationship with the 
       target resource. In such cases, the server MUST either create all of
       the relationships or not create any of them.
+    </t>
+    
+    <t>
+      The semantics of the LINK method change to a "conditional LINK" if
+      the request message includes an If-Modified-Since, If-Unmodified-
+      Since, If-Match, If-None-Match, or If-Range header field
+      (<xref target="I-D.ietf-httpbis-p4-conditional"/>).  A conditional 
+      LINK requests that the relationship be established only under the 
+      circumstances described by the conditional header field(s).
     </t>
     
   </section>
@@ -126,6 +137,15 @@
       each of which identifies a separate relationship to remove. In such cases, 
       the server MUST either remove the entire set of relationships atomically
       or not remove any of them.
+    </t>
+    
+    <t>
+      The semantics of the UNLINK method change to a "conditional UNLINK" if
+      the request message includes an If-Modified-Since, If-Unmodified-
+      Since, If-Match, If-None-Match, or If-Range header field
+      (<xref target="I-D.ietf-httpbis-p4-conditional"/>).  A conditional 
+      UNLINK requests that the relationship be established only under the 
+      circumstances described by the conditional header field(s).
     </t>
 
   </section>
@@ -216,6 +236,34 @@
       make such changes.
     </t>
   </section>
+
+  <section title="IANA Considerations">
+    
+    <t>
+      IANA is requested to add the LINK and UNLINK methods to the 
+      permanent registry at &lt;http://www.iana.org/assignments/http-methods&gt;
+      (see Section 8.1 of <xref target="I-D.ietf-httpbis-p2-semantics" />).
+    </t>
+    
+    <texttable>
+      <ttcol>Method Name</ttcol>
+      <ttcol>Safe</ttcol>
+      <ttcol>Idempotent</ttcol>
+      <ttcol>Specification</ttcol>
+      
+      <c>LINK</c>
+      <c>No</c>
+      <c>Yes</c>
+      <c><xref target="link"/></c>
+      
+      <c>UNLINK</c>
+      <c>No</c>
+      <c>Yes</c>
+      <c><xref target="unlink"/></c>
+      
+    </texttable>
+    
+  </section>
   
 </middle>
  
@@ -224,6 +272,7 @@
   &rfc2119;
   &rfc5988;
   &part2;
+  &part4;
   &part6;
 </references>
 <references title="Informational References">
