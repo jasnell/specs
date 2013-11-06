@@ -4,17 +4,17 @@
 
 Network Working Group                                           J. Snell
 Internet-Draft
-Intended status: Informational                          October 22, 2013
-Expires: April 25, 2014
+Intended status: Informational                         November 04, 2013
+Expires: May 08, 2014
 
 
-         Additional Link Relations and the urn:social Namespace
-                   draft-snell-more-link-relations-02
+        Additional Link Relations and the 'urn:social' Namespace
+                   draft-snell-more-link-relations-03
 
 Abstract
 
-   This specification defines a number of additional Link Relation Types
-   that can used for a variety of purposes.
+   This specification defines the 'social' URN namespace and a handful
+   of socially-related Link Relation types.
 
 Status of This Memo
 
@@ -31,7 +31,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 25, 2014.
+   This Internet-Draft will expire on May 08, 2014.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Snell                    Expires April 25, 2014                 [Page 1]
+Snell                     Expires May 08, 2014                  [Page 1]
 
-Internet-Draft             More Link Relations              October 2013
+Internet-Draft             More Link Relations             November 2013
 
 
 Table of Contents
@@ -66,25 +66,25 @@ Table of Contents
      2.2.  urn:social:direct . . . . . . . . . . . . . . . . . . . .   4
      2.3.  urn:social:extended . . . . . . . . . . . . . . . . . . .   4
      2.4.  urn:social:peer . . . . . . . . . . . . . . . . . . . . .   4
-     2.5.  urn:social:subordinate  . . . . . . . . . . . . . . . . .   4
+     2.5.  urn:social:subordinate  . . . . . . . . . . . . . . . . .   5
      2.6.  urn:social:superior . . . . . . . . . . . . . . . . . . .   5
      2.7.  urn:social:common . . . . . . . . . . . . . . . . . . . .   5
      2.8.  urn:social:interested . . . . . . . . . . . . . . . . . .   5
      2.9.  urn:social:self . . . . . . . . . . . . . . . . . . . . .   5
-     2.10. urn:social:role:{tokens}  . . . . . . . . . . . . . . . .   5
+     2.10. urn:social:role:{tokens}  . . . . . . . . . . . . . . . .   6
    3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
-     3.1.  Relationship of 'to', 'bto', 'cc', 'bcc', 'from', 'bfrom'
-           and 'scope' . . . . . . . . . . . . . . . . . . . . . . .   7
    4.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
    5.  Informative References  . . . . . . . . . . . . . . . . . . .   7
-   Appendix A.  Examples . . . . . . . . . . . . . . . . . . . . . .   7
+   Appendix A.  Relationship of 'to', 'bto', 'cc', 'bcc', 'from',
+                'bfrom' and 'scope'  . . . . . . . . . . . . . . . .   7
+   Appendix B.  Examples . . . . . . . . . . . . . . . . . . . . . .   7
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   8
 
 1.  Introduction
 
    This specification defines and adds the following additional link
    relation types to the IANA Registry of Link Relations established by
-   [RFC5988]: to, bto, cc, bcc, from, bfrom, source, generator,
+   [RFC5988]: to, bto, cc, bcc, from, bfrom, source, scope, generator,
    provider, location, alias and mentioned-by.  Further, this
    specification proposes a new 'social' URN namespace.
 
@@ -109,15 +109,17 @@ Table of Contents
 
 
 
-Snell                    Expires April 25, 2014                 [Page 2]
+Snell                     Expires May 08, 2014                  [Page 2]
 
-Internet-Draft             More Link Relations              October 2013
+Internet-Draft             More Link Relations             November 2013
 
 
    social-url = "urn:social:" social-nss
    NZDIGIT    = %x31-39
    distance   = ":" NZDIGIT
    confidence = ":" 2DIGIT
+   roles      = ":" (TOKEN *( ";" TOKEN ) )
+   dimensions = ":" (TOKEN *( ";" TOKEN ) )
    social-nss = "self" /
                 "everyone" /
                 "direct"   /
@@ -125,15 +127,15 @@ Internet-Draft             More Link Relations              October 2013
                 ( "peer" [ distance ] ) /
                 ( "subordinate" [ distance ] ) /
                 ( "superior" [ distance ] ) /
-                ( "common" [ confidence ] ) /
+                ( "common" [ dimensions ] [ confidence ] ) /
                 ( "interested" [ confidence ] ) /
-                ( "role" ":" TOKEN )
+                ( "role" roles )
 
 
    Within any given social networking system, there is an available
    population of entities.  Each NSS term represent specific subsets of
    this population and are defined in terms of these subsets relative to
-   a fixed context.  For example, if the fixed content is a person, the
+   a fixed context.  For example, if the fixed context is a person, the
    "urn:social:direct" URN identifies the subset of the total population
    that is directly connected to the context person within the social
    graph, while the "urn:social:extended" URN identifies the subset that
@@ -150,29 +152,37 @@ Internet-Draft             More Link Relations              October 2013
    distance is omitted from the NSS, no limit to the distance is
    assumed.
 
+   The "common" NSS value MAY include an additional segment consisting
+   of one or more semicolon ";" delimited TOKENs whose values identify
+   application and context specific dimensions or attributes an
+   application can use to determine commonality.  For instance, the URN
+   "urn:social:common:gender;age" could be used to refer to a subset of
+   the total population that shares both the same gender and approximate
+   age.
+
    The "common" and "interested" NSS values MAY include a two-digit
    "confidence factor" whose value specifies a confidence interval an
+
+
+
+Snell                     Expires May 08, 2014                  [Page 3]
+
+Internet-Draft             More Link Relations             November 2013
+
+
    implementation can apply when determining which members of the total
    population ought to be considered.  The values range from 00-99,
    corresponding to confidence intervals between 0% to 99%.  If the
    confidence factor is omitted from the NSS, a confidence interval of
    100% is assumed.
 
-   The "role" NSS value MUST include one or more semicolon ";" TOKEN
-   delimited segments whose values identify specific named "roles"
-   within the population.  For instance, the URN
-   "urn:social:role:editor" identifies all members of the relevant
-
-
-
-Snell                    Expires April 25, 2014                 [Page 3]
-
-Internet-Draft             More Link Relations              October 2013
-
-
-   population who are assigned to the "editor" rolel.  The URN
-   "urn:social:role:reader;writer" identifes all members of the relevant
-   population who are assigned to both the "reader" and "writer" roles.
+   The "role" NSS value MUST include one or more semicolon ";" delimited
+   TOKENs whose values identify specific named "roles" within the
+   population.  For instance, the URN "urn:social:role:editor"
+   identifies all members of the relevant population who are assigned to
+   the "editor" rolel.  The URN "urn:social:role:reader;writer"
+   identifes all members of the relevant population who are assigned to
+   both the "reader" and "writer" roles.
 
    The 'social' URN namespace is defined to be intentionally ambiguous
    and highly dependent on context.  The specific interpretation of each
@@ -209,6 +219,13 @@ Internet-Draft             More Link Relations              October 2013
    target resource but are considered to share the same hierarchical
    position.
 
+
+
+Snell                     Expires May 08, 2014                  [Page 4]
+
+Internet-Draft             More Link Relations             November 2013
+
+
 2.5.  urn:social:subordinate
 
    The "urn:social:subordinate" URN identifies the subset of the total
@@ -218,14 +235,6 @@ Internet-Draft             More Link Relations              October 2013
    Subordinate relationships exist only within populations in which
    there exists a hierarchical division of members in the population.
    An example of such a network would be a company or similarly
-
-
-
-Snell                    Expires April 25, 2014                 [Page 4]
-
-Internet-Draft             More Link Relations              October 2013
-
-
    structured organization.  Subordinates might be directly or
    indirectly connected to the target resource but are considered to
    share a lower hierarchical position.
@@ -264,6 +273,15 @@ Internet-Draft             More Link Relations              October 2013
 
 2.9.  urn:social:self
 
+
+
+
+
+Snell                     Expires May 08, 2014                  [Page 5]
+
+Internet-Draft             More Link Relations             November 2013
+
+
    The "urn:social:self" URN identifies the context resource itself as a
    member of the total population.
 
@@ -272,15 +290,6 @@ Internet-Draft             More Link Relations              October 2013
    The "urn:social:role:{token}" URN identifies the subset of the total
    population that is both visible to the contexst and has been assigned
    to each of the individual roles identified within by the URN.
-
-
-
-
-
-Snell                    Expires April 25, 2014                 [Page 5]
-
-Internet-Draft             More Link Relations              October 2013
-
 
    The values of the role tokens are specific to the context in which
    they are being used.
@@ -321,6 +330,14 @@ Internet-Draft             More Link Relations              October 2013
    |                 | used to identify the entity publishing the      |
    |                 | resource.                                       |
    | generator       | Refers to the resource that generated the       |
+
+
+
+Snell                     Expires May 08, 2014                  [Page 6]
+
+Internet-Draft             More Link Relations             November 2013
+
+
    |                 | context resource.  Typically, this would be     |
    |                 | used to identify the software application that  |
    |                 | created the context resource.                   |
@@ -330,26 +347,10 @@ Internet-Draft             More Link Relations              October 2013
    |                 | article, or a social status update mentions a   |
    |                 | particular user, etc.                           |
    | location        | References a URI/IRI that represents a physical |
-
-
-
-Snell                    Expires April 25, 2014                 [Page 6]
-
-Internet-Draft             More Link Relations              October 2013
-
-
    |                 | or logical location with which the context      |
    |                 | resource is associated.                         |
    +-----------------+-------------------------------------------------+
 
-
-3.1.  Relationship of 'to', 'bto', 'cc', 'bcc', 'from', 'bfrom' and
-      'scope'
-
-   The "scope" link relation is closely aligned with the so-called
-   "audience targeting" link relations "to", "bto", "cc", "bcc", "from",
-   and "bfrom" in that "scope" links identify the total population from
-   which the audience is drawn.
 
 4.  Security Considerations
 
@@ -360,7 +361,15 @@ Internet-Draft             More Link Relations              October 2013
 
    [RFC5988]  Nottingham, M., "Web Linking", RFC 5988, October 2010.
 
-Appendix A.  Examples
+Appendix A.  Relationship of 'to', 'bto', 'cc', 'bcc', 'from', 'bfrom'
+             and 'scope'
+
+   The "scope" link relation is closely aligned with the so-called
+   "audience targeting" link relations "to", "bto", "cc", "bcc", "from",
+   and "bfrom" in that "scope" links identify the total population from
+   which the audience is drawn.
+
+Appendix B.  Examples
 
    Using targeting link relations and the urn:social namespace:
 
@@ -380,18 +389,9 @@ Appendix A.  Examples
 
 
 
-
-
-
-
-
-
-
-
-
-Snell                    Expires April 25, 2014                 [Page 7]
+Snell                     Expires May 08, 2014                  [Page 7]
 
-Internet-Draft             More Link Relations              October 2013
+Internet-Draft             More Link Relations             November 2013
 
 
    Using the targeting link relations with urn:social:role:
@@ -445,9 +445,9 @@ Author's Address
 
 
 
-Snell                    Expires April 25, 2014                 [Page 8]
+Snell                     Expires May 08, 2014                  [Page 8]
 
-Internet-Draft             More Link Relations              October 2013
+Internet-Draft             More Link Relations             November 2013
 
 
    James M Snell
@@ -501,4 +501,4 @@ Internet-Draft             More Link Relations              October 2013
 
 
 
-Snell                    Expires April 25, 2014                 [Page 9]
+Snell                     Expires May 08, 2014                  [Page 9]

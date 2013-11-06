@@ -7,10 +7,10 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-more-link-relations-02"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-more-link-relations-03"> 
   <front> 
     <title abbrev="More Link Relations"> 
-      Additional Link Relations and the urn:social Namespace
+      Additional Link Relations and the 'urn:social' Namespace
     </title> 
  
     <author initials="J.M." surname="Snell" fullname="James M Snell"> 
@@ -19,7 +19,7 @@
       </address> 
     </author> 
     
-    <date month="October" year="2013" /> 
+    <date month="November" year="2013" /> 
  
     <area>Applications</area> 
     <keyword>I-D</keyword> 
@@ -29,9 +29,8 @@
  
     <abstract> 
       <t>
-        This specification defines a number of additional 
-        Link Relation Types that can used for a variety of 
-        purposes.
+        This specification defines the 'social' URN namespace 
+        and a handful of socially-related Link Relation types.
       </t> 
     </abstract> 
  
@@ -44,8 +43,8 @@
         This specification defines and adds the following additional 
         link relation types to the IANA Registry of Link Relations
         established by <xref target="RFC5988"/>: to, bto, cc, bcc, 
-        from, bfrom, source, generator, provider, location, alias and
-        mentioned-by. Further, this specification proposes a new 
+        from, bfrom, source, scope, generator, provider, location, alias 
+        and mentioned-by. Further, this specification proposes a new 
         'social' URN namespace.
       </t>
       
@@ -73,6 +72,8 @@
   NZDIGIT    = %x31-39
   distance   = ":" NZDIGIT
   confidence = ":" 2DIGIT
+  roles      = ":" (TOKEN *( ";" TOKEN ) )
+  dimensions = ":" (TOKEN *( ";" TOKEN ) )
   social-nss = "self" /
                "everyone" /
                "direct"   /
@@ -80,9 +81,9 @@
                ( "peer" [ distance ] ) /
                ( "subordinate" [ distance ] ) /
                ( "superior" [ distance ] ) /
-               ( "common" [ confidence ] ) /
+               ( "common" [ dimensions ] [ confidence ] ) /
                ( "interested" [ confidence ] ) /
-               ( "role" ":" TOKEN )
+               ( "role" roles )
       ]]></artwork></figure>
             
       <t>
@@ -110,6 +111,16 @@
       </t>
       
       <t>
+        The "common" NSS value MAY include an additional segment consisting
+        of one or more semicolon ";" delimited TOKENs whose values identify
+        application and context specific dimensions or attributes an application 
+        can use to determine commonality. For instance, the URN 
+        "urn:social:common:gender;age" could be used to refer to a subset
+        of the total population that shares both the same gender and approximate
+        age. 
+      </t>
+      
+      <t>
         The "common" and "interested" NSS values MAY include a two-digit 
         "confidence factor" whose value specifies a confidence interval 
         an implementation can apply when determining which members of
@@ -120,8 +131,8 @@
       </t>
       
       <t>
-        The "role" NSS value MUST include one or more semicolon ";" TOKEN 
-        delimited segments whose values identify specific named "roles" 
+        The "role" NSS value MUST include one or more semicolon ";" 
+        delimited TOKENs whose values identify specific named "roles" 
         within the population. For instance, the URN "urn:social:role:editor" 
         identifies all members of the relevant population who are assigned
         to the "editor" rolel. The URN "urn:social:role:reader;writer" 
@@ -341,18 +352,7 @@
         </c>
         
       </texttable>
-      
-      <section title="Relationship of 'to', 'bto', 'cc', 'bcc', 'from', 'bfrom' and 'scope'">
-        
-        <t>
-          The "scope" link relation is closely aligned with the so-called
-          "audience targeting" link relations "to", "bto", "cc", "bcc", "from",
-          and "bfrom" in that "scope" links identify the total population 
-          from which the audience is drawn. 
-        </t>
-        
-      </section>
-            
+                  
     </section> 
  
     <section title="Security Considerations"> 
@@ -367,6 +367,17 @@
     <references title="Informative References">
       &rfc5988;
     </references>
+    
+    <section title="Relationship of 'to', 'bto', 'cc', 'bcc', 'from', 'bfrom' and 'scope'">
+      
+      <t>
+        The "scope" link relation is closely aligned with the so-called
+        "audience targeting" link relations "to", "bto", "cc", "bcc", "from",
+        and "bfrom" in that "scope" links identify the total population 
+        from which the audience is drawn. 
+      </t>
+      
+    </section>
     
     <section title="Examples">
     
