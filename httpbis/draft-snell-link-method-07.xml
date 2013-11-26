@@ -12,7 +12,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-06"> 
+<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-07"> 
   <front> 
     <title abbrev="HTTP Link and Unlink Methods"> 
       HTTP Link and Unlink Methods
@@ -60,27 +60,75 @@
 
   </section> 
   
+  <section title="Link Relationships" anchor="model">
+    
+    <t>
+      The LINK and UNLINK methods are used to manage relationships 
+      between resources. Those relationships are defined using the Link
+      model established in Section 3 of <xref target="RFC5988" />. For 
+      every individual link, the context IRI, link relation type, target 
+      IRI, and optional collection of target attributes MUST be considered; 
+      that is, for any effective request URI, there can exist at most one Link 
+      relationship between any context and target IRI pairing with any given 
+      combination of link relation type and target attributes.
+    </t>
+    
+    <t>
+      Within LINK and UNLINK requests, a <xref target="RFC5988"/> Link 
+      header field is used to describe a Link relationship to be 
+      managed. Any single LINK or UNLINK request MAY contain multiple Link
+      header fields, each of which describes a separate relationship between
+      a context IRI and target IRI. When a LINK request contains multiple 
+      Link header fields, the server MUST create all of the specified relationships
+      or not create any of them. Likewise, when an UNLINK request contains
+      multiple Link header fields, the server MUST either remove all the 
+      specified relationship or not remove any of them.
+    </t>
+    
+    <t>
+      The target and context IRIs of a Link relationship are determined 
+      following the requirements specified in Sections 5.1 and 5.2 of 
+      <xref target="RFC5988"/>.
+    </t>
+    
+    <t>
+      When determining whether or not a relationship already exists between
+      a context IRI and target IRI, implementations will need to compare the 
+      given IRIs with other, previously established relationships. To do so,
+      the implementation MUST first resolve the IRIs as required by 
+      <xref target="RFC5988" /> and then compare on a case-sensitive, 
+      character-by-character basis. For instance, the IRIs 
+      "http://example.org/foo" and "http://example.org/Foo" MUST NOT be 
+      considered to be equivalent.
+    </t>
+    
+  </section>
+  
   <section title="LINK" anchor="link">
   
     <t>
       The LINK method is used to establish one or more relationships between
       the resource identified by the effective request URI and one or more other 
       resources. Metadata contained within Link header fields <xref target="RFC5988"/>
-      provide information about which other resources are being connected to the 
-      target and the type of relationship being established. A payload 
+      provide information about the relationships being established. A payload 
       within a LINK request has no defined semantics.
     </t>
     
     <t>
-      LINK requests are idempotent. For any pair of resources, exactly one 
-      relationship of any given link relation type can exist. However, multiple 
-      relationships of different types can be established between the same pair 
-      of resources.
+      LINK requests are idempotent but are not safe. Establishing a 
+      relationship causes an inherent change to the state of the target 
+      resource.
     </t>
     
     <t>
-      LINK requests are not safe, however. Establishing a relationship
-      causes an inherent change to the state of the target resource.
+      Any successful response (using a 2xx status code) to a LINK request
+      indicates that all of the Link relationships described in the request
+      have been established. No specific 2xx status code is required. 
+    </t>
+
+    <t>
+      Responses to LINK requests SHOULD contain one Link header field
+      for each Link relationship established by the LINK request.
     </t>
     
     <t>
@@ -90,13 +138,6 @@
       of <xref target="I-D.ietf-httpbis-p6-cache"/>).
     </t>
 
-    <t>
-      A single LINK request can contain multiple Link header fields, each
-      of which establishes a separate, independent relationship with the 
-      target resource. In such cases, the server MUST either create all of
-      the relationships or not create any of them.
-    </t>
-    
     <t>
       The semantics of the LINK method change to a "conditional LINK" if
       the request message includes an If-Modified-Since, If-Unmodified-
@@ -126,19 +167,23 @@
     </t>
     
     <t>
+      Responses to UNLINK requests SHOULD contain one Link header field
+      for each Link relationship removed by the UNLINK request.
+    </t>
+    
+    <t>
+      Any successful response (using a 2xx status code) to an UNLINK request
+      indicates that all of the Link relationships described in the request
+      have been removed. No specific 2xx status code is required. 
+    </t>
+    
+    <t>
       Responses to UNLINK requests are not cacheable. If an UNLINK
       request passes through a cache that has one or more stored responses
       for the effective request URI, those stored responses will be
       invalidated (see Section 6 of <xref target="I-D.ietf-httpbis-p6-cache"/>).
     </t>
 
-    <t>
-      A single UNLINK request message can contain multiple Link header fields, 
-      each of which identifies a separate relationship to remove. In such cases, 
-      the server MUST either remove the entire set of relationships atomically
-      or not remove any of them.
-    </t>
-    
     <t>
       The semantics of the UNLINK method change to a "conditional UNLINK" if
       the request message includes an If-Modified-Since, If-Unmodified-
@@ -187,10 +232,21 @@
   Link: <http://example.com/profiles/sally>; rel="tag"
     ]]></artwork></figure>
     
+    <figure><preamble>Possible response:</preamble><artwork><![CDATA[
+  HTTP/1.1 202 Accepted
+  Link: <http://example.com/profiles/joe>; rel="tag"
+  Link: <http://example.com/profiles/sally>; rel="tag"
+    ]]></artwork></figure>
+    
     <figure><preamble>Example 2: Removing an existing Link relationship between
     two resources:</preamble><artwork><![CDATA[
   UNLINK /images/my_dog.jpg HTTP/1.1
   Host: example.org
+  Link: <http://example.com/profiles/sally>; rel="tag"
+    ]]></artwork></figure>
+    
+    <figure><preamble>Possible response:</preamble><artwork><![CDATA[
+  HTTP/1.1 204 No Content
   Link: <http://example.com/profiles/sally>; rel="tag"
     ]]></artwork></figure>
     
@@ -219,6 +275,15 @@
   LINK /my-resource HTTP/1.1
   Host: example.org
   Link: <http://example.com/my-monitor>; rel="monitor"
+    ]]></artwork></figure>
+    
+    <figure><preamble>Example 7: Using the Link anchor attribute to change the 
+     context IRI (in this example, a link relationship is established between 
+     the IRIs "acct:joe@example.org" and "acct:sally@example.org")</preamble>
+     <artwork><![CDATA[
+  LINK /my-resource HTTP/1.1
+  Host: example.org
+  Link: <acct:joe@example.org>; rel="follow"; anchor="acct:sally@example.org"
     ]]></artwork></figure>
     
   </section>
@@ -266,18 +331,17 @@
   </section>
   
 </middle>
- 
 <back>
-<references title="Normative References"> 
-  &rfc2119;
-  &rfc5988;
-  &part2;
-  &part4;
-  &part6;
-</references>
-<references title="Informational References">
-  &rfc2068;
-</references>
+  <references title="Normative References"> 
+    &rfc2119;
+    &rfc5988;
+    &part2;
+    &part4;
+    &part6;
+  </references>
+  <references title="Informational References">
+    &rfc2068;
+  </references>
 </back>
 </rfc> 
  

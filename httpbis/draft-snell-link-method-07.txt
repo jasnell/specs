@@ -4,12 +4,12 @@
 
 Individual Submission                                           J. Snell
 Internet-Draft
-Intended status: Standards Track                       November 04, 2013
-Expires: May 08, 2014
+Intended status: Standards Track                       November 06, 2013
+Expires: May 10, 2014
 
 
                       HTTP Link and Unlink Methods
-                       draft-snell-link-method-06
+                       draft-snell-link-method-07
 
 Abstract
 
@@ -31,7 +31,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 08, 2014.
+   This Internet-Draft will expire on May 10, 2014.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Snell                     Expires May 08, 2014                  [Page 1]
+Snell                     Expires May 10, 2014                  [Page 1]
 
 Internet-Draft        HTTP Link and Unlink Methods         November 2013
 
@@ -61,17 +61,18 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
-   2.  LINK  . . . . . . . . . . . . . . . . . . . . . . . . . . . .   2
-   3.  UNLINK  . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
-   4.  Relationship to other HTTP Methods and Discoverability of
-       Links . . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
-   5.  Example . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
-     8.2.  Informational References  . . . . . . . . . . . . . . . .   6
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   6
+   2.  Link Relationships  . . . . . . . . . . . . . . . . . . . . .   2
+   3.  LINK  . . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   4.  UNLINK  . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   5.  Relationship to other HTTP Methods and Discoverability of
+       Links . . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+   6.  Example . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
+     9.2.  Informational References  . . . . . . . . . . . . . . . .   7
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
 
 1.  Introduction
 
@@ -82,42 +83,73 @@ Table of Contents
    "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
    and "OPTIONAL" are to be interpreted as described in [RFC2119].
 
-2.  LINK
+2.  Link Relationships
+
+   The LINK and UNLINK methods are used to manage relationships between
+   resources.  Those relationships are defined using the Link model
+   established in Section 3 of [RFC5988].  For every individual link,
+   the context IRI, link relation type, target IRI, and optional
+   collection of target attributes MUST be considered; that is, for any
+   effective request URI, there can exist at most one Link relationship
+   between any context and target IRI pairing with any given combination
+   of link relation type and target attributes.
+
+   Within LINK and UNLINK requests, a [RFC5988] Link header field is
+   used to describe a Link relationship to be managed.  Any single LINK
+   or UNLINK request MAY contain multiple Link header fields, each of
+   which describes a separate relationship between a context IRI and
+   target IRI.  When a LINK request contains multiple Link header
+   fields, the server MUST create all of the specified relationships or
+   not create any of them.  Likewise, when an UNLINK request contains
+   multiple Link header fields, the server MUST either remove all the
+   specified relationship or not remove any of them.
+
+
+
+
+
+
+Snell                     Expires May 10, 2014                  [Page 2]
+
+Internet-Draft        HTTP Link and Unlink Methods         November 2013
+
+
+   The target and context IRIs of a Link relationship are determined
+   following the requirements specified in Sections 5.1 and 5.2 of
+   [RFC5988].
+
+   When determining whether or not a relationship already exists between
+   a context IRI and target IRI, implementations will need to compare
+   the given IRIs with other, previously established relationships.  To
+   do so, the implementation MUST first resolve the IRIs as required by
+   [RFC5988] and then compare on a case-sensitive, character-by-
+   character basis.  For instance, the IRIs "http://example.org/foo" and
+   "http://example.org/Foo" MUST NOT be considered to be equivalent.
+
+3.  LINK
 
    The LINK method is used to establish one or more relationships
    between the resource identified by the effective request URI and one
    or more other resources.  Metadata contained within Link header
-   fields [RFC5988] provide information about which other resources are
-   being connected to the target and the type of relationship being
+   fields [RFC5988] provide information about the relationships being
    established.  A payload within a LINK request has no defined
    semantics.
 
-   LINK requests are idempotent.  For any pair of resources, exactly one
-   relationship of any given link relation type can exist.  However,
-   multiple relationships of different types can be established between
-   the same pair of resources.
+   LINK requests are idempotent but are not safe.  Establishing a
+   relationship causes an inherent change to the state of the target
+   resource.
 
-   LINK requests are not safe, however.  Establishing a relationship
-   causes an inherent change to the state of the target resource.
+   Any successful response (using a 2xx status code) to a LINK request
+   indicates that all of the Link relationships described in the request
+   have been established.  No specific 2xx status code is required.
+
+   Responses to LINK requests SHOULD contain one Link header field for
+   each Link relationship established by the LINK request.
 
    Responses to LINK requests are not cacheable.  If a LINK request
    passes through a cache that has one or more stored responses for the
    effective request URI, those stored responses will be invalidated
    (see Section 6 of [I-D.ietf-httpbis-p6-cache]).
-
-
-
-
-
-Snell                     Expires May 08, 2014                  [Page 2]
-
-Internet-Draft        HTTP Link and Unlink Methods         November 2013
-
-
-   A single LINK request can contain multiple Link header fields, each
-   of which establishes a separate, independent relationship with the
-   target resource.  In such cases, the server MUST either create all of
-   the relationships or not create any of them.
 
    The semantics of the LINK method change to a "conditional LINK" if
    the request message includes an If-Modified-Since, If-Unmodified-
@@ -126,10 +158,18 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    that the relationship be established only under the circumstances
    described by the conditional header field(s).
 
-3.  UNLINK
+4.  UNLINK
 
    The UNLINK method is used to remove one or more relationships between
    the resource identified by the effective request URI and other
+
+
+
+Snell                     Expires May 10, 2014                  [Page 3]
+
+Internet-Draft        HTTP Link and Unlink Methods         November 2013
+
+
    resources.  Metadata contained within Link header fields [RFC5988]
    provide the information about the relationships that are to be
    removed.  A payload within an UNLINK request has no defined
@@ -139,15 +179,17 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    relationship causes an inherent change to the state of the target
    resource.
 
+   Responses to UNLINK requests SHOULD contain one Link header field for
+   each Link relationship removed by the UNLINK request.
+
+   Any successful response (using a 2xx status code) to an UNLINK
+   request indicates that all of the Link relationships described in the
+   request have been removed.  No specific 2xx status code is required.
+
    Responses to UNLINK requests are not cacheable.  If an UNLINK request
    passes through a cache that has one or more stored responses for the
    effective request URI, those stored responses will be invalidated
    (see Section 6 of [I-D.ietf-httpbis-p6-cache]).
-
-   A single UNLINK request message can contain multiple Link header
-   fields, each of which identifies a separate relationship to remove.
-   In such cases, the server MUST either remove the entire set of
-   relationships atomically or not remove any of them.
 
    The semantics of the UNLINK method change to a "conditional UNLINK"
    if the request message includes an If-Modified-Since, If-Unmodified-
@@ -156,20 +198,12 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    that the relationship be established only under the circumstances
    described by the conditional header field(s).
 
-4.  Relationship to other HTTP Methods and Discoverability of Links
+5.  Relationship to other HTTP Methods and Discoverability of Links
 
    The use of the LINK and UNLINK request methods to manage
    relationships between resources has no direct bearing on the use or
    appearance of Link header fields within any other HTTP request or
    response message involving the same effective request URI.  Nor do
-
-
-
-Snell                     Expires May 08, 2014                  [Page 3]
-
-Internet-Draft        HTTP Link and Unlink Methods         November 2013
-
-
    the methods have any direct normative impact on the use of link-like
    structures within the resource representations returned by a server
    for any particular resource.
@@ -181,7 +215,16 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    enumerating the relationships that have been established using the
    LINK request method.
 
-5.  Example
+6.  Example
+
+
+
+
+
+Snell                     Expires May 10, 2014                  [Page 4]
+
+Internet-Draft        HTTP Link and Unlink Methods         November 2013
+
 
    There exists a broad range of possible use cases for the LINK and
    UNLINK methods.  The examples that follow illustrate a subset of
@@ -196,11 +239,24 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    Link: <http://example.com/profiles/sally>; rel="tag"
 
 
+   Possible response:
+
+   HTTP/1.1 202 Accepted
+   Link: <http://example.com/profiles/joe>; rel="tag"
+   Link: <http://example.com/profiles/sally>; rel="tag"
+
+
    Example 2: Removing an existing Link relationship between two
    resources:
 
    UNLINK /images/my_dog.jpg HTTP/1.1
    Host: example.org
+   Link: <http://example.com/profiles/sally>; rel="tag"
+
+
+   Possible response:
+
+   HTTP/1.1 204 No Content
    Link: <http://example.com/profiles/sally>; rel="tag"
 
 
@@ -221,7 +277,7 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
 
 
 
-Snell                     Expires May 08, 2014                  [Page 4]
+Snell                     Expires May 10, 2014                  [Page 5]
 
 Internet-Draft        HTTP Link and Unlink Methods         November 2013
 
@@ -249,7 +305,16 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    Link: <http://example.com/my-monitor>; rel="monitor"
 
 
-6.  Security Considerations
+   Example 7: Using the Link anchor attribute to change the context IRI
+   (in this example, a link relationship is established between the IRIs
+   "acct:joe@example.org" and "acct:sally@example.org")
+
+   LINK /my-resource HTTP/1.1
+   Host: example.org
+   Link: <acct:joe@example.org>; rel="follow"; anchor="acct:sally@example.org"
+
+
+7.  Security Considerations
 
    The LINK and UNLINK methods are subject to the same general security
    considerations as all HTTP methods as described in
@@ -259,32 +324,31 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    state, the server is responsible for determining the client's
    authorization to make such changes.
 
-7.  IANA Considerations
+8.  IANA Considerations
 
    IANA is requested to add the LINK and UNLINK methods to the permanent
    registry at <http://www.iana.org/assignments/http-methods> (see
    Section 8.1 of [I-D.ietf-httpbis-p2-semantics]).
 
-            +-------------+------+------------+---------------+
-            | Method Name | Safe | Idempotent | Specification |
-            +-------------+------+------------+---------------+
-            | LINK        | No   | Yes        | Section 2     |
-            | UNLINK      | No   | Yes        | Section 3     |
-            +-------------+------+------------+---------------+
 
 
 
-
-
-
-Snell                     Expires May 08, 2014                  [Page 5]
+Snell                     Expires May 10, 2014                  [Page 6]
 
 Internet-Draft        HTTP Link and Unlink Methods         November 2013
 
 
-8.  References
+            +-------------+------+------------+---------------+
+            | Method Name | Safe | Idempotent | Specification |
+            +-------------+------+------------+---------------+
+            | LINK        | No   | Yes        | Section 3     |
+            | UNLINK      | No   | Yes        | Section 4     |
+            +-------------+------+------------+---------------+
 
-8.1.  Normative References
+
+9.  References
+
+9.1.  Normative References
 
    [I-D.ietf-httpbis-p2-semantics]
               Fielding, R. and J. Reschke, "Hypertext Transfer Protocol
@@ -308,7 +372,7 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
 
    [RFC5988]  Nottingham, M., "Web Linking", RFC 5988, October 2010.
 
-8.2.  Informational References
+9.2.  Informational References
 
    [RFC2068]  Fielding, R., Gettys, J., Mogul, J., Nielsen, H., and T.
               Berners-Lee, "Hypertext Transfer Protocol -- HTTP/1.1",
@@ -325,12 +389,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-Snell                     Expires May 08, 2014                  [Page 6]
+Snell                     Expires May 10, 2014                  [Page 7]
