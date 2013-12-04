@@ -275,6 +275,12 @@
         <ttcol>Name</ttcol>
         <ttcol>Description</ttcol>
         
+        <c>id</c>
+        <c>
+          Specifies an IRI considered to represent the identity 
+          of the link context.
+        </c>
+        
         <c>to</c>
         <c>
           Refers to a resource that is considered to be part of the

@@ -4,12 +4,12 @@
 
 Individual Submission                                           J. Snell
 Internet-Draft
-Intended status: Standards Track                       November 06, 2013
-Expires: May 10, 2014
+Intended status: Standards Track                        December 4, 2013
+Expires: June 7, 2014
 
 
                       HTTP Link and Unlink Methods
-                       draft-snell-link-method-07
+                       draft-snell-link-method-08
 
 Abstract
 
@@ -31,7 +31,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 10, 2014.
+   This Internet-Draft will expire on June 7, 2014.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Snell                     Expires May 10, 2014                  [Page 1]
+Snell                     Expires June 7, 2014                  [Page 1]
 
-Internet-Draft        HTTP Link and Unlink Methods         November 2013
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
 Table of Contents
@@ -69,7 +69,7 @@ Table of Contents
    6.  Example . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
    8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
-   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
      9.2.  Informational References  . . . . . . . . . . . . . . . .   7
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Snell                     Expires May 10, 2014                  [Page 2]
+Snell                     Expires June 7, 2014                  [Page 2]
 
-Internet-Draft        HTTP Link and Unlink Methods         November 2013
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
    The target and context IRIs of a Link relationship are determined
@@ -165,9 +165,9 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
 
 
 
-Snell                     Expires May 10, 2014                  [Page 3]
+Snell                     Expires June 7, 2014                  [Page 3]
 
-Internet-Draft        HTTP Link and Unlink Methods         November 2013
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
    resources.  Metadata contained within Link header fields [RFC5988]
@@ -221,9 +221,9 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
 
 
 
-Snell                     Expires May 10, 2014                  [Page 4]
+Snell                     Expires June 7, 2014                  [Page 4]
 
-Internet-Draft        HTTP Link and Unlink Methods         November 2013
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
    There exists a broad range of possible use cases for the LINK and
@@ -238,13 +238,11 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    Link: <http://example.com/profiles/joe>; rel="tag"
    Link: <http://example.com/profiles/sally>; rel="tag"
 
-
    Possible response:
 
    HTTP/1.1 202 Accepted
    Link: <http://example.com/profiles/joe>; rel="tag"
    Link: <http://example.com/profiles/sally>; rel="tag"
-
 
    Example 2: Removing an existing Link relationship between two
    resources:
@@ -253,12 +251,10 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    Host: example.org
    Link: <http://example.com/profiles/sally>; rel="tag"
 
-
    Possible response:
 
    HTTP/1.1 204 No Content
    Link: <http://example.com/profiles/sally>; rel="tag"
-
 
    Example 3: Establish a "pingback" or "trackback" style link to a blog
    entry about an article
@@ -266,21 +262,6 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    LINK /articles/an_interesting_article HTTP/1.1
    Host: example.org
    Link: <http://example.com/my_blog_post>; rel="mention"
-
-
-
-
-
-
-
-
-
-
-
-Snell                     Expires May 10, 2014                  [Page 5]
-
-Internet-Draft        HTTP Link and Unlink Methods         November 2013
-
 
    Example 4: Establish a link between two semantically related
    resources:
@@ -290,12 +271,22 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    Link: <http://example.com/schemas/my_schema>; rel="describedBy"
 
 
+
+
+
+
+
+
+Snell                     Expires June 7, 2014                  [Page 5]
+
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
+
+
    Example 5: Add an existing resource to a collection:
 
    LINK /some-collection-resource HTTP/1.1
    Host: example.org
    Link: <http://example.com/my-member-resource>; rel="item"
-
 
    Example 6: Link one resource to another that monitors its current
    state (e.g. pub/sub)
@@ -304,15 +295,14 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    Host: example.org
    Link: <http://example.com/my-monitor>; rel="monitor"
 
-
    Example 7: Using the Link anchor attribute to change the context IRI
    (in this example, a link relationship is established between the IRIs
    "acct:joe@example.org" and "acct:sally@example.org")
 
    LINK /my-resource HTTP/1.1
    Host: example.org
-   Link: <acct:joe@example.org>; rel="follow"; anchor="acct:sally@example.org"
-
+   Link: <acct:joe@example.org>; rel="follow";
+     anchor="acct:sally@example.org"
 
 7.  Security Considerations
 
@@ -330,14 +320,6 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
    registry at <http://www.iana.org/assignments/http-methods> (see
    Section 8.1 of [I-D.ietf-httpbis-p2-semantics]).
 
-
-
-
-Snell                     Expires May 10, 2014                  [Page 6]
-
-Internet-Draft        HTTP Link and Unlink Methods         November 2013
-
-
             +-------------+------+------------+---------------+
             | Method Name | Safe | Idempotent | Specification |
             +-------------+------+------------+---------------+
@@ -345,27 +327,34 @@ Internet-Draft        HTTP Link and Unlink Methods         November 2013
             | UNLINK      | No   | Yes        | Section 4     |
             +-------------+------+------------+---------------+
 
-
 9.  References
+
+
+
+
+
+Snell                     Expires June 7, 2014                  [Page 6]
+
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
+
 
 9.1.  Normative References
 
    [I-D.ietf-httpbis-p2-semantics]
               Fielding, R. and J. Reschke, "Hypertext Transfer Protocol
               (HTTP/1.1): Semantics and Content", draft-ietf-
-              httpbis-p2-semantics-24 (work in progress), September
-              2013.
+              httpbis-p2-semantics-25 (work in progress), November 2013.
 
    [I-D.ietf-httpbis-p4-conditional]
               Fielding, R. and J. Reschke, "Hypertext Transfer Protocol
               (HTTP/1.1): Conditional Requests", draft-ietf-
-              httpbis-p4-conditional-24 (work in progress), September
+              httpbis-p4-conditional-25 (work in progress), November
               2013.
 
    [I-D.ietf-httpbis-p6-cache]
               Fielding, R., Nottingham, M., and J. Reschke, "Hypertext
               Transfer Protocol (HTTP/1.1): Caching", draft-ietf-
-              httpbis-p6-cache-24 (work in progress), September 2013.
+              httpbis-p6-cache-25 (work in progress), November 2013.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
@@ -389,4 +378,15 @@ Author's Address
 
 
 
-Snell                     Expires May 10, 2014                  [Page 7]
+
+
+
+
+
+
+
+
+
+
+
+Snell                     Expires June 7, 2014                  [Page 7]
