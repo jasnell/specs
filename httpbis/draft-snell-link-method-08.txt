@@ -2,10 +2,10 @@
 
 
 
-Individual Submission                                           J. Snell
-Internet-Draft
-Intended status: Standards Track                        December 4, 2013
-Expires: June 7, 2014
+Individual Submission                                         J.M. Snell
+Internet-Draft                                             December 2013
+Intended status: Standards Track
+Expires: June 04, 2014
 
 
                       HTTP Link and Unlink Methods
@@ -31,7 +31,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 7, 2014.
+   This Internet-Draft will expire on June 04, 2014.
 
 Copyright Notice
 
@@ -45,31 +45,26 @@ Copyright Notice
    carefully, as they describe your rights and restrictions with respect
    to this document.
 
-
-
-
-
-
-
-
-
-Snell                     Expires June 7, 2014                  [Page 1]
-
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
-
-
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  Link Relationships  . . . . . . . . . . . . . . . . . . . . .   2
    3.  LINK  . . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+
+
+
+Snell                    Expires June 04, 2014                  [Page 1]
+
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
+
+
    4.  UNLINK  . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
    5.  Relationship to other HTTP Methods and Discoverability of
        Links . . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
    6.  Example . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
    8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
-   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
      9.2.  Informational References  . . . . . . . . . . . . . . . .   7
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
@@ -104,16 +99,6 @@ Table of Contents
    multiple Link header fields, the server MUST either remove all the
    specified relationship or not remove any of them.
 
-
-
-
-
-
-Snell                     Expires June 7, 2014                  [Page 2]
-
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
-
-
    The target and context IRIs of a Link relationship are determined
    following the requirements specified in Sections 5.1 and 5.2 of
    [RFC5988].
@@ -121,6 +106,14 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
    When determining whether or not a relationship already exists between
    a context IRI and target IRI, implementations will need to compare
    the given IRIs with other, previously established relationships.  To
+
+
+
+Snell                    Expires June 04, 2014                  [Page 2]
+
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
+
+
    do so, the implementation MUST first resolve the IRIs as required by
    [RFC5988] and then compare on a case-sensitive, character-by-
    character basis.  For instance, the IRIs "http://example.org/foo" and
@@ -162,18 +155,20 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
    The UNLINK method is used to remove one or more relationships between
    the resource identified by the effective request URI and other
-
-
-
-Snell                     Expires June 7, 2014                  [Page 3]
-
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
-
-
    resources.  Metadata contained within Link header fields [RFC5988]
    provide the information about the relationships that are to be
    removed.  A payload within an UNLINK request has no defined
    semantics.
+
+
+
+
+
+
+Snell                    Expires June 04, 2014                  [Page 3]
+
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
+
 
    UNLINK request messages are idempotent but are not safe.  Removing a
    relationship causes an inherent change to the state of the target
@@ -217,15 +212,6 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 6.  Example
 
-
-
-
-
-Snell                     Expires June 7, 2014                  [Page 4]
-
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
-
-
    There exists a broad range of possible use cases for the LINK and
    UNLINK methods.  The examples that follow illustrate a subset of
    those cases.
@@ -233,16 +219,25 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
    Example 1: Creating two separate links between an image and the
    profiles of two people associated with the image:
 
+
+
+Snell                    Expires June 04, 2014                  [Page 4]
+
+Internet-Draft        HTTP Link and Unlink Methods         December 2013
+
+
    LINK /images/my_dog.jpg HTTP/1.1
    Host: example.org
    Link: <http://example.com/profiles/joe>; rel="tag"
    Link: <http://example.com/profiles/sally>; rel="tag"
+
 
    Possible response:
 
    HTTP/1.1 202 Accepted
    Link: <http://example.com/profiles/joe>; rel="tag"
    Link: <http://example.com/profiles/sally>; rel="tag"
+
 
    Example 2: Removing an existing Link relationship between two
    resources:
@@ -251,10 +246,12 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
    Host: example.org
    Link: <http://example.com/profiles/sally>; rel="tag"
 
+
    Possible response:
 
    HTTP/1.1 204 No Content
    Link: <http://example.com/profiles/sally>; rel="tag"
+
 
    Example 3: Establish a "pingback" or "trackback" style link to a blog
    entry about an article
@@ -262,6 +259,7 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
    LINK /articles/an_interesting_article HTTP/1.1
    Host: example.org
    Link: <http://example.com/my_blog_post>; rel="mention"
+
 
    Example 4: Establish a link between two semantically related
    resources:
@@ -277,7 +275,9 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
 
-Snell                     Expires June 7, 2014                  [Page 5]
+
+
+Snell                    Expires June 04, 2014                  [Page 5]
 
 Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
@@ -288,12 +288,14 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
    Host: example.org
    Link: <http://example.com/my-member-resource>; rel="item"
 
+
    Example 6: Link one resource to another that monitors its current
-   state (e.g. pub/sub)
+   state (e.g.  pub/sub)
 
    LINK /my-resource HTTP/1.1
    Host: example.org
    Link: <http://example.com/my-monitor>; rel="monitor"
+
 
    Example 7: Using the Link anchor attribute to change the context IRI
    (in this example, a link relationship is established between the IRIs
@@ -303,6 +305,7 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
    Host: example.org
    Link: <acct:joe@example.org>; rel="follow";
      anchor="acct:sally@example.org"
+
 
 7.  Security Considerations
 
@@ -327,16 +330,15 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
             | UNLINK      | No   | Yes        | Section 4     |
             +-------------+------+------------+---------------+
 
-9.  References
 
 
 
-
-
-Snell                     Expires June 7, 2014                  [Page 6]
+Snell                    Expires June 04, 2014                  [Page 6]
 
 Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
+
+9.  References
 
 9.1.  Normative References
 
@@ -386,7 +388,4 @@ Author's Address
 
 
 
-
-
-
-Snell                     Expires June 7, 2014                  [Page 7]
+Snell                    Expires June 04, 2014                  [Page 7]

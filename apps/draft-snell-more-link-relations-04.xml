@@ -1,0 +1,239 @@
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+  <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
+  <!ENTITY rfc3987 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3987.xml'>
+  <!ENTITY rfc3986 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3986.xml'>
+]>
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-more-link-relations-04"> 
+  <front> 
+    <title abbrev="More Link Relations"> 
+      Additional Link Relation Registrations
+    </title> 
+ 
+    <author initials="J.M." surname="Snell" fullname="James M Snell"> 
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+    
+    <date month="March" year="2014" /> 
+ 
+    <area>Applications</area> 
+    <keyword>I-D</keyword> 
+    <keyword>http</keyword> 
+    <keyword>link</keyword> 
+    <keyword>rel</keyword>
+ 
+    <abstract> 
+      <t>
+        This specification registers a handful of new RFC 5988 
+        Link Relation types.
+      </t> 
+    </abstract> 
+ 
+  </front> 
+  
+  <middle> 
+    <section anchor="intro" title="Introduction"> 
+ 
+      <t>
+        This specification defines and adds the following additional 
+        link relation types to the IANA Registry of Link Relations
+        established by <xref target="RFC5988"/>: to, bto, cc, bcc, 
+        from, bfrom, source, scope, generator, provider, location, alias 
+        and mentioned-by.
+      </t>
+      
+      <t>
+        Note that this document is a work-in-progress draft specification
+        that does not yet represent a "standard". It is the intention of 
+        this specification to propose a few new ideas and openly solicit 
+        feedback on their definition and use. While this document might 
+        eventually evolve into an RFC the ideas described herein have not 
+        yet been broadly implemented and have definitions that may evolve
+        through successive iterations of this draft.
+      </t>
+      
+    </section> 
+                              
+    <section title="IANA Considerations"> 
+      
+      <t>
+        The following Link Relations are added to the IANA Registry of 
+        Link Relations:
+      </t>
+      
+      <texttable>
+        <ttcol>Name</ttcol>
+        <ttcol>Description</ttcol>
+        
+        <c>id</c>
+        <c>
+          Specifies an IRI <xref target="RFC3987"/> or URI <xref target="RFC3986"/>considered 
+          to represent the identity of the link context.
+        </c>
+        
+        <c>to</c>
+        <c>
+          Refers to a resource that is considered to be part of the
+          public primary audience of the link's context.
+        </c>
+        
+        <c>bto</c>
+        <c>
+          Refers to a resource that is considered to be part of the
+          private primary audience of the link's context.
+        </c>
+        
+        <c>cc</c>
+        <c>
+          Refers to a resource that is considered to be part of the 
+          public secondary audience of the link's context.
+        </c>
+        
+        <c>bcc</c>
+        <c>
+          Refers to a resource that is considered to be part of the 
+          private secondary audience of the link's context.
+        </c>
+        
+        <c>from</c>
+        <c>
+          Refers to a resource that is publicly considered to be the originator
+          of the link's context.
+        </c>
+        
+        <c>bfrom</c>
+        <c>
+          Refers to a resource that is privately considered to be the orignator
+          of the link's context.
+        </c>
+        
+        <c>scope</c>
+        <c>
+          Refers to a resource that identifies the total population of entities
+          for which the context is considered relevant. 
+        </c>
+        
+        <c>source</c>
+        <c>
+          Refers to the original source of information contained by the 
+          context resource.
+        </c>
+        
+        <c>provider</c>
+        <c>
+          Refers to the resource that provided the context resource. 
+          Typically, this would be used to identify the entity publishing
+          the resource. 
+        </c>
+        
+        <c>generator</c>
+        <c>
+          Refers to the resource that generated the context resource.
+          Typically, this would be used to identify the software application
+          that created the context resource.
+        </c>
+        
+        <c>mentioned-by</c>
+        <c>
+          Refers to a resource that mentions the context resource in some 
+          fashion. This, for example, would be used when an article mentions
+          another article, or a social status update mentions a particular
+          user, etc.
+        </c>
+        
+        <c>location</c>
+        <c>
+          References an IRI or URI representing a physical or logical location
+          with which the context resource is associated.
+        </c>
+        
+      </texttable>
+                  
+    </section> 
+ 
+    <section title="Security Considerations"> 
+    
+      <t>There are no additional security concerns introduced by this
+      document.</t>
+    
+    </section> 
+  </middle> 
+ 
+  <back>
+    <references title="Informative References">
+      &rfc5988;
+      &rfc3986;
+      &rfc3987;
+    </references>
+    
+    <section title="Examples">
+    
+      <figure><preamble>Using targeting link relations and the urn:social namespace:</preamble><artwork><![CDATA[
+    POST /alerts HTTP/1.1
+    Host: example.org
+    Content-Type: text/plain
+    Authorization: Basic {Base64 Credentials}
+    Link: <urn:social:everyone>; rel="to"
+    Link: <urn:social:extended:2>; rel="cc"
+    Link: <urn:social:self>; rel="bfrom"
+    Link: <http://example.net/my-social-net>; rel="scope"
+  
+    Test message
+      ]]></artwork></figure>
+      
+      <figure><preamble>Using the targeting link relations with urn:social:role:</preamble><artwork><![CDATA[
+    POST /alerts HTTP/1.1
+    Host: example.org
+    Content-Type: text/plain
+    Authorization: Basic {Base64 Credentials}
+    Link: <urn:social:role:moderator>; rel="to"
+    Link: <urn:social:role:editor>; rel="cc"
+
+    Test message   
+      ]]></artwork></figure>
+    
+ 
+      <figure><preamble>Using publication link relations:</preamble><artwork><![CDATA[
+    <html>
+      <head>
+        ...
+        <link 
+          rel="source" 
+          href="http://example.net/post/1" />
+        <link 
+          rel="provider" 
+          href="http://example.org" />
+        <link 
+          rel="generator" 
+          href="http://example.com/software/app/1.1" />
+        ...
+      </head>
+      <body>...</body>
+    </html>
+  
+
+      ]]></artwork></figure>
+    
+      <figure><preamble>Using the location relation:</preamble><artwork><![CDATA[
+    Link: <geo:37.786971,-122.399677>; rel="location"
+      ]]></artwork></figure>
+    
+      <figure><preamble>Using the mentioned-by relation:</preamble><artwork><![CDATA[
+    LINK /articles/1 HTTP/1.1
+    Host: example.org
+    Link: <articles/2>; rel="mentioned-by"
+      ]]></artwork></figure>
+ 
+    </section>
+    
+  </back>
+  
+</rfc> 
+ 

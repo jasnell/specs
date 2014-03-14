@@ -1,16 +1,17 @@
 <?xml version="1.0"?> 
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
   <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
+  <!ENTITY rfc2141 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2141.xml'>
 ]>
 <?rfc toc="yes"?> 
 <?rfc strict="yes"?> 
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-more-link-relations-03"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-social-urn-00"> 
   <front> 
-    <title abbrev="More Link Relations"> 
-      Additional Link Relations and the 'urn:social' Namespace
+    <title abbrev="Social URN"> 
+      The 'urn:social' Namespace
     </title> 
  
     <author initials="J.M." surname="Snell" fullname="James M Snell"> 
@@ -19,18 +20,19 @@
       </address> 
     </author> 
     
-    <date month="November" year="2013" /> 
+    <date month="March" year="2014" /> 
  
     <area>Applications</area> 
+    <workgroup>Individual Submission</workgroup> 
     <keyword>I-D</keyword> 
-    <keyword>http</keyword> 
-    <keyword>link</keyword> 
-    <keyword>rel</keyword>
+    <keyword>urn</keyword> 
+    <keyword>social</keyword> 
  
     <abstract> 
       <t>
-        This specification defines the 'social' URN namespace 
-        and a handful of socially-related Link Relation types.
+        This document defines a Uniform Resource Name (URN) namespace
+        identifier for generating URN's suitable for use in a variety 
+        of social constructs.
       </t> 
     </abstract> 
  
@@ -38,16 +40,19 @@
   
   <middle> 
     <section anchor="intro" title="Introduction"> 
- 
+
       <t>
-        This specification defines and adds the following additional 
-        link relation types to the IANA Registry of Link Relations
-        established by <xref target="RFC5988"/>: to, bto, cc, bcc, 
-        from, bfrom, source, scope, generator, provider, location, alias 
-        and mentioned-by. Further, this specification proposes a new 
-        'social' URN namespace.
+        In many systems, it is often desirable to express aspects of 
+        social relationships, role and identities relative to a currently
+        authenticated individual. For example, a system may provide options
+        for listing status updates from "Your Friends", or allow sharing 
+        links with "Joe's Network", and so on. While such concepts are
+        generally trivial to represent within the user interface, there
+        has not existed any means of representing relative social context
+        in a machine readable and processable manner. The "urn:social" 
+        Uniform Resource Name (URN) namespace provides such a mechanism.
       </t>
-      
+ 
       <t>
         Note that this document is a work-in-progress draft specification
         that does not yet represent a "standard". It is the intention of 
@@ -60,7 +65,7 @@
       
     </section> 
     
-    <section title="The 'social' URN Namespace">
+    <section anchor="urn-social" title="The 'social' URN Namespace">
       
       <t>
         This specification defines the 'social' URN namespace having the 
@@ -74,34 +79,36 @@
   confidence = ":" 2DIGIT
   roles      = ":" (TOKEN *( ";" TOKEN ) )
   dimensions = ":" (TOKEN *( ";" TOKEN ) )
-  social-nss = "self" /
-               "everyone" /
-               "direct"   /
+  social-nss =   "self" /
+                 "everyone" /
+                 "private" /
+                 "public" /
+                 "direct"   /
                ( "extended" [ distance ] ) /
                ( "peer" [ distance ] ) /
                ( "subordinate" [ distance ] ) /
                ( "superior" [ distance ] ) /
                ( "common" [ dimensions ] [ confidence ] ) /
                ( "interested" [ confidence ] ) /
-               ( "role" roles )
+               ( "role" roles ) /
+               ( "familial" roles [ distance ]) /
       ]]></artwork></figure>
             
       <t>
         Within any given social networking system, there is an available
-        population of entities. Each NSS term represent specific subsets of 
+        population of entities. The NSS terms represent specific subsets of 
         this population and are defined in terms of these subsets relative 
         to a fixed context. For example, if the fixed context is a person,
         the "urn:social:direct" URN identifies the subset of the total 
-        population that is directly connected to the context person within 
+        population that has direct social connections to that person within 
         the social graph, while the "urn:social:extended" URN identifies the
-        subset that is directly or indirectly connected to the context 
-        person.
+        subset that has direct or indirect social connections.
       </t>
       
       <t>
-        The "extended", "peer", "subordinate", and "superior" NSS values
-        MAY include an additional single digit non-zero "distance" specifier,
-        whose value identifies a "degree of separation" from the link 
+        The "extended", "peer", "subordinate", and "superior" NSS terms
+        MAY include an additional single-digit, non-zero "distance" specifier,
+        the value of which identifies a "degree of separation" from the 
         context. For instance, the URN "urn:social:extended:1" would identify
         members of the context's extended network that are only 1 degree of 
         separation from the context (which is equivalent to the "urn:social:direct"
@@ -109,14 +116,14 @@
         separation from the context. If the distance is omitted from the NSS,
         no limit to the distance is assumed.
       </t>
-      
+
       <t>
         The "common" NSS value MAY include an additional segment consisting
         of one or more semicolon ";" delimited TOKENs whose values identify
-        application and context specific dimensions or attributes an application 
+        application and context specific dimensions (or attributes) an application 
         can use to determine commonality. For instance, the URN 
         "urn:social:common:gender;age" could be used to refer to a subset
-        of the total population that shares both the same gender and approximate
+        of the total population that share both the same gender and approximate
         age. 
       </t>
       
@@ -135,13 +142,26 @@
         delimited TOKENs whose values identify specific named "roles" 
         within the population. For instance, the URN "urn:social:role:editor" 
         identifies all members of the relevant population who are assigned
-        to the "editor" rolel. The URN "urn:social:role:reader;writer" 
+        to the "editor" role. The URN "urn:social:role:reader;writer" 
         identifes all members of the relevant population who are assigned
         to both the "reader" and "writer" roles.
       </t>
+
+      <t>
+        The "familial" NSS value limits results to the subset of the 
+        population sharing a direct familial relationship with the context. 
+        Familial URNs MAY contain one or more semicolon ";" delimited TOKENs 
+        whose values identify specific named "family roles" (i.e. "father", 
+        "mother", "grandparents", etc). Each role is considered individually. 
+        That is, for instance, the URN "urn:social:familiar:father;mother" 
+        identifies all members of the relevant population who fulfill either 
+        the father or mother familial roles relative to the context resource.
+        Family URNs MAY include a single non-zero "distance" specifier that 
+        identifies a "degree of separation" from the context.
+      </t>
       
       <t>
-        The 'social' URN namespace is defined to be intentionally 
+        The Social URN namespace is defined to be intentionally 
         ambiguous and highly dependent on context. The specific interpretation
         of each NSS, including any distance or confidence specifiers, depend
         entirely on how and where the NSS is being used.
@@ -154,6 +174,22 @@
         </t>
       </section>
       
+      <section title="urn:social:public">
+        <t>
+          The "urn:social:public" URN identifies the subset of the total 
+          population that is both visible to the context and shares a 
+          publicly known or visible relationship with the context.
+        </t>
+      </section>
+
+      <section title="urn:social:private">
+        <t>
+          The "urn:social:private" URN identifies the subset of the total
+          population that is both visible to the context and shares a 
+          private or publicly invisible relationship with the context.
+        </t>
+      </section>
+
       <section title="urn:social:direct">
         <t>
           The "urn:social:direct" URN identifies the subset of the total
@@ -162,7 +198,7 @@
         </t>
       </section>
       
-      <section title="urn:social:extended">
+      <section title="urn:social:extended:{distance}">
         <t>
           The "urn:social:extended" URN identifies the subset of the total
           population that is visible to and connected either directly or 
@@ -170,7 +206,7 @@
         </t>
       </section>
       
-      <section title="urn:social:peer">
+      <section title="urn:social:peer:{distance}">
         <t>
           The "urn:social:peer" URN identifies the subset of the total
           population that is both visible to the context and considered 
@@ -186,7 +222,7 @@
         </t>
       </section>
       
-      <section title="urn:social:subordinate">
+      <section title="urn:social:subordinate:{distance}">
         <t>
           The "urn:social:subordinate" URN identifies the subset of the
           total population that is both visible to the context and 
@@ -202,7 +238,7 @@
         </t>
       </section>
       
-      <section title="urn:social:superior">
+      <section title="urn:social:superior:{distance}">
         <t>
           The "urn:social:superior" URN identifies the subset of the
           total population that is both visible to the context and 
@@ -218,11 +254,11 @@
         </t>
       </section>
       
-      <section title="urn:social:common">
+      <section title="urn:social:common:{dimensions}:{confidence}">
         <t>
-          The "urn:social:common" URN identifies the subset of the total
-          population that is both visible to the context and 
-          is determined to share common attributes with the context.
+          The "urn:social:common:{dimensions}:{confidence} URN identifies
+          the subset of the total population that is both visible to the 
+          context and is determined to share common attributes with the context.
         </t>
         <t>
           Determination of "common attributes" is dependent entirely on the
@@ -230,9 +266,15 @@
           interests in a given topic as the "common attribute" binding a 
           particular grouping of members.
         </t>
+        <figure><preamble>Examples:</preamble><artwork>
+  urn:social:common:gender;age
+  urn:social:common:likes;65
+  urn:social:common:likes;gender
+  urn:social:common:employer
+        </artwork></figure>
       </section>
       
-      <section title="urn:social:interested">
+      <section title="urn:social:interested:{confidence}">
         <t>
           The "urn:social:interested" URN identifies the subset of the 
           total population that is both visible to the context and has 
@@ -251,8 +293,8 @@
       
       <section title="urn:social:role:{tokens}">
         <t>
-          The "urn:social:role:{token}" URN identifies the subset of 
-          the total population that is both visible to the contexst and
+          The "urn:social:role:{tokens}" URN identifies the subset of 
+          the total population that is both visible to the context and
           has been assigned to each of the individual roles identified 
           within by the URN.
         </t>
@@ -260,104 +302,118 @@
           The values of the role tokens are specific to the context
           in which they are being used.
         </t>
+        <figure><preamble>Examples:</preamble><artwork>
+  urn:social:role:reader;writer
+  urn:social:role:administrator
+  urn:social:role:editor
+  urn:social:role:moderator
+        </artwork></figure>
       </section>
       
+      <section title="urn:social:familial:{tokens}:{distance}">
+        <t>
+          The "urn:social:familial:{tokens}:{distance}" URN identifies the subset of 
+          the total population that is both visible to the context and
+          has fulfills at least one of the individual familial roles identified 
+          within by the URN.
+        </t>
+        <t>
+          The values of the role tokens are specific to the context
+          in which they are being used.
+        </t>
+        <figure><preamble>Examples:</preamble><artwork>
+  urn:social:familial:father;mother
+  urn:social:familial:siblings
+  urn:social:familial
+        </artwork></figure>
+      </section>
+
     </section>
                               
     <section title="IANA Considerations"> 
       
       <t>
-        The following Link Relations are added to the IANA Registry of 
-        Link Relations.
+        This document defines a URN NID registration of "social", which 
+        is to be added to the "Formal URN Namespaces" registry. 
       </t>
-      
-      <texttable>
-        <ttcol>Name</ttcol>
-        <ttcol>Description</ttcol>
-        
-        <c>id</c>
-        <c>
-          Specifies an IRI considered to represent the identity 
-          of the link context.
-        </c>
-        
-        <c>to</c>
-        <c>
-          Refers to a resource that is considered to be part of the
-          public primary audience of the link's context.
-        </c>
-        
-        <c>bto</c>
-        <c>
-          Refers to a resource that is considered to be part of the
-          private primary audience of the link's context.
-        </c>
-        
-        <c>cc</c>
-        <c>
-          Refers to a resource that is considered to be part of the 
-          public secondary audience of the link's context.
-        </c>
-        
-        <c>bcc</c>
-        <c>
-          Refers to a resource that is considered to be part of the 
-          private secondary audience of the link's context.
-        </c>
-        
-        <c>from</c>
-        <c>
-          Refers to a resource that is publicly considered to be the originator
-          of the link's context.
-        </c>
-        
-        <c>bfrom</c>
-        <c>
-          Refers to a resource that is privately considered to be the orignator
-          of the link's context.
-        </c>
-        
-        <c>scope</c>
-        <c>
-          Refers to a resource that identifies the total population of entities
-          to which the context is relevant. 
-        </c>
-        
-        <c>source</c>
-        <c>
-          Refers to the original source of information contained by the 
-          context resource.
-        </c>
-        
-        <c>provider</c>
-        <c>
-          Refers to the resource that provided the context resource. 
-          Typically, this would be used to identify the entity publishing
-          the resource. 
-        </c>
-        
-        <c>generator</c>
-        <c>
-          Refers to the resource that generated the context resource.
-          Typically, this would be used to identify the software application
-          that created the context resource.
-        </c>
-        
-        <c>mentioned-by</c>
-        <c>
-          Refers to a resource that mentions the context resource in some 
-          fashion. This, for example, would be used when an article mentions
-          another article, or a social status update mentions a particular
-          user, etc.
-        </c>
-        
-        <c>location</c>
-        <c>
-          References a URI/IRI that represents a physical or logical location
-          with which the context resource is associated.
-        </c>
-        
-      </texttable>
+
+      <section title="Namespace Definition Template">
+
+        <section title="Namespace ID">
+          <t>The Namespace ID "social" has been assigned.</t>
+        </section>
+        <section title="Registration Information">
+          <t>Version 1.0</t>
+          <t>Date: 2014-03-11</t>
+        </section>
+        <section title="Declared Registrant of the Namespace">
+          <t>Individual: James M Snell (jasnell@gmail.com)</t>
+        </section>
+        <section title="Declaration of Syntatic Structure">
+          <t>
+            URNs that use the "social" NID shall have the following
+            structure:
+          </t>
+          <t>
+            urn:social:{NSS}
+          </t>
+          <t>
+            The Namespace Specific String (NSS) is a mandatory string of 
+            ASCII characters that conform to the rules described in 
+            <xref target="urn-social"/> of this document.
+          </t>
+        </section>
+        <section title="Relevant Ancillary Documentation">
+          <t>None.</t>
+        </section>
+        <section title="Identifier Uniqueness Considerations">
+          <t>None.</t>
+        </section>
+        <section title="Identifier Persistence Considerations">
+          <t>Social URN's are immutable.</t>
+        </section>
+        <section title="Process of Identifier Assignment">
+          <t>
+            This document defines the full range of possible NSS 
+            constructions with specific exception given to the 
+            dimension, role, confidence and distance parameters 
+            that are accepted on some Social URN constructions. 
+            Assignment for those fields is considered to be 
+            completely open.
+          </t>
+        </section>
+        <section title="Process for Identifier Resolution">
+          <t>
+            Social URNs are designed to be resolvable relative to 
+            some fixed social context. Outside such a context, 
+            Social URNs retain meaning relative to general abstract
+            social roles and relationships. For instance, the Social
+            URN "urn:social:self" will always resolve to identify 
+            the currently relevant social context, while the Social
+            URN "urn:social:role:reader" will always resolve to 
+            identify members of a population who share the "reader" 
+            role.
+          </t>
+        </section>
+        <section title="Rules for Lexical Equivalence">
+          <t>
+            No special considerations; the rules for lexical equivalence
+            specified in <xref target="RFC2141"/> apply.
+          </t>
+        </section>
+        <section title="Conformance with URN Syntax">
+          <t>No special considerations.</t>
+        </section>
+        <section title="Validation Mechanism">
+          <t>None.</t>
+        </section>
+        <section title="Scope">
+          <t>
+            The scope of a Social URN depends entirely on the context
+            against which it is being resolved.
+          </t>
+        </section>
+      </section>
                   
     </section> 
  
@@ -372,79 +428,8 @@
   <back>
     <references title="Informative References">
       &rfc5988;
+      &rfc2141;
     </references>
-    
-    <section title="Relationship of 'to', 'bto', 'cc', 'bcc', 'from', 'bfrom' and 'scope'">
-      
-      <t>
-        The "scope" link relation is closely aligned with the so-called
-        "audience targeting" link relations "to", "bto", "cc", "bcc", "from",
-        and "bfrom" in that "scope" links identify the total population 
-        from which the audience is drawn. 
-      </t>
-      
-    </section>
-    
-    <section title="Examples">
-    
-      <figure><preamble>Using targeting link relations and the urn:social namespace:</preamble><artwork><![CDATA[
-    POST /alerts HTTP/1.1
-    Host: example.org
-    Content-Type: text/plain
-    Authorization: Basic {Base64 Credentials}
-    Link: <urn:social:everyone>; rel="to"
-    Link: <urn:social:extended:2>; rel="cc"
-    Link: <urn:social:self>; rel="bfrom"
-    Link: <http://example.net/my-social-net>; rel="scope"
-  
-    Test message
-      ]]></artwork></figure>
-      
-      <figure><preamble>Using the targeting link relations with urn:social:role:</preamble><artwork><![CDATA[
-    POST /alerts HTTP/1.1
-    Host: example.org
-    Content-Type: text/plain
-    Authorization: Basic {Base64 Credentials}
-    Link: <urn:social:role:moderator>; rel="to"
-    Link: <urn:social:role:editor>; rel="cc"
-
-    Test message   
-      ]]></artwork></figure>
-    
- 
-      <figure><preamble>Using publication link relations:</preamble><artwork><![CDATA[
-    <html>
-      <head>
-        ...
-        <link 
-          rel="source" 
-          href="http://example.net/post/1" />
-        <link 
-          rel="provider" 
-          href="http://example.org" />
-        <link 
-          rel="generator" 
-          href="http://example.com/software/app/1.1" />
-        ...
-      </head>
-      <body>...</body>
-    </html>
-  
-
-      ]]></artwork></figure>
-    
-      <figure><preamble>Using the location relation:</preamble><artwork><![CDATA[
-    Link: <geo:37.786971,-122.399677>; rel="location"
-      ]]></artwork></figure>
-    
-      <figure><preamble>Using the mentioned-by relation:</preamble><artwork><![CDATA[
-    LINK /articles/1 HTTP/1.1
-    Host: example.org
-    Link: <articles/2>; rel="mentioned-by"
-      ]]></artwork></figure>
- 
-    </section>
-    
   </back>
   
 </rfc> 
