@@ -1,8 +1,0 @@
-Activity Streams
-
- - Additional generalized extensions
- 
-   - "priority" - indication of the relative priority/importance of the activity
-   - "startTime" - date-time the activity began
-   - "endTime" - date-time the activity completed
-
