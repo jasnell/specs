@@ -1,0 +1,504 @@
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+  <!ENTITY rfc5234 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5234.xml'>
+  <!ENTITY rfc2616 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2616.xml'>
+]>
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-jsondoc-00"> 
+  <front> 
+    <title abbrev="JSON Documentation Model"> 
+      The JSON Documentation Model
+    </title> 
+ 
+    <author initials="J.M." surname="Snell" fullname="James M Snell"> 
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+    
+    <author initials="J." surname="Algermissen" fullname="Jan Algermissen"> 
+      <address> 
+        <email>jan.algermissen@nordsc.com</email> 
+      </address> 
+    </author> 
+
+    <date month="May" year="2014" /> 
+ 
+    <area>Applications</area> 
+    <workgroup>Individual Submission</workgroup> 
+    <keyword>I-D</keyword> 
+    <keyword>json</keyword> 
+    <keyword>documentation</keyword> 
+ 
+    <abstract> 
+      <t>
+        This document describes a model and grammar for documenting
+        JSON-based data structures
+      </t> 
+    </abstract> 
+ 
+  </front> 
+  
+  <middle> 
+    <section anchor="intro" title="Introduction"> 
+
+      <t>
+        This document introduces a model and a grammar for describing and 
+        documenting JSON-based data structures. Like other grammars of 
+        it's kind (e.g. RELAX NG for XML), it is designed to be simple,
+        easy to learn, and capable of describing real world JSON data 
+        structures without going overboard on features, extensibility 
+        or expressiveness.
+      </t>
+
+      <t>
+      In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
+      "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
+      are to be  interpreted as described in <xref target="RFC2119" />.
+    </t> 
+ 
+    </section> 
+    
+    <section title="Rules and Syntax Conventions">
+
+      <t>
+        This JSON Documentation Model uses a simple abstract data model and 
+        text format for describing common JSON constructs. Similar to 
+        the commonly used Augmented Backus-Naur Form (ABNF) syntax defined 
+        in <xref target="RFC5234"/> and the RELAX NG grammar defined by 
+        Oasis for the documentation of XML structures, the grammar defined
+        here uses collections of named rules to define the construction of 
+        specific artifacts appearing within a JSON document.
+      </t>
+
+      <t>
+        For example, the following creates a "foo" rule that describes a 
+        JSON object consisting of one mandatory "bar" property whose 
+        value is a string, an an optional "baz" property whose value is
+        a number:
+      </t>
+
+      <figure><artwork>
+  foo {
+    "bar" (string),
+    ["baz" (number)]
+  }
+      </artwork></figure>
+
+      <t>
+        The "curly brackets" { and } indicate that the rule is defining a 
+        JSON object. The parentheses ( and ) are used to indicate constraints
+        on the property or rule. Square brackets [ and ] are used to indicate
+        that a given property is optional or, when used in combination with the
+        asterisk (*), addition (+), or question (?) symbols, to indicate that
+        a property can appear any number of times, at least once, or at most
+        once, respectively. 
+      </t>
+
+      <t>
+        Rules can be defined to represent not only JSON objects, arrays and 
+        primitives, but also union types (data values that can take multiple forms),
+        value constraints, and references to rules expressed in alternative
+        grammars such as ABNF.
+      </t>
+
+      <t>
+        Each of possible options are illustrated in the examples that follow.
+      </t>
+
+    </section>
+
+    <section title="ABNF Grammar References">
+
+      <t>
+        In many specification documents, the ABNF grammar is used to formally 
+        describe the construction of data types and instance values. This
+        JSON documentation model allows for the direct reuse of ABNF 
+        rules by simply prefixing those rules with a "backtick" (`) 
+        character. By convention, the source of the ABNF rule definition
+        can be referenced by following the rule definition with a comment
+        delineated a double forward slash (//). For instance:
+      </t>
+
+      <figure><artwork>
+  `token // RFC2616
+      </artwork></figure>
+
+      <t>
+        Indicates that we are borrowing the ABNF 'token' rule as specified
+        in <xref target="RFC2616" />.
+      </t>
+
+      <t>
+        Once the rule is declared, we can use it anywhere within our JSON
+        model description, for instance:
+      </t>
+
+      <figure><artwork>
+  `token // RFC2616
+  foo {
+    "bar" (`token),
+    ["baz" (number)]
+  }
+      </artwork></figure>
+
+      <t>
+        Here, the value of the "bar" property from our previous example is 
+        specified as being conformant to the 'token' ABNF rule from RFC 2616.
+      </t>
+
+    </section>
+
+    <section title="JSON Primitives">
+
+      <t>
+        A number of predefined rule names are provided to represent the basic
+        constructs of the JSON data format. These include:
+        <list style="symbols">
+          <t>string,</t>
+          <t>number,</t>
+          <t>boolean,</t>
+          <t>null, and</t>
+          <t>array</t>
+        </list>
+      </t>
+
+      <t>
+        The value type for a rule is considered to be a constraint on the rule, 
+        and is therefore expressed using the parentheses, for instance:
+      </t>
+
+      <figure><artwork>
+  foo (string)
+      </artwork></figure>
+
+      <t>
+        Specifies that the value of rule "foo" is a JSON string.
+      </t>
+
+      <figure><artwork>
+  foo (number)
+      </artwork></figure>
+
+      <t>
+        Specifies that the value of rule "foo" is a JSON number.
+      </t>
+
+      <t>
+        Additional constraints can be placed on a rule at any time
+        using nesting. For instance:
+      </t>
+
+      <figure><artwork>
+  foo (array (string))
+      </artwork></figure>
+
+      <t>
+        Indicates that the value of rule "foo" is an array of JSON
+        strings.
+      </t>
+
+      <t>
+        Rules can be declared once and referenced multiple times, or 
+        can be nested within other rules. For instance:
+      </t>
+
+      <figure><artwork>
+  foo (array (string))
+
+  bar {
+    "a" (foo),
+    "b" (array(string))
+  }
+      </artwork></figure>
+
+      <t>
+        The "a" and "b" properties both have values that are defined as 
+        an array of JSON strings. While, the "a" property uses the defined rule
+        "foo", the "b" property uses a nested anonymous rule definition.
+      </t>
+
+    </section>
+
+    <section title="Literals">
+
+      <t>
+        Literal values are encapsulated using double (or single) quotation 
+        marks. For instance "foo" represents the literal string "foo". 
+        Literals can be used within the JSON documentation model as either
+        contraints or object property names. For instance:
+      </t>
+
+      <figure><artwork>
+foo (string("bar"))
+
+baz {
+  "a" (foo),
+  foo ("a")
+}
+      </artwork></figure>
+
+      <t>
+        In this contrived example, the foo rule is constrained to always 
+        equal the literal JSON string "bar". In the "baz" JSON object,
+        the literal property name "a" is defined as type foo. Note, 
+        however, the names of object properties can also be rule references.
+        The JSON object below conforms to the rule defined above:
+      </t>
+
+      <figure><artwork>
+{
+  "a" : "bar",
+  "bar": "a"
+}
+      </artwork></figure>
+
+    </section>
+
+    <section title="Regular Expressions">
+
+      <t>
+        Constraints can be specified as Regular Expressions by prefixing
+        the expression with a tilde (~) character. For instance:
+      </t>
+
+      <figure><artwork> 
+  foo (~[A-Za-z0-9]+)
+      </artwork></figure>
+
+    </section>
+
+    <section title="Union Constraints">
+
+      <t>
+        Rules are not limited to single data types. Using the pipe character (|),
+        a rule can defined to allow multiple data types to be used. For instance:
+      </t>
+
+      <figure><artwork>
+foo (string|number)
+      </artwork></figure>
+
+      <t>
+        Indicates that "foo" can be either a JSON string or JSON number.
+      </t>
+
+      <t>
+        Consider the more complex example below:
+      </t>
+
+      <figure><artwork>
+`token // RFC2616
+`IRI-reference // RFC3987
+
+object-id {
+  "name" (string)
+}
+
+id (`token|`IRI-reference|object-id)
+
+bar {
+  "id" (id)
+}
+      </artwork></figure>
+
+      <t>
+        Here, the "id" rule can take one of three possible forms, two of 
+        which are defined by ABNF rules borrowed from other specifications
+        and the third defined as a JSON object with a single mandatory 
+        "name" property.
+      </t>
+
+    </section>
+
+    <section title="Additional Constraints">
+
+      <t>
+        As illustrated in the previous examples, rule constraints are 
+        encapsulated using parentheses. So far, all of the examples 
+        given deal specifically with providing the data type or value
+        format associated with the rule. Additional constraints can be
+        specified by including additional, comma-separated "{key}={constraint}" 
+        pairs within the parenthesis. Note, however, that this specification
+        does not currently define any additional types of constraints.
+      </t>
+
+      <t>
+        To take a hypothetical example, then, suppose that a specification
+        wishes to place limits on the maximum and minimum number of characters
+        a string value can contain. To do so, the specification might introduce
+        "minLength" and "maxLength" constraints:
+      </t>
+
+      <figure><artwork>
+  foo (string, minLength=5, maxLength=10)
+      </artwork></figure>
+
+    </section>
+
+    <section title="Object Rules">
+
+      <t>
+        JSON Objects are defined using curly brackets { and }. Each 
+        member property is specified using a comma separated listing
+        of rule references. Optional properties, or properties with
+        alternative cardinality rules are encapsulated within square
+        brackets. Literal property names are surrounded by double 
+        (or single) quotation marks. When a property name is expected
+        to conform to a defined rule, the quotation marks are omitted.
+        Properties that use literal property names can use the square
+        brackets to indicate optionality but MUST NOT use the asterisk,
+        question mark or addition symbols to indicate variable cardinality.
+      </t>
+
+      <t>
+        For example:
+      </t>
+
+      <figure><artwork>
+  foo {
+    "baz" (string)  
+  }
+      </artwork></figure>
+
+      <t>Matches the JSON object</t>
+
+      <figure><artwork>
+  {"baz": "some string value"}
+      </artwork></figure>
+
+      <t>
+        This illustrates the least complicated option: an object with 
+        a single, required property with a literal name. The example
+        that follows is a bit more complex:
+      </t>
+
+      <figure><artwork>
+  `Language-Tag // RFC 5646
+
+  Language-Map {
+    [`Language-Tag (string)]*
+  }
+      </artwork></figure>
+
+      <t>
+        There are a couple of things going on in this example:
+        <list style="symbols">
+          <t>First, we are borrow the Language-Tag ABNF rule from RFC 5646</t>
+          <t>
+            Second, we are declaring a "Language-Map" JSON object capable
+            of containing zero or more properties, all of which must conform
+            to the borrowed Language-Tag ABNF definition. The value of these
+            properties MUST be JSON strings. 
+        </list>
+      </t>
+
+      <t>
+        Given this definition, we can have a JSON object instance such as
+        the following:
+      </t>
+
+      <figure><artwork>
+  {
+    "en-US": "This is the US English Version",
+    "de": "das ist die Deutsch version"
+  }
+      </artwork></figure>
+
+      <t>
+        You can also use Regular Expressions to define property names, 
+        for instance:
+      </t>
+
+      <figure><artwork>
+  foo {
+    [~[A-Za-z0-9]+ (string)]+
+  }
+      </artwork></figure>
+
+      <t>
+        Here, the foo rule matches JSON objects that contain at least
+        one JSON property and whose property names all consist of 
+        upper or lower case ASCII letters or digits.
+      </t>
+
+    </section>
+
+    <section title="The Header">
+
+      <t>
+        Instances of this JSON documentation model can contain an 
+        optional header consisting of one or more directives that 
+        detail specific global attributes of the model. For instance,
+      </t>
+
+      <figure><artwork>
+  name "My JSON Grammar";
+  omit-nulls;    // defines that null values ought to be omitted
+  omit-empty-arrays;   // defines that empty-array values ought to be omitted
+      </artwork></figure>
+
+      <t>TODO: Complete this</t>
+
+    </section>
+
+    <section title="A complete example">
+
+      <figure><artwork>
+  name "My JSON Grammar";
+  omit-nulls;
+  omit-empty-arrays;
+
+  `token         // RFC 2616
+  `IRI-reference // RFC 3987
+  `Language-Tag  // RFC 5646
+
+  ID (`token | `IRI-reference | Obj)
+
+  Language-Map {
+    [`Language-Tag (string)]*
+  }
+
+  NaturalLanguageValue (Language-Map | string)
+
+  Obj {
+    "id" (ID),
+    "title" (NaturalLanguageValue),
+    "items" (array(Obj)),
+    ["language" (`Language-Tag)]
+  }
+
+      </artwork></figure>
+
+    </section>
+
+    <section title="IANA Considerations"> 
+      
+      <t>TBD</t>
+                  
+    </section> 
+ 
+    <section title="Security Considerations"> 
+    
+      <t>TBD</t>
+    
+    </section> 
+  </middle> 
+ 
+  <back>
+    <references title="Normative References">
+      &rfc2119;
+      &rfc5234;
+    </references>
+    <references title="Informative References">
+      &rfc2616;
+    </references>
+  </back>
+  
+</rfc> 
+ 

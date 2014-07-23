@@ -3,13 +3,13 @@
 
 
 Individual Submission                                         J.M. Snell
-Internet-Draft                                             December 2013
+Internet-Draft                                                  May 2014
 Intended status: Standards Track
-Expires: June 04, 2014
+Expires: November 27, 2014
 
 
                       HTTP Link and Unlink Methods
-                       draft-snell-link-method-08
+                       draft-snell-link-method-09
 
 Abstract
 
@@ -31,11 +31,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 04, 2014.
+   This Internet-Draft will expire on November 27, 2014.
 
 Copyright Notice
 
-   Copyright (c) 2013 IETF Trust and the persons identified as the
+   Copyright (c) 2014 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -53,9 +53,9 @@ Table of Contents
 
 
 
-Snell                    Expires June 04, 2014                  [Page 1]
+Snell                  Expires November 27, 2014                [Page 1]
 
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
+Internet-Draft        HTTP Link and Unlink Methods              May 2014
 
 
    4.  UNLINK  . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
@@ -109,9 +109,9 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
 
-Snell                    Expires June 04, 2014                  [Page 2]
+Snell                  Expires November 27, 2014                [Page 2]
 
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
+Internet-Draft        HTTP Link and Unlink Methods              May 2014
 
 
    do so, the implementation MUST first resolve the IRIs as required by
@@ -165,9 +165,9 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
 
-Snell                    Expires June 04, 2014                  [Page 3]
+Snell                  Expires November 27, 2014                [Page 3]
 
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
+Internet-Draft        HTTP Link and Unlink Methods              May 2014
 
 
    UNLINK request messages are idempotent but are not safe.  Removing a
@@ -221,9 +221,9 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
 
-Snell                    Expires June 04, 2014                  [Page 4]
+Snell                  Expires November 27, 2014                [Page 4]
 
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
+Internet-Draft        HTTP Link and Unlink Methods              May 2014
 
 
    LINK /images/my_dog.jpg HTTP/1.1
@@ -277,9 +277,9 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
 
-Snell                    Expires June 04, 2014                  [Page 5]
+Snell                  Expires November 27, 2014                [Page 5]
 
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
+Internet-Draft        HTTP Link and Unlink Methods              May 2014
 
 
    Example 5: Add an existing resource to a collection:
@@ -333,9 +333,9 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
 
 
 
-Snell                    Expires June 04, 2014                  [Page 6]
+Snell                  Expires November 27, 2014                [Page 6]
 
-Internet-Draft        HTTP Link and Unlink Methods         December 2013
+Internet-Draft        HTTP Link and Unlink Methods              May 2014
 
 
 9.  References
@@ -345,18 +345,18 @@ Internet-Draft        HTTP Link and Unlink Methods         December 2013
    [I-D.ietf-httpbis-p2-semantics]
               Fielding, R. and J. Reschke, "Hypertext Transfer Protocol
               (HTTP/1.1): Semantics and Content", draft-ietf-
-              httpbis-p2-semantics-25 (work in progress), November 2013.
+              httpbis-p2-semantics-26 (work in progress), February 2014.
 
    [I-D.ietf-httpbis-p4-conditional]
               Fielding, R. and J. Reschke, "Hypertext Transfer Protocol
               (HTTP/1.1): Conditional Requests", draft-ietf-
-              httpbis-p4-conditional-25 (work in progress), November
+              httpbis-p4-conditional-26 (work in progress), February
               2013.
 
    [I-D.ietf-httpbis-p6-cache]
               Fielding, R., Nottingham, M., and J. Reschke, "Hypertext
               Transfer Protocol (HTTP/1.1): Caching", draft-ietf-
-              httpbis-p6-cache-25 (work in progress), November 2013.
+              httpbis-p6-cache-26 (work in progress), February 2014.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
@@ -388,4 +388,4 @@ Author's Address
 
 
 
-Snell                    Expires June 04, 2014                  [Page 7]
+Snell                  Expires November 27, 2014                [Page 7]

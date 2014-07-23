@@ -3,16 +3,16 @@
   <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
   <!ENTITY rfc2068 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2068.xml'>
   <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
-  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p2-semantics-25.xml'>
-  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p6-cache-25.xml'>
-  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p4-conditional-25.xml'>
+  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p2-semantics-26.xml'>
+  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p6-cache-26.xml'>
+  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p4-conditional-26.xml'>
 ]>
 <?rfc toc="yes"?> 
 <?rfc strict="yes"?> 
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-08"> 
+<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-09"> 
   <front> 
     <title abbrev="HTTP Link and Unlink Methods"> 
       HTTP Link and Unlink Methods
@@ -24,7 +24,7 @@
       </address> 
     </author> 
     
-    <date month="December" year="2013" /> 
+    <date month="May" year="2014" /> 
  
     <area>Applications</area> 
     <workgroup>Individual Submission</workgroup> 
