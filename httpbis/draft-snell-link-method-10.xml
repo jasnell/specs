@@ -3,16 +3,16 @@
   <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
   <!ENTITY rfc2068 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2068.xml'>
   <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
-  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p2-semantics-26.xml'>
-  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p6-cache-26.xml'>
-  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.draft-ietf-httpbis-p4-conditional-26.xml'>
+  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7231.xml'>
+  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7234.xml'>
+  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7232.xml'>
 ]>
 <?rfc toc="yes"?> 
 <?rfc strict="yes"?> 
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-09"> 
+<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-10"> 
   <front> 
     <title abbrev="HTTP Link and Unlink Methods"> 
       HTTP Link and Unlink Methods
@@ -24,7 +24,7 @@
       </address> 
     </author> 
     
-    <date month="May" year="2014" /> 
+    <date month="August" year="2014" /> 
  
     <area>Applications</area> 
     <workgroup>Individual Submission</workgroup> 
@@ -135,14 +135,14 @@
       Responses to LINK requests are not cacheable. If a LINK request passes 
       through a cache that has one or more stored responses for the effective 
       request URI, those stored responses will be invalidated (see Section 6 
-      of <xref target="I-D.ietf-httpbis-p6-cache"/>).
+      of <xref target="RFC7234"/>).
     </t>
 
     <t>
       The semantics of the LINK method change to a "conditional LINK" if
       the request message includes an If-Modified-Since, If-Unmodified-
       Since, If-Match, If-None-Match, or If-Range header field
-      (<xref target="I-D.ietf-httpbis-p4-conditional"/>).  A conditional 
+      (<xref target="RFC7232"/>).  A conditional 
       LINK requests that the relationship be established only under the 
       circumstances described by the conditional header field(s).
     </t>
@@ -181,14 +181,14 @@
       Responses to UNLINK requests are not cacheable. If an UNLINK
       request passes through a cache that has one or more stored responses
       for the effective request URI, those stored responses will be
-      invalidated (see Section 6 of <xref target="I-D.ietf-httpbis-p6-cache"/>).
+      invalidated (see Section 6 of <xref target="RFC7234"/>).
     </t>
 
     <t>
       The semantics of the UNLINK method change to a "conditional UNLINK" if
       the request message includes an If-Modified-Since, If-Unmodified-
       Since, If-Match, If-None-Match, or If-Range header field
-      (<xref target="I-D.ietf-httpbis-p4-conditional"/>).  A conditional 
+      (<xref target="RFC7232"/>).  A conditional 
       UNLINK requests that the relationship be established only under the 
       circumstances described by the conditional header field(s).
     </t>
@@ -293,7 +293,7 @@
     <t>
       The LINK and UNLINK methods are subject to the same general security 
       considerations as all HTTP methods as described in 
-      <xref target="I-D.ietf-httpbis-p2-semantics"/>.
+      <xref target="RFC7231"/>.
     </t>
     
     <t>
@@ -308,7 +308,7 @@
     <t>
       IANA is requested to add the LINK and UNLINK methods to the 
       permanent registry at &lt;http://www.iana.org/assignments/http-methods&gt;
-      (see Section 8.1 of <xref target="I-D.ietf-httpbis-p2-semantics" />).
+      (see Section 8.1 of <xref target="RFC7231" />).
     </t>
     
     <texttable>

@@ -9,7 +9,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="info" ipr="trust200811" docName="draft-snell-more-link-relations-04"> 
+<rfc category="info" ipr="trust200811" docName="draft-snell-more-link-relations-05"> 
   <front> 
     <title abbrev="More Link Relations"> 
       Additional Link Relation Registrations
@@ -21,7 +21,7 @@
       </address> 
     </author> 
     
-    <date month="March" year="2014" /> 
+    <date month="August" year="2014" /> 
  
     <area>Applications</area> 
     <keyword>I-D</keyword> 
@@ -147,11 +147,32 @@
           another article, or a social status update mentions a particular
           user, etc.
         </c>
-        
+
+        <c>mentions</c>
+        <c>
+          Refers to a resource mentioned by the context resource in some
+          fashion. This, for example, would be used when an article mentions
+          another article, or a social status update mentions a particular
+          user, etc.
+        </c>
+
+        <c>derived-from</c>
+        <c>
+          Refers to a resource from which the context resource was derived.
+        </c>
+
         <c>location</c>
         <c>
           References an IRI or URI representing a physical or logical location
           with which the context resource is associated.
+        </c>
+
+        <c>card</c>
+        <c>
+          References an IRI or URI representing a "card" summarizing
+          the context resource. For instance, this may link to a VCard or 
+          HTML document that provides summary information about and contact 
+          information for a person, organization or community.
         </c>
         
       </texttable>
@@ -171,68 +192,7 @@
       &rfc5988;
       &rfc3986;
       &rfc3987;
-    </references>
-    
-    <section title="Examples">
-    
-      <figure><preamble>Using targeting link relations and the urn:social namespace:</preamble><artwork><![CDATA[
-    POST /alerts HTTP/1.1
-    Host: example.org
-    Content-Type: text/plain
-    Authorization: Basic {Base64 Credentials}
-    Link: <urn:social:everyone>; rel="to"
-    Link: <urn:social:extended:2>; rel="cc"
-    Link: <urn:social:self>; rel="bfrom"
-    Link: <http://example.net/my-social-net>; rel="scope"
-  
-    Test message
-      ]]></artwork></figure>
-      
-      <figure><preamble>Using the targeting link relations with urn:social:role:</preamble><artwork><![CDATA[
-    POST /alerts HTTP/1.1
-    Host: example.org
-    Content-Type: text/plain
-    Authorization: Basic {Base64 Credentials}
-    Link: <urn:social:role:moderator>; rel="to"
-    Link: <urn:social:role:editor>; rel="cc"
-
-    Test message   
-      ]]></artwork></figure>
-    
- 
-      <figure><preamble>Using publication link relations:</preamble><artwork><![CDATA[
-    <html>
-      <head>
-        ...
-        <link 
-          rel="source" 
-          href="http://example.net/post/1" />
-        <link 
-          rel="provider" 
-          href="http://example.org" />
-        <link 
-          rel="generator" 
-          href="http://example.com/software/app/1.1" />
-        ...
-      </head>
-      <body>...</body>
-    </html>
-  
-
-      ]]></artwork></figure>
-    
-      <figure><preamble>Using the location relation:</preamble><artwork><![CDATA[
-    Link: <geo:37.786971,-122.399677>; rel="location"
-      ]]></artwork></figure>
-    
-      <figure><preamble>Using the mentioned-by relation:</preamble><artwork><![CDATA[
-    LINK /articles/1 HTTP/1.1
-    Host: example.org
-    Link: <articles/2>; rel="mentioned-by"
-      ]]></artwork></figure>
- 
-    </section>
-    
+    </references>    
   </back>
   
 </rfc> 
