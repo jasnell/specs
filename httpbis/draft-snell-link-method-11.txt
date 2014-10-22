@@ -4,12 +4,12 @@
 
 Individual Submission                                           J. Snell
 Internet-Draft
-Intended status: Standards Track                          August 1, 2014
-Expires: February 2, 2015
+Intended status: Standards Track                        October 22, 2014
+Expires: April 25, 2015
 
 
                       HTTP Link and Unlink Methods
-                       draft-snell-link-method-10
+                       draft-snell-link-method-11
 
 Abstract
 
@@ -31,7 +31,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on February 2, 2015.
+   This Internet-Draft will expire on April 25, 2015.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Snell                   Expires February 2, 2015                [Page 1]
+Snell                    Expires April 25, 2015                 [Page 1]
 
-Internet-Draft        HTTP Link and Unlink Methods           August 2014
+Internet-Draft        HTTP Link and Unlink Methods          October 2014
 
 
 Table of Contents
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Snell                   Expires February 2, 2015                [Page 2]
+Snell                    Expires April 25, 2015                 [Page 2]
 
-Internet-Draft        HTTP Link and Unlink Methods           August 2014
+Internet-Draft        HTTP Link and Unlink Methods          October 2014
 
 
    The target and context IRIs of a Link relationship are determined
@@ -165,9 +165,9 @@ Internet-Draft        HTTP Link and Unlink Methods           August 2014
 
 
 
-Snell                   Expires February 2, 2015                [Page 3]
+Snell                    Expires April 25, 2015                 [Page 3]
 
-Internet-Draft        HTTP Link and Unlink Methods           August 2014
+Internet-Draft        HTTP Link and Unlink Methods          October 2014
 
 
    provide the information about the relationships that are to be
@@ -221,9 +221,9 @@ Internet-Draft        HTTP Link and Unlink Methods           August 2014
 
 
 
-Snell                   Expires February 2, 2015                [Page 4]
+Snell                    Expires April 25, 2015                 [Page 4]
 
-Internet-Draft        HTTP Link and Unlink Methods           August 2014
+Internet-Draft        HTTP Link and Unlink Methods          October 2014
 
 
 6.  Example
@@ -277,9 +277,9 @@ Internet-Draft        HTTP Link and Unlink Methods           August 2014
 
 
 
-Snell                   Expires February 2, 2015                [Page 5]
+Snell                    Expires April 25, 2015                 [Page 5]
 
-Internet-Draft        HTTP Link and Unlink Methods           August 2014
+Internet-Draft        HTTP Link and Unlink Methods          October 2014
 
 
    Example 5: Add an existing resource to a collection:
@@ -304,6 +304,16 @@ Internet-Draft        HTTP Link and Unlink Methods           August 2014
      Link: <acct:joe@example.org>; rel="follow";
        anchor="acct:sally@example.org"
 
+   Example 8: Using the Link anchor attribute to change the context IRI
+   using a fragment identifier (in this example, a link with the
+   relationship type "http://schema.org/knows" is established between
+   "http://example.org/alice#me" and "http://example.com/bob#me"
+
+     LINK /alice HTTP/1.1
+     Host: example.org
+     Link: <http://example.com/bob#me>; rel="http://schema.org/knows";
+       anchor="#me"
+
 7.  Security Considerations
 
    The LINK and UNLINK methods are subject to the same general security
@@ -319,24 +329,21 @@ Internet-Draft        HTTP Link and Unlink Methods           August 2014
    registry at <http://www.iana.org/assignments/http-methods> (see
    Section 8.1 of [RFC7231]).
 
+
+
+
+
+Snell                    Expires April 25, 2015                 [Page 6]
+
+Internet-Draft        HTTP Link and Unlink Methods          October 2014
+
+
             +-------------+------+------------+---------------+
             | Method Name | Safe | Idempotent | Specification |
             +-------------+------+------------+---------------+
             | LINK        | No   | Yes        | Section 3     |
             | UNLINK      | No   | Yes        | Section 4     |
             +-------------+------+------------+---------------+
-
-
-
-
-
-
-
-
-Snell                   Expires February 2, 2015                [Page 6]
-
-Internet-Draft        HTTP Link and Unlink Methods           August 2014
-
 
 9.  References
 
@@ -382,11 +389,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-Snell                   Expires February 2, 2015                [Page 7]
+Snell                    Expires April 25, 2015                 [Page 7]
