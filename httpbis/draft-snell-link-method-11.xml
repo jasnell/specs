@@ -12,7 +12,7 @@
 <?rfc symrefs="yes" ?> 
 <?rfc sortrefs="yes"?> 
 <?rfc compact="yes"?> 
-<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-10"> 
+<rfc category="std" ipr="trust200811" docName="draft-snell-link-method-11"> 
   <front> 
     <title abbrev="HTTP Link and Unlink Methods"> 
       HTTP Link and Unlink Methods
@@ -24,7 +24,7 @@
       </address> 
     </author> 
     
-    <date month="August" year="2014" /> 
+    <date month="October" year="2014" /> 
  
     <area>Applications</area> 
     <workgroup>Individual Submission</workgroup> 
@@ -287,6 +287,15 @@
     anchor="acct:sally@example.org"
     ]]></artwork></figure>
     
+    <figure><preamble>Example 8: Using fragment identifiers to establish links
+      with embedded resources. In this example, a link relationship is established
+      between "http://example.org/alice#me" and "http://example.org/bob#me".</preamble>
+      <artwork><![CDATA[
+  LINK /alice HTTP/1.1
+  Host: example.org
+  Link: <http://example.org/bob#me>; rel="knows"; anchor="#me"]]>
+    </artwork></figure>
+
   </section>
 
   <section title="Security Considerations">
