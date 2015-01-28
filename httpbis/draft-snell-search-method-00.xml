@@ -1,0 +1,518 @@
+<?xml version="1.0"?> 
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [ 
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+  <!ENTITY rfc2068 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2068.xml'>
+  <!ENTITY rfc5323 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5323.xml'>
+  <!ENTITY rfc4918 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4918.xml'>
+  <!ENTITY part1 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7230.xml'>
+  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7231.xml'>
+  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7234.xml'>
+  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7232.xml'>
+]>
+<?rfc toc="yes"?> 
+<?rfc strict="yes"?> 
+<?rfc symrefs="yes" ?> 
+<?rfc sortrefs="yes"?> 
+<?rfc compact="yes"?> 
+<rfc category="std" ipr="trust200811" docName="draft-snell-search-method-00"> 
+  <front> 
+    <title abbrev="HTTP SEARCH Method"> 
+      HTTP SEARCH Method
+    </title> 
+ 
+    <author initials="J." surname="Reschke" fullname="Julian Reschke">
+      <address>
+        <email>julian.reschke@gmx.de</email>
+      </address>
+    </author>
+    <author initials="A." surname="Malhotra" fullname="Ashok Malhotra">
+      <address>
+        <email>ashok.malhotra@oracle.com</email>
+      </address>
+    </author>
+     <author initials="J.M." surname="Snell" fullname="James M Snell"> 
+      <address> 
+        <email>jasnell@gmail.com</email> 
+      </address> 
+    </author> 
+
+    <date month="January" year="2015" /> 
+ 
+    <area>Applications</area> 
+    <workgroup>Individual Submission</workgroup> 
+    <keyword>I-D</keyword> 
+    <keyword>http</keyword>
+    <keyword>search</keyword>
+    <keyword>method</keyword>
+ 
+    <abstract> 
+      <t>
+        This specification updates the definition and semantics of the 
+        HTTP SEARCH request method previously defined by <xref target="RFC5323" />.
+      </t> 
+    </abstract> 
+ 
+  </front> 
+  
+  <middle> 
+
+  <section anchor="intro" title="Introduction"> 
+
+    <t>
+      This specification updates the HTTP SEARCH method originally
+      defined in <xref target="RFC5323"/>.
+    </t>
+  
+    <t>
+      In this document, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", 
+      "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" 
+      are to be  interpreted as described in <xref target="RFC2119" />.
+    </t> 
+
+  </section> 
+  
+  <section title="Rationale" anchor="rationale">
+    <t>TBD</t>
+  </section>
+  
+  <section title="SEARCH" anchor="search">
+  
+    <t>
+      The SEARCH method is used to initiate a server-side search.
+    </t>
+
+    <t>
+      The effective request URI (as defined by <xref target="RFC7230"/>) 
+      identifies the "search arbiter". The arbiter can be any HTTP resource 
+      capable of performing the requested search. The SEARCH method defines 
+      no relationship between this arbiter and the scope of the search; rather, 
+      the particular query grammar used in the query defines the relationship. 
+      For example a query grammar can force the effective request URI to 
+      correspond exactly to the search scope.
+    </t>
+
+    <t>
+      The body of the request defines the query. Implementations MAY use 
+      a request body of any content type with the SEARCH method; however,
+      for backwards compatibility with existing WebDAV implementations,  
+      SEARCH requests that use the text/xml or application/xml content types
+      MUST be processed in exact accordance with the requirements established by 
+      <xref target="RFC5323" />. 
+    </t>
+
+    <t>
+      SEARCH requests are both safe and idempotent. The performance of a 
+      search is not expected to alter the state of the search arbiter identified 
+      by the effective request URI; however, while performing a search, the arbiter 
+      can be expected to allocate computing and memory resources or even create 
+      additional HTTP resources through which the response to the search 
+      can be retrieved. 
+    </t>
+
+    <t>
+      A successful response to a SEARCH request is expected to provide some 
+      indication as to the final disposition of the search operation. For instance,
+      a successful search that yields no results can be represented by a 204 No Content
+      response. If the response includes a body payload, the payload is expected
+      to describe the results of the search operation. In some cases, the search
+      arbiter might choose to respond indirectly to the SEARCH request by returning
+      either a 201 Created or 3xx Redirection with a Location header specifying
+      an alternate Request URI from which the search results can be retrieved by
+      using an HTTP GET request. Various non-normative examples of successful 
+      SEARCH responses are illustrated in <xref target="examples" />.
+    </t>
+
+    <t>
+      The response to a SEARCH request is not cacheable. It ought to be noted,
+      however, that because SEARCH requests are safe and idempotent, responses 
+      to a SEARCH SHOULD NOT invalidate previously cached responses to other 
+      requests directed at the same effective request URI.
+    </t>
+
+    <t>
+      The semantics of the SEARCH method change to a "conditional SEARCH" if
+      the request message includes an If-Modified-Since, If-Unmodified-
+      Since, If-Match, If-None-Match, or If-Range header field
+      (<xref target="RFC7232"/>).  A conditional 
+      SEARCH requests that the query be performed only under the 
+      circumstances described by the conditional header field(s).
+    </t>
+    
+  </section>
+
+<!--   <section title="Truncated Search Results">
+
+    <t>
+      A search arbiter MAY impose limits on the number of results returned 
+      in the SEARCH response, for example, to limit the amount of resources
+      expended in processing a query. If it does so, the reply SHOULD use 
+      status code 206 (Partial Content) to indicate that it is returning 
+      only a subset of the matching results. The 206 response MUST include 
+      a Content-Range header field describing the range of the enclosed 
+      responses. 
+    </t>
+
+    <t>
+      Note that it may be the case that the query format used within 
+      the body of the SEARCH request specifies it's own mechanisms for
+      identifying subsets of responses to return. In such cases, support 
+      for the <xref target="RFC7233" />-based mechanisms described below 
+      is optional. 
+    </t>
+
+    <t>
+      This specification defines and registers three new "range unit"
+      identifiers as described in <xref target="RFC7233" />, Section 2.2.
+      These new range units include:
+      <list style="symbols">
+        <t>offset</t>
+        <t>page</t>
+        <t>bookmark</t>
+      </list>
+    </t>
+
+    <section title="Offset Ranges">
+
+      <t>
+        The response to a SEARCH result will typically take the form of a 
+        set of matching entities. This set can be ordered and indexed such
+        that each distinct entity is assigned an integer offset starting at
+        zero (0) and counting up. The "offset" range unit can be used to 
+        indicate a subset of matching entities from the starting offset 
+        (inclusive) up to the ending offset (exclusive).
+      </t>
+
+<figure><preamble></preamble><artwork><![CDATA[
+  offset-range-specifier = "offset" "=" lower "-" [ limit ] [ max]
+  max = "/" 1*DIGIT
+  lower = 1*DIGIT
+  limit = 1*DIGIT
+]]></artwork></figure>
+
+      <t>
+        For example, "offset=0-10" indicates a range of exactly 10 
+        items starting from offset position 0.
+      </t>
+
+      <t>
+        The offset range MAY omit the limit value to indicate no upper 
+        limit to the range.
+      </t>
+
+      <t>
+        The offset range MAY include an additional max value indicating
+        the maximum upper limit for the offset range. When used in the 
+        response to a SEARCH request, this value can be used to indicate
+        the total number of matching results. For instance, the offset
+        range "offset=0-10/20" indicates a maximum upper limit of 20 
+        items.
+      </t>
+
+    </section>
+
+    <section title="Page Ranges">
+      <t>
+        The "page" range unit allows partial responses to be organized
+        into distinct numbered groupings or "pages". These determination
+        of these pages is entirely up to the server. The "page" range 
+        unit allows the range to identify the specific page number 
+        covered by the range.
+      </t>
+
+<figure><preamble></preamble><artwork><![CDATA[
+  offset-range-specifier = "page" "=" page [ max]
+  max = "/" 1*DIGIT
+  page = 1*DIGIT
+]]></artwork></figure>
+
+      <t>
+        The page range MAY include an additional max value indicating
+        the maximum number of pages. For instance, the page range 
+        "page=2/20" indicates page 2 of 20.
+      </t>
+
+    </section>
+
+    <section title="Bookmark Ranges">
+
+      <t>
+        The "bookmark" range unit provides servers with a mechanism 
+        for providing an opaque Base64-encoded identifier a client 
+        can echo back to the server in subsequent range requests. 
+        The intent is to provide a mechanism similar to paging 
+        but in a manner that hides many of the details the server
+        may use to determine which subset of responses to return 
+        next.
+      </t>
+
+<figure><preamble></preamble><artwork><![CDATA[
+  bookmark-range-specifier = "bookmark" "=" <base64-encoded value>
+]]></artwork></figure>
+
+    </section>
+
+    <section title="Ranged SEARCH Requests">
+
+      <t>
+        The "offset", "page" and "bookmark" range units MAY be used
+        with the Range request header field (<xref target="RFC7233" />,
+        Section 3.1) to indicate a subset of entries to return.
+      </t>
+
+<figure><preamble></preamble><artwork><![CDATA[
+SEARCH /query HTTP/1.1
+Host: example.org
+Content-Type: example/query
+Range: offset=0-10
+]]></artwork></figure>
+
+<figure><preamble></preamble><artwork><![CDATA[
+SEARCH /query HTTP/1.1
+Host: example.org
+Content-Type: example/query
+Range: page=2
+]]></artwork></figure>
+
+<figure><preamble></preamble><artwork><![CDATA[
+SEARCH /query HTTP/1.1
+Host: example.org
+Content-Type: example/query
+Range: bookmark=AB12CD34EF
+]]></artwork></figure>
+
+    </section>
+
+  </section> -->
+
+  <section title="The &quot;Accept-Search&quot; Header Field" anchor="accept-search">
+    <t>TBD</t>
+  </section>
+  
+  <section title="Relationship to other HTTP Methods">
+    <t>TBD</t>
+  </section>
+
+  <section title="Examples" anchor="examples">
+  
+    <section title="Simple SEARCH with a Direct Response">
+<figure><preamble>A simple SPAQRL query with a Direct Response:</preamble><artwork><![CDATA[
+SEARCH /query HTTP/1.1
+Host: example.org
+Content-Type: application/sparql-query
+Accept: application/ld+json
+
+PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?email
+FROM <http://www.w3.org/People/Berners-Lee/card>
+WHERE {
+    ?person foaf:name ?name .
+    OPTIONAL { ?person foaf:mbox ?email }
+} ORDER BY ?name LIMIT 10 OFFSET 10
+]]></artwork></figure>
+
+<figure><preamble>Response:</preamble><artwork><![CDATA[
+TBD
+]]></artwork></figure>
+
+    </section>
+
+    <section title="Simple SEARCH with Indirect Response (201 Created)">
+<figure><preamble>A simple SPAQRL query with an Indirect Response (201 Created)</preamble><artwork><![CDATA[
+SEARCH /query HTTP/1.1
+Host: example.org
+Content-Type: application/sparql-query
+Accept: application/ld+json
+
+PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?email
+FROM <http://www.w3.org/People/Berners-Lee/card>
+WHERE {
+    ?person foaf:name ?name .
+    OPTIONAL { ?person foaf:mbox ?email }
+} ORDER BY ?name LIMIT 10 OFFSET 10
+]]></artwork></figure>
+
+<figure><preamble>Response:</preamble><artwork><![CDATA[
+HTTP/1.1 201 Created
+Location: http://example.org/query123res
+]]></artwork></figure>
+
+<figure><preamble>Fetch Query Response:</preamble><artwork><![CDATA[
+GET /query123res HTTP/1.1
+Host: example.org
+]]></artwork></figure>
+
+<figure><preamble>Response:</preamble><artwork><![CDATA[
+TBD
+]]></artwork></figure>
+
+    </section>
+
+    <section title="Simple SEARCH with Indirect Response (303 See Other)">
+<figure><preamble>A simple SPAQRL query with an Indirect Response (303 See Other)</preamble><artwork><![CDATA[
+SEARCH /query HTTP/1.1
+Host: example.org
+Content-Type: application/sparql-query
+Accept: application/ld+json
+
+PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?email
+FROM <http://www.w3.org/People/Berners-Lee/card>
+WHERE {
+    ?person foaf:name ?name .
+    OPTIONAL { ?person foaf:mbox ?email }
+} ORDER BY ?name LIMIT 10 OFFSET 10
+]]></artwork></figure>
+
+<figure><preamble>Response:</preamble><artwork><![CDATA[
+HTTP/1.1 303 See Other
+Location: http://example.org/query123res
+]]></artwork></figure>
+
+<figure><preamble>Fetch Query Response:</preamble><artwork><![CDATA[
+GET /query123res HTTP/1.1
+Host: example.org
+]]></artwork></figure>
+
+<figure><preamble>Response:</preamble><artwork><![CDATA[
+TBD
+]]></artwork></figure>
+
+    </section>
+
+    <section title="Possible approach for a &quot;Stored Query&quot;">
+
+      <t>
+        "Stored Queries" are one possible way that a server can 
+        implement SEARCH. Essentially, a client would first create 
+        a resource representing a parameterized query using either
+        PUT or POST, then would invoke the query using a SEARCH 
+        request.
+      </t>
+
+<figure><preamble>A simple SPAQRL query with an Indirect Response (303 See Other)</preamble><artwork><![CDATA[
+POST /queries HTTP/1.1
+Host: example.org
+Content-Type: application/sparql-query
+Accept: application/ld+json
+Slug: Query A
+
+PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?email
+FROM <http://www.w3.org/People/Berners-Lee/card>
+WHERE {
+    ?person foaf:name ?name .
+    OPTIONAL { ?person foaf:mbox ?email }
+} ORDER BY ?name LIMIT 10 OFFSET 10
+]]></artwork></figure> 
+
+<figure><preamble>Response:</preamble><artwork><![CDATA[
+HTTP/1.1 201 Created
+Location: /queries/query-a
+Accept-Query: application/x-www-form-urlencoded
+]]></artwork></figure>
+
+<figure><preamble>The SEARCH Request:</preamble><artwork><![CDATA[
+SEARCH /queries/query-a HTTP/1.1
+Host: example.org
+Content-Type: application/x-www-form-urlencoded
+
+email=sam%40example.org
+]]></artwork></figure>
+ 
+      <t>
+        The response to the SEARCH would return the results of executing
+        the query operation using the specified input parameter. In contrast,
+        performing a GET request on the resource would return the definition
+        of the stored query itself:
+      </t>
+
+<figure><preamble>The SEARCH Request:</preamble><artwork><![CDATA[
+GET /queries/query-a HTTP/1.1
+Host: example.org
+]]></artwork></figure>
+
+<figure><preamble>GET Response:</preamble><artwork><![CDATA[
+HTTP/1.1 200 OK
+Content-Type: application/sparql-query
+
+PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?email
+FROM <http://www.w3.org/People/Berners-Lee/card>
+WHERE {
+    ?person foaf:name ?name .
+    OPTIONAL { ?person foaf:mbox ?email }
+} ORDER BY ?name LIMIT 10 OFFSET 10
+]]></artwork></figure> 
+
+    </section>
+
+  </section>
+
+  <section title="Discussion Notes">
+    <t>Ed. Note: Remove this section before publication</t>
+
+    <t>
+      <list style="symbols">
+        <t>
+          The 'Accept-Search' header field ought to be considered to signal a server's support for search.
+          It's use would be equivalent to that of Accept-Patch and Accept-Post... that is, to indicate
+          the specific query data formats supported by a resource.
+        </t>
+        <t>
+          Result-set truncation and paging ought to be considered. Many query string based APIs support
+          offset, limit, page or bookmark based truncation of results. Do we want to require specific 
+          query formats to define their own truncation/paging within the query language (e.g. SPARQL's 
+          limit and offset) or is there value in providing a generalized HTTP Range header based 
+          mechanism (e.g. "Range: offset=0-10" to indicate returning ten results starting at offset 0, or
+          "Range: page=1" to indicate returning the first page of results, etc.) 
+        </t>
+      </list>
+    </t>
+  </section>
+
+  <section title="Security Considerations">
+    <t>
+      The SEARCH method is subject to the same general security 
+      considerations as all HTTP methods as described in 
+      <xref target="RFC7231"/>.
+    </t>    
+  </section>
+
+  <section title="IANA Considerations">
+    
+    <t>
+      IANA is requested to update the registration of the SEARCH method in the 
+      permanent registry at &lt;http://www.iana.org/assignments/http-methods&gt;
+      (see Section 8.1 of <xref target="RFC7231" />).
+    </t>
+    
+    <texttable>
+      <ttcol>Method Name</ttcol>
+      <ttcol>Safe</ttcol>
+      <ttcol>Idempotent</ttcol>
+      <ttcol>Specification</ttcol>
+      
+      <c>SEARCH</c>
+      <c>Yes</c>
+      <c>Yes</c>
+      <c><xref target="search"/></c>
+      
+    </texttable>
+    
+  </section>
+  
+</middle>
+<back>
+  <references title="Normative References"> 
+    &rfc2119;
+    &rfc5323;
+    &rfc4918;
+    &part1;
+    &part2;
+    &part4;
+    &part6;
+  </references>
+</back>
+</rfc> 
+ 
