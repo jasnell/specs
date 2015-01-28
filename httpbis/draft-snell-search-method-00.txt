@@ -66,15 +66,14 @@ Table of Contents
    4.  The "Accept-Search" Header Field  . . . . . . . . . . . . . .   3
    5.  Relationship to other HTTP Methods  . . . . . . . . . . . . .   3
    6.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     6.1.  Simple SEARCH with a Direct Response  . . . . . . . . . .   4
-     6.2.  Simple SEARCH with Indirect Response (201 Created)  . . .   4
-     6.3.  Simple SEARCH with Indirect Response (303 See Other)  . .   5
-     6.4.  Possible approach for a "Stored Query"  . . . . . . . . .   5
-   7.  Discussion Notes  . . . . . . . . . . . . . . . . . . . . . .   7
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
-   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-   10. Normative References  . . . . . . . . . . . . . . . . . . . .   8
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   8
+     6.1.  Simple SEARCH with a Direct Response  . . . . . . . . . .   3
+     6.2.  Simple SEARCH with Indirect Response (303 See Other)  . .   4
+     6.3.  Possible approach for a "Stored Query"  . . . . . . . . .   5
+   7.  Discussion Notes  . . . . . . . . . . . . . . . . . . . . . .   6
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
+   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   10. Normative References  . . . . . . . . . . . . . . . . . . . .   7
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   7
 
 1.  Introduction
 
@@ -105,7 +104,8 @@ Table of Contents
    request body of any content type with the SEARCH method; however, for
    backwards compatibility with existing WebDAV implementations, SEARCH
    requests that use the text/xml or application/xml content types MUST
-
+   be processed in exact accordance with the requirements established by
+   [RFC5323].
 
 
 
@@ -113,9 +113,6 @@ Reschke, et al.          Expires August 1, 2015                 [Page 2]
 
 Internet-Draft             HTTP SEARCH Method               January 2015
 
-
-   be processed in exact accordance with the requirements established by
-   [RFC5323].
 
    SEARCH requests are both safe and idempotent.  The performance of a
    search is not expected to alter the state of the search arbiter
@@ -130,11 +127,11 @@ Internet-Draft             HTTP SEARCH Method               January 2015
    represented by a 204 No Content response.  If the response includes a
    body payload, the payload is expected to describe the results of the
    search operation.  In some cases, the search arbiter might choose to
-   respond indirectly to the SEARCH request by returning either a 201
-   Created or 3xx Redirection with a Location header specifying an
-   alternate Request URI from which the search results can be retrieved
-   by using an HTTP GET request.  Various non-normative examples of
-   successful SEARCH responses are illustrated in Section 6.
+   respond indirectly to the SEARCH request by returning a 3xx
+   Redirection with a Location header specifying an alternate Request
+   URI from which the search results can be retrieved by using an HTTP
+   GET request.  Various non-normative examples of successful SEARCH
+   responses are illustrated in Section 6.
 
    The response to a SEARCH request is not cacheable.  It ought to be
    noted, however, that because SEARCH requests are safe and idempotent,
@@ -158,6 +155,9 @@ Internet-Draft             HTTP SEARCH Method               January 2015
 
 6.  Examples
 
+6.1.  Simple SEARCH with a Direct Response
+
+
 
 
 
@@ -169,8 +169,6 @@ Reschke, et al.          Expires August 1, 2015                 [Page 3]
 
 Internet-Draft             HTTP SEARCH Method               January 2015
 
-
-6.1.  Simple SEARCH with a Direct Response
 
    A simple SPAQRL query with a Direct Response:
 
@@ -191,46 +189,7 @@ Internet-Draft             HTTP SEARCH Method               January 2015
 
    TBD
 
-6.2.  Simple SEARCH with Indirect Response (201 Created)
-
-   A simple SPAQRL query with an Indirect Response (201 Created)
-
-   SEARCH /query HTTP/1.1
-   Host: example.org
-   Content-Type: application/sparql-query
-   Accept: application/ld+json
-
-   PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
-   SELECT ?name ?email
-   FROM <http://www.w3.org/People/Berners-Lee/card>
-   WHERE {
-       ?person foaf:name ?name .
-       OPTIONAL { ?person foaf:mbox ?email }
-   } ORDER BY ?name LIMIT 10 OFFSET 10
-
-   Response:
-
-   HTTP/1.1 201 Created
-   Location: http://example.org/query123res
-
-   Fetch Query Response:
-
-   GET /query123res HTTP/1.1
-   Host: example.org
-
-
-
-
-Reschke, et al.          Expires August 1, 2015                 [Page 4]
-
-Internet-Draft             HTTP SEARCH Method               January 2015
-
-
-   Response:
-
-   TBD
-
-6.3.  Simple SEARCH with Indirect Response (303 See Other)
+6.2.  Simple SEARCH with Indirect Response (303 See Other)
 
    A simple SPAQRL query with an Indirect Response (303 See Other)
 
@@ -257,30 +216,26 @@ Internet-Draft             HTTP SEARCH Method               January 2015
    GET /query123res HTTP/1.1
    Host: example.org
 
+
+
+
+
+
+Reschke, et al.          Expires August 1, 2015                 [Page 4]
+
+Internet-Draft             HTTP SEARCH Method               January 2015
+
+
    Response:
 
    TBD
 
-6.4.  Possible approach for a "Stored Query"
+6.3.  Possible approach for a "Stored Query"
 
    "Stored Queries" are one possible way that a server can implement
    SEARCH.  Essentially, a client would first create a resource
    representing a parameterized query using either PUT or POST, then
    would invoke the query using a SEARCH request.
-
-
-
-
-
-
-
-
-
-
-Reschke, et al.          Expires August 1, 2015                 [Page 5]
-
-Internet-Draft             HTTP SEARCH Method               January 2015
-
 
    A simple SPAQRL query with an Indirect Response (303 See Other)
 
@@ -317,26 +272,20 @@ Internet-Draft             HTTP SEARCH Method               January 2015
    performing a GET request on the resource would return the definition
    of the stored query itself:
 
+
+
+
+
+
+Reschke, et al.          Expires August 1, 2015                 [Page 5]
+
+Internet-Draft             HTTP SEARCH Method               January 2015
+
+
    The SEARCH Request:
 
    GET /queries/query-a HTTP/1.1
    Host: example.org
-
-
-
-
-
-
-
-
-
-
-
-
-Reschke, et al.          Expires August 1, 2015                 [Page 6]
-
-Internet-Draft             HTTP SEARCH Method               January 2015
-
 
    GET Response:
 
@@ -381,18 +330,19 @@ Internet-Draft             HTTP SEARCH Method               January 2015
    the permanent registry at <http://www.iana.org/assignments/http-
    methods> (see Section 8.1 of [RFC7231]).
 
+
+
+
+Reschke, et al.          Expires August 1, 2015                 [Page 6]
+
+Internet-Draft             HTTP SEARCH Method               January 2015
+
+
             +-------------+------+------------+---------------+
             | Method Name | Safe | Idempotent | Specification |
             +-------------+------+------------+---------------+
             | SEARCH      | Yes  | Yes        | Section 3     |
             +-------------+------+------------+---------------+
-
-
-
-Reschke, et al.          Expires August 1, 2015                 [Page 7]
-
-Internet-Draft             HTTP SEARCH Method               January 2015
-
 
 10.  Normative References
 
@@ -439,10 +389,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-Reschke, et al.          Expires August 1, 2015                 [Page 8]
+Reschke, et al.          Expires August 1, 2015                 [Page 7]
