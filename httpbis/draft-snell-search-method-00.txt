@@ -5,10 +5,9 @@
 Individual Submission                                         J. Reschke
 Internet-Draft
 Intended status: Standards Track                             A. Malhotra
-Expires: August 24, 2015
+Expires: October 12, 2015
                                                                 J. Snell
-
-                                                       February 20, 2015
+                                                          April 10, 2015
 
 
                            HTTP SEARCH Method
@@ -34,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 24, 2015.
+   This Internet-Draft will expire on October 12, 2015.
 
 Copyright Notice
 
@@ -53,9 +52,10 @@ Copyright Notice
 
 
 
-Reschke, et al.          Expires August 24, 2015                [Page 1]
+
+Reschke, et al.         Expires October 12, 2015                [Page 1]
 
-Internet-Draft             HTTP SEARCH Method              February 2015
+Internet-Draft             HTTP SEARCH Method                 April 2015
 
 
 Table of Contents
@@ -67,7 +67,7 @@ Table of Contents
      4.1.  Simple SEARCH with a Direct Response  . . . . . . . . . .   5
      4.2.  Simple SEARCH with Indirect Response (303 See Other)  . .   6
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
    7.  Normative References  . . . . . . . . . . . . . . . . . . . .   7
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   7
 
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Reschke, et al.          Expires August 24, 2015                [Page 2]
+Reschke, et al.         Expires October 12, 2015                [Page 2]
 
-Internet-Draft             HTTP SEARCH Method              February 2015
+Internet-Draft             HTTP SEARCH Method                 April 2015
 
 
       distinct resources.  For instance, because mechanisms such as HTTP
@@ -165,9 +165,9 @@ Internet-Draft             HTTP SEARCH Method              February 2015
 
 
 
-Reschke, et al.          Expires August 24, 2015                [Page 3]
+Reschke, et al.         Expires October 12, 2015                [Page 3]
 
-Internet-Draft             HTTP SEARCH Method              February 2015
+Internet-Draft             HTTP SEARCH Method                 April 2015
 
 
    In this document, the key words "MUST", "MUST NOT", "REQUIRED",
@@ -221,9 +221,9 @@ Internet-Draft             HTTP SEARCH Method              February 2015
 
 
 
-Reschke, et al.          Expires August 24, 2015                [Page 4]
+Reschke, et al.         Expires October 12, 2015                [Page 4]
 
-Internet-Draft             HTTP SEARCH Method              February 2015
+Internet-Draft             HTTP SEARCH Method                 April 2015
 
 
    The semantics of the SEARCH method change to a "conditional SEARCH"
@@ -249,74 +249,94 @@ Internet-Draft             HTTP SEARCH Method              February 2015
 
 4.  Examples
 
+   The non-normative examples in this section make use of a simple,
+   hypothetical plain-text based query syntax based on SQL with results
+   returned as comma-separated values.  This is done for illustration
+   purposes only.  Implementations are free to use any format they wish
+   on both the request and response.
+
 4.1.  Simple SEARCH with a Direct Response
 
    A simple SPAQRL query with a Direct Response:
 
-   SEARCH /query HTTP/1.1
-   Host: example.org
-   Content-Type: application/sparql-query
-   Accept: application/ld+json
+     SEARCH /contacts HTTP/1.1
+     Host: example.org
+     Content-Type: text/query
+     Accept: text/csv
 
-   PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
-   SELECT ?name ?email
-   FROM <http://www.w3.org/People/Berners-Lee/card>
-   WHERE {
-       ?person foaf:name ?name .
-       OPTIONAL { ?person foaf:mbox ?email }
-   } ORDER BY ?name LIMIT 10 OFFSET 10
+     select surname, givenname, email limit 10
+
+
+
+
+
+
+
+
+
+
+
+
+Reschke, et al.         Expires October 12, 2015                [Page 5]
+
+Internet-Draft             HTTP SEARCH Method                 April 2015
+
 
    Response:
 
-   TBD
+     HTTP/1.1 200 OK
+     Content-Type: text/csv
 
-
-
-
-
-
-
-
-Reschke, et al.          Expires August 24, 2015                [Page 5]
-
-Internet-Draft             HTTP SEARCH Method              February 2015
-
+     surname, givenname, email
+     Smith, John, john.smith@example.org
+     Jones, Sally, sally.jones@example.com
+     Dubois, Camille, camille.dubois@example.net
 
 4.2.  Simple SEARCH with Indirect Response (303 See Other)
 
    A simple SPAQRL query with an Indirect Response (303 See Other)
 
-   SEARCH /query HTTP/1.1
-   Host: example.org
-   Content-Type: application/sparql-query
-   Accept: application/ld+json
+     SEARCH /contacts HTTP/1.1
+     Host: example.org
+     Content-Type: text/query
+     Accept: text/csv
 
-   PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
-   SELECT ?name ?email
-   FROM <http://www.w3.org/People/Berners-Lee/card>
-   WHERE {
-       ?person foaf:name ?name .
-       OPTIONAL { ?person foaf:mbox ?email }
-   } ORDER BY ?name LIMIT 10 OFFSET 10
+     select surname, givenname, email limit 10
 
    Response:
 
-   HTTP/1.1 303 See Other
-   Location: http://example.org/query123res
+     HTTP/1.1 303 See Other
+     Location: http://example.org/contacts/query123
 
    Fetch Query Response:
 
-   GET /query123res HTTP/1.1
-   Host: example.org
+     GET /contacts/query123 HTTP/1.1
+     Host: example.org
 
    Response:
 
-   TBD
+     HTTP/1.1 200 OK
+     Content-Type: text/csv
+
+     surname, givenname, email
+     Smith, John, john.smith@example.org
+     Jones, Sally, sally.jones@example.com
+     Dubois, Camille, camille.dubois@example.net
 
 5.  Security Considerations
 
    The SEARCH method is subject to the same general security
    considerations as all HTTP methods as described in [RFC7231].
+
+
+
+
+
+
+Reschke, et al.         Expires October 12, 2015                [Page 6]
+
+Internet-Draft             HTTP SEARCH Method                 April 2015
+
 
 6.  IANA Considerations
 
@@ -329,14 +349,6 @@ Internet-Draft             HTTP SEARCH Method              February 2015
             +-------------+------+------------+---------------+
             | SEARCH      | Yes  | Yes        | Section 2     |
             +-------------+------+------------+---------------+
-
-
-
-
-Reschke, et al.          Expires August 24, 2015                [Page 6]
-
-Internet-Draft             HTTP SEARCH Method              February 2015
-
 
 7.  Normative References
 
@@ -368,12 +380,18 @@ Authors' Addresses
 
    Julian Reschke
 
-   Email: julian.reschke@gmx.de
+   Email: julian.reschke@greenbytes.de
 
 
    Ashok Malhotra
 
    Email: ashok.malhotra@oracle.com
+
+
+
+Reschke, et al.         Expires October 12, 2015                [Page 7]
+
+Internet-Draft             HTTP SEARCH Method                 April 2015
 
 
    James M Snell
@@ -389,4 +407,42 @@ Authors' Addresses
 
 
 
-Reschke, et al.          Expires August 24, 2015                [Page 7]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reschke, et al.         Expires October 12, 2015                [Page 8]

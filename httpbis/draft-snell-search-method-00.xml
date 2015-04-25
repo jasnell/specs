@@ -22,7 +22,7 @@
 
     <author initials="J." surname="Reschke" fullname="Julian Reschke">
       <address>
-        <email>julian.reschke@gmx.de</email>
+        <email>julian.reschke@greenbytes.de</email>
       </address>
     </author>
     <author initials="A." surname="Malhotra" fullname="Ashok Malhotra">
@@ -36,7 +36,7 @@
       </address>
     </author>
 
-    <date month="February" year="2015" />
+    <date month="April" year="2015" />
 
     <area>Applications</area>
     <workgroup>Individual Submission</workgroup>
@@ -255,56 +255,64 @@ Accept-Search = "Accept-Search" ":" 1#media-type
 
   <section title="Examples" anchor="examples">
 
+    <t>
+      The non-normative examples in this section make use of a simple,
+      hypothetical plain-text based query syntax based on SQL with results
+      returned as comma-separated values. This is done for illustration
+      purposes only. Implementations are free to use any format they wish on
+      both the request and response.
+    </t>
+
     <section title="Simple SEARCH with a Direct Response">
 <figure><preamble>A simple SPAQRL query with a Direct Response:</preamble><artwork><![CDATA[
-SEARCH /query HTTP/1.1
-Host: example.org
-Content-Type: application/sparql-query
-Accept: application/ld+json
+  SEARCH /contacts HTTP/1.1
+  Host: example.org
+  Content-Type: text/query
+  Accept: text/csv
 
-PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
-SELECT ?name ?email
-FROM <http://www.w3.org/People/Berners-Lee/card>
-WHERE {
-    ?person foaf:name ?name .
-    OPTIONAL { ?person foaf:mbox ?email }
-} ORDER BY ?name LIMIT 10 OFFSET 10
+  select surname, givenname, email limit 10
 ]]></artwork></figure>
 
 <figure><preamble>Response:</preamble><artwork><![CDATA[
-TBD
+  HTTP/1.1 200 OK
+  Content-Type: text/csv
+
+  surname, givenname, email
+  Smith, John, john.smith@example.org
+  Jones, Sally, sally.jones@example.com
+  Dubois, Camille, camille.dubois@example.net
 ]]></artwork></figure>
 
     </section>
 
     <section title="Simple SEARCH with Indirect Response (303 See Other)">
 <figure><preamble>A simple SPAQRL query with an Indirect Response (303 See Other)</preamble><artwork><![CDATA[
-SEARCH /query HTTP/1.1
-Host: example.org
-Content-Type: application/sparql-query
-Accept: application/ld+json
+  SEARCH /contacts HTTP/1.1
+  Host: example.org
+  Content-Type: text/query
+  Accept: text/csv
 
-PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
-SELECT ?name ?email
-FROM <http://www.w3.org/People/Berners-Lee/card>
-WHERE {
-    ?person foaf:name ?name .
-    OPTIONAL { ?person foaf:mbox ?email }
-} ORDER BY ?name LIMIT 10 OFFSET 10
+  select surname, givenname, email limit 10
 ]]></artwork></figure>
 
 <figure><preamble>Response:</preamble><artwork><![CDATA[
-HTTP/1.1 303 See Other
-Location: http://example.org/query123res
+  HTTP/1.1 303 See Other
+  Location: http://example.org/contacts/query123
 ]]></artwork></figure>
 
 <figure><preamble>Fetch Query Response:</preamble><artwork><![CDATA[
-GET /query123res HTTP/1.1
-Host: example.org
+  GET /contacts/query123 HTTP/1.1
+  Host: example.org
 ]]></artwork></figure>
 
 <figure><preamble>Response:</preamble><artwork><![CDATA[
-TBD
+  HTTP/1.1 200 OK
+  Content-Type: text/csv
+
+  surname, givenname, email
+  Smith, John, john.smith@example.org
+  Jones, Sally, sally.jones@example.com
+  Dubois, Camille, camille.dubois@example.net
 ]]></artwork></figure>
 
     </section>
