@@ -1,5 +1,7 @@
 ## "json/*"" Primary Media Type
 
+(work in progress. will be writing up in ID form once the basic concepts are down)
+
 Using "json" as the primary media content type indicates that the content identified conforms to the JSON format as defined by RFC 4627.
 
 Subtypes defined within the "json" tree identify specific profiles or applications of the JSON data format.
