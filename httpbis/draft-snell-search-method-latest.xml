@@ -1,19 +1,11 @@
 <?xml version="1.0"?>
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
-  <!ENTITY rfc2068 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2068.xml'>
-  <!ENTITY rfc5323 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5323.xml'>
-  <!ENTITY part1 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7230.xml'>
-  <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7231.xml'>
-  <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7232.xml'>
-]>
 <?rfc toc="yes"?>
 <?rfc strict="yes"?>
 <?rfc symrefs="yes" ?>
 <?rfc sortrefs="yes"?>
 <?rfc compact="yes"?>
 <?rfc-ext xml2rfc-backend="202007"?>
-<rfc category="std" ipr="trust200902" docName="draft-snell-search-method-latest" updates="5323" version="3">
+<rfc category="std" ipr="trust200902" docName="draft-snell-search-method-latest" updates="5323" version="3" xmlns:xi="http://www.w3.org/2001/XInclude">
   <front>
     <title>
       HTTP SEARCH Method
@@ -393,11 +385,11 @@ Accept-Search = "Accept-Search" ":" 1#media-type
 </middle>
 <back>
   <references title="Normative References">
-    &rfc2119;
-    &rfc5323;
-    &part1;
-    &part2;
-    &part4;
+    <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+    <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5323.xml"/>
+    <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7230.xml"/>
+    <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7231.xml"/>
+    <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7232.xml"/>
   </references>
 </back>
 </rfc>
