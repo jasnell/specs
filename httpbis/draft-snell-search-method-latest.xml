@@ -12,7 +12,8 @@
 <?rfc symrefs="yes" ?>
 <?rfc sortrefs="yes"?>
 <?rfc compact="yes"?>
-<rfc category="std" ipr="trust200811" docName="draft-snell-search-method-latest" updates="5323">
+<?rfc-ext xml2rfc-backend="202007"?>
+<rfc category="std" ipr="trust200902" docName="draft-snell-search-method-latest" updates="5323" version="3">
   <front>
     <title>
       HTTP SEARCH Method
