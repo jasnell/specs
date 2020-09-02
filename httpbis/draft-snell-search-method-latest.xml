@@ -50,6 +50,20 @@
       </t>
     </abstract>
 
+    <note title="Editorial Note" removeInRFC="true">
+      <t>
+        Distribution of this document is unlimited. Although this is not a work
+        item of the HTTPbis Working Group, comments should be sent to the
+        Hypertext Transfer Protocol (HTTP) mailing list at <eref target="mailto:ietf-http-wg@w3.org">ietf-http-wg@w3.org</eref>,
+        which may be joined by sending a message with subject
+        "subscribe" to <eref target="mailto:ietf-http-wg-request@w3.org?subject=subscribe">ietf-http-wg-request@w3.org</eref>.
+      </t>
+      <t>
+        Discussions of the HTTPbis Working Group are archived at
+        <eref target="http://lists.w3.org/Archives/Public/ietf-http-wg/"/>.
+      </t>
+    </note>
+
   </front>
 
   <middle>
