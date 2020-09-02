@@ -3,10 +3,8 @@
   <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
   <!ENTITY rfc2068 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2068.xml'>
   <!ENTITY rfc5323 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5323.xml'>
-  <!ENTITY rfc4918 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4918.xml'>
   <!ENTITY part1 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7230.xml'>
   <!ENTITY part2 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7231.xml'>
-  <!ENTITY part6 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7234.xml'>
   <!ENTITY part4 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.7232.xml'>
 ]>
 <?rfc toc="yes"?>
@@ -375,11 +373,9 @@ Accept-Search = "Accept-Search" ":" 1#media-type
   <references title="Normative References">
     &rfc2119;
     &rfc5323;
-    &rfc4918;
     &part1;
     &part2;
     &part4;
-    &part6;
   </references>
 </back>
 </rfc>
