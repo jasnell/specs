@@ -359,7 +359,7 @@ Accept-Search = "Accept-Search" ":" 1#media-type
     <t>
       IANA is requested to update the registration of the SEARCH method in the
       permanent registry at &lt;http://www.iana.org/assignments/http-methods&gt;
-      (see Section 8.1 of <xref target="RFC7231" />).
+      (see <xref target="RFC7231" section="8.1"/>).
     </t>
 
     <table>
