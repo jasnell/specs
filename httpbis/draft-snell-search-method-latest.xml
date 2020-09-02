@@ -80,49 +80,51 @@
       identifies the specific parameters of the search operation.
     </t>
 
-<figure><preamble>A typical use of HTTP GET for requesting a search</preamble>
+    <t>
+      A typical use of HTTP GET for requesting a search
+    </t>
 <artwork><![CDATA[
 GET /feed?q=foo&limit=10&sort=-published HTTP/1.1
 Host: example.org
-]]></artwork></figure>
+]]></artwork>
 
     <t>
       While there are definite advantages to using GET requests in this manner,
       the disadvantages should not be overlooked. Specifically:
-      <list style="symbols">
-        <t>
-          Without specific knowledge of the resource and server to which the
-          GET request is being sent, there is no way for the client to know
-          that a search operation is being requested. Identical requests sent
-          to two different servers can implement entirely different semantics.
-        </t>
-        <t>
-          Encoding query parameters directly into the request URI effectively
-          casts every possible combination of query inputs as distinct
-          resources. For instance, because mechanisms such as HTTP caching
-          handle request URIs as opaque character sequences, queries such
-          as 'http://example.org/?q=foo' and 'http://example.org/?q=Foo'
-          will be treated as entirely separate resources even if they
-          yield identical results.
-        </t>
-        <t>
-          While most modern browser and server implementations allow for
-          long request URIs, there is no standardized minimum or maximum
-          length for URIs in general. Many resource constrained devices
-          enforce strict limits on the maximum number of characters that can
-          be included in a URI. Such limits can prove impractical for
-          large or complex query parameters.
-        </t>
-        <t>
-          Query expressions included within a request URI must either be
-          restricted to relatively simple key value pairs or encoded
-          such that the query can be safely represented in the limited
-          character-set allowed by URL standards. Such encoding can add
-          significant complexity, introduce bugs, or otherwise reduce the
-          overall visibility of the query being requested.
-        </t>
-      </list>
     </t>
+    <ul>
+      <li>
+        Without specific knowledge of the resource and server to which the
+        GET request is being sent, there is no way for the client to know
+        that a search operation is being requested. Identical requests sent
+        to two different servers can implement entirely different semantics.
+      </li>
+      <li>
+        Encoding query parameters directly into the request URI effectively
+        casts every possible combination of query inputs as distinct
+        resources. For instance, because mechanisms such as HTTP caching
+        handle request URIs as opaque character sequences, queries such
+        as 'http://example.org/?q=foo' and 'http://example.org/?q=Foo'
+        will be treated as entirely separate resources even if they
+        yield identical results.
+      </li>
+      <li>
+        While most modern browser and server implementations allow for
+        long request URIs, there is no standardized minimum or maximum
+        length for URIs in general. Many resource constrained devices
+        enforce strict limits on the maximum number of characters that can
+        be included in a URI. Such limits can prove impractical for
+        large or complex query parameters.
+      </li>
+      <li>
+        Query expressions included within a request URI must either be
+        restricted to relatively simple key value pairs or encoded
+        such that the query can be safely represented in the limited
+        character-set allowed by URL standards. Such encoding can add
+        significant complexity, introduce bugs, or otherwise reduce the
+        overall visibility of the query being requested.
+      </li>
+    </ul>
 
     <t>
       As an alternative to using GET, many implementations make use of the
@@ -132,14 +134,16 @@ Host: example.org
       request URI.
     </t>
 
-<figure><preamble>A typical use of HTTP GET for requesting a search</preamble>
+    <t>
+      A typical use of HTTP GET for requesting a search
+    </t>
 <artwork><![CDATA[
 POST /feed HTTP/1.1
 Host: example.org
 Content-Type: application/x-www-form-urlencoded
 
 q=foo&limit=10&sort=-published
-]]></artwork></figure>
+]]></artwork>
 
     <t>
       This variation, however, suffers from the same basic limitation as GET
@@ -240,9 +244,9 @@ q=foo&limit=10&sort=-published
       the specific query format Content-Type's that may be used.
     </t>
 
-<figure><preamble></preamble><artwork><![CDATA[
+<artwork><![CDATA[
 Accept-Search = "Accept-Search" ":" 1#media-type
-]]></artwork></figure>
+]]></artwork>
 
     <t>
       The Accept-Search header specifies a comma-separated listing of media
@@ -267,16 +271,19 @@ Accept-Search = "Accept-Search" ":" 1#media-type
     </t>
 
     <section title="Simple SEARCH with a Direct Response">
-<figure><preamble>A simple query with a direct response:</preamble><artwork><![CDATA[
+
+      <t>A simple query with a direct response:</t>
+<artwork><![CDATA[
   SEARCH /contacts HTTP/1.1
   Host: example.org
   Content-Type: text/query
   Accept: text/csv
 
   select surname, givenname, email limit 10
-]]></artwork></figure>
+]]></artwork>
 
-<figure><preamble>Response:</preamble><artwork><![CDATA[
+      <t>Response:</t>
+<artwork><![CDATA[
   HTTP/1.1 200 OK
   Content-Type: text/csv
 
@@ -284,31 +291,36 @@ Accept-Search = "Accept-Search" ":" 1#media-type
   Smith, John, john.smith@example.org
   Jones, Sally, sally.jones@example.com
   Dubois, Camille, camille.dubois@example.net
-]]></artwork></figure>
+]]></artwork>
 
     </section>
 
     <section title="Simple SEARCH with indirect response (303 See Other)">
-<figure><preamble>A simple query with an Indirect Response (303 See Other)</preamble><artwork><![CDATA[
+
+      <t>A simple query with an Indirect Response (303 See Other)</t>
+<artwork><![CDATA[
   SEARCH /contacts HTTP/1.1
   Host: example.org
   Content-Type: text/query
   Accept: text/csv
 
   select surname, givenname, email limit 10
-]]></artwork></figure>
+]]></artwork>
 
-<figure><preamble>Response:</preamble><artwork><![CDATA[
+      <t>Response:</t>
+<artwork><![CDATA[
   HTTP/1.1 303 See Other
   Location: http://example.org/contacts/query123
-]]></artwork></figure>
+]]></artwork>
 
-<figure><preamble>Fetch Query Response:</preamble><artwork><![CDATA[
+      <t>Fetch Query Response:</t>
+<artwork><![CDATA[
   GET /contacts/query123 HTTP/1.1
   Host: example.org
-]]></artwork></figure>
+]]></artwork>
 
-<figure><preamble>Response:</preamble><artwork><![CDATA[
+      <t>Response:</t>
+<artwork><![CDATA[
   HTTP/1.1 200 OK
   Content-Type: text/csv
 
@@ -316,7 +328,7 @@ Accept-Search = "Accept-Search" ":" 1#media-type
   Smith, John, john.smith@example.org
   Jones, Sally, sally.jones@example.com
   Dubois, Camille, camille.dubois@example.net
-]]></artwork></figure>
+]]></artwork>
 
     </section>
 
@@ -338,19 +350,24 @@ Accept-Search = "Accept-Search" ":" 1#media-type
       (see Section 8.1 of <xref target="RFC7231" />).
     </t>
 
-    <texttable>
-      <ttcol>Method Name</ttcol>
-      <ttcol>Safe</ttcol>
-      <ttcol>Idempotent</ttcol>
-      <ttcol>Specification</ttcol>
-
-      <c>SEARCH</c>
-      <c>Yes</c>
-      <c>Yes</c>
-      <c><xref target="search"/></c>
-
-    </texttable>
-
+    <table>
+      <thead>
+        <tr>
+          <th>Method Name</th>
+          <th>Safe</th>
+          <th>Idempotent</th>
+          <th>Specification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SEARCH</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td><xref target="search"/></td>
+        </tr>        
+      </tbody>
+    </table>
   </section>
 
 </middle>
