@@ -16,7 +16,7 @@
 <?rfc compact="yes"?>
 <rfc category="std" ipr="trust200811" docName="draft-snell-search-method-latest">
   <front>
-    <title abbrev="HTTP SEARCH Method">
+    <title>
       HTTP SEARCH Method
     </title>
 
