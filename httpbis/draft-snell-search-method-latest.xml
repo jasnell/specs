@@ -38,9 +38,8 @@
 
     <date/>
 
-    <area>Applications</area>
-    <workgroup>Individual Submission</workgroup>
-    <keyword>I-D</keyword>
+    <area>Applications and Real-Time</area>
+    <!--<workgroup>Individual Submission</workgroup>-->
     <keyword>http</keyword>
     <keyword>search</keyword>
     <keyword>method</keyword>
