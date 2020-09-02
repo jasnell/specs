@@ -20,13 +20,20 @@
     </title>
 
     <author initials="J." surname="Reschke" fullname="Julian Reschke">
+      <organization abbrev="greenbytes">greenbytes GmbH</organization>
       <address>
+        <postal>
+          <street>Hafenweg 16</street>
+          <city>Münster</city><code>48155</code>
+          <country>Germany</country>
+        </postal>
         <email>julian.reschke@greenbytes.de</email>
+        <uri>https://greenbytes.de/tech/webdav/</uri>
       </address>
     </author>
     <author initials="A." surname="Malhotra" fullname="Ashok Malhotra">
       <address>
-        <email>ashok.malhotra@oracle.com</email>
+        <email>malhotrasahib@gmail.com</email>
       </address>
     </author>
      <author initials="J.M." surname="Snell" fullname="James M Snell">
