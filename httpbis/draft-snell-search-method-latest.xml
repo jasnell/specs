@@ -14,7 +14,7 @@
 <?rfc symrefs="yes" ?>
 <?rfc sortrefs="yes"?>
 <?rfc compact="yes"?>
-<rfc category="std" ipr="trust200811" docName="draft-snell-search-method-latest">
+<rfc category="std" ipr="trust200811" docName="draft-snell-search-method-latest" updates="5323">
   <front>
     <title>
       HTTP SEARCH Method
