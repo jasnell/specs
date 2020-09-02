@@ -48,7 +48,7 @@
       <t>
         This specification updates the definition and semantics of the
         HTTP SEARCH request method originally defined by
-        <xref target="RFC5323" />.
+        RFC 5323.
       </t>
     </abstract>
 
