@@ -14,7 +14,7 @@
 <?rfc symrefs="yes" ?>
 <?rfc sortrefs="yes"?>
 <?rfc compact="yes"?>
-<rfc category="std" ipr="trust200811" docName="draft-snell-search-method-01">
+<rfc category="std" ipr="trust200811" docName="draft-snell-search-method-latest">
   <front>
     <title abbrev="HTTP SEARCH Method">
       HTTP SEARCH Method
@@ -36,7 +36,7 @@
       </address>
     </author>
 
-    <date month="September" year="2018" />
+    <date/>
 
     <area>Applications</area>
     <workgroup>Individual Submission</workgroup>
