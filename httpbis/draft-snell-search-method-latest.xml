@@ -262,8 +262,8 @@ Accept-Search = "Accept-Search" ":" 1#media-type
 
     <t>
       The Accept-Search header specifies a comma-separated listing of media
-      types (with optional parameters) as defined by <xref target="RFC7231"/>,
-      Section 3.1.1.1.
+      types (with optional parameters) as defined by
+      <xref target="RFC7231" sectionFormat="comma" section="3.1.1.1"/>.
     </t>
 
     <t>
