@@ -147,15 +147,15 @@ Host: example.org
     </t>
 
     <t>
-      A typical use of HTTP GET for requesting a search
+      A typical use of HTTP POST for requesting a search
     </t>
-<artwork><![CDATA[
+<artwork>
 POST /feed HTTP/1.1
 Host: example.org
 Content-Type: application/x-www-form-urlencoded
 
-q=foo&limit=10&sort=-published
-]]></artwork>
+q=foo&amp;limit=10&amp;sort=-published
+</artwork>
 
     <t>
       This variation, however, suffers from the same basic limitation as GET
