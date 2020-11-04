@@ -95,10 +95,10 @@
     <t>
       A typical use of HTTP GET for requesting a search
     </t>
-<artwork><![CDATA[
-GET /feed?q=foo&limit=10&sort=-published HTTP/1.1
+<artwork type="http-message">
+GET /feed?q=foo&amp;limit=10&amp;sort=-published HTTP/1.1
 Host: example.org
-]]></artwork>
+</artwork>
 
     <t>
       While there are definite advantages to using GET requests in this manner,
@@ -149,7 +149,7 @@ Host: example.org
     <t>
       A typical use of HTTP POST for requesting a search
     </t>
-<artwork>
+<artwork type="http-message">
 POST /feed HTTP/1.1
 Host: example.org
 Content-Type: application/x-www-form-urlencoded
@@ -256,9 +256,9 @@ q=foo&amp;limit=10&amp;sort=-published
       the specific query format Content-Type's that may be used.
     </t>
 
-<artwork><![CDATA[
+<sourcecode type="abnf">
 Accept-Search = "Accept-Search" ":" 1#media-type
-]]></artwork>
+</sourcecode>
 
     <t>
       The Accept-Search header specifies a comma-separated listing of media
@@ -285,62 +285,62 @@ Accept-Search = "Accept-Search" ":" 1#media-type
     <section title="Simple SEARCH with a Direct Response">
 
       <t>A simple query with a direct response:</t>
-<artwork><![CDATA[
-  SEARCH /contacts HTTP/1.1
-  Host: example.org
-  Content-Type: text/query
-  Accept: text/csv
+<artwork type="http-message">
+SEARCH /contacts HTTP/1.1
+Host: example.org
+Content-Type: text/query
+Accept: text/csv
 
-  select surname, givenname, email limit 10
-]]></artwork>
+select surname, givenname, email limit 10
+</artwork>
 
       <t>Response:</t>
-<artwork><![CDATA[
-  HTTP/1.1 200 OK
-  Content-Type: text/csv
+<artwork type="http-message">
+HTTP/1.1 200 OK
+Content-Type: text/csv
 
-  surname, givenname, email
-  Smith, John, john.smith@example.org
-  Jones, Sally, sally.jones@example.com
-  Dubois, Camille, camille.dubois@example.net
-]]></artwork>
+surname, givenname, email
+Smith, John, john.smith@example.org
+Jones, Sally, sally.jones@example.com
+Dubois, Camille, camille.dubois@example.net
+</artwork>
 
     </section>
 
     <section title="Simple SEARCH with indirect response (303 See Other)">
 
       <t>A simple query with an Indirect Response (303 See Other)</t>
-<artwork><![CDATA[
-  SEARCH /contacts HTTP/1.1
-  Host: example.org
-  Content-Type: text/query
-  Accept: text/csv
+<artwork type="http-message">
+SEARCH /contacts HTTP/1.1
+Host: example.org
+Content-Type: text/query
+Accept: text/csv
 
-  select surname, givenname, email limit 10
-]]></artwork>
+select surname, givenname, email limit 10
+</artwork>
 
       <t>Response:</t>
-<artwork><![CDATA[
-  HTTP/1.1 303 See Other
-  Location: http://example.org/contacts/query123
-]]></artwork>
+<artwork type="http-message">
+HTTP/1.1 303 See Other
+Location: http://example.org/contacts/query123
+</artwork>
 
       <t>Fetch Query Response:</t>
-<artwork><![CDATA[
-  GET /contacts/query123 HTTP/1.1
-  Host: example.org
-]]></artwork>
+<artwork type="http-message">
+GET /contacts/query123 HTTP/1.1
+Host: example.org
+</artwork>
 
       <t>Response:</t>
-<artwork><![CDATA[
-  HTTP/1.1 200 OK
-  Content-Type: text/csv
+<artwork type="http-message">
+HTTP/1.1 200 OK
+Content-Type: text/csv
 
-  surname, givenname, email
-  Smith, John, john.smith@example.org
-  Jones, Sally, sally.jones@example.com
-  Dubois, Camille, camille.dubois@example.net
-]]></artwork>
+surname, givenname, email
+Smith, John, john.smith@example.org
+Jones, Sally, sally.jones@example.com
+Dubois, Camille, camille.dubois@example.net
+</artwork>
 
     </section>
 
