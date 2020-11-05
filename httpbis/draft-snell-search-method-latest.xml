@@ -205,6 +205,7 @@ q=foo&amp;limit=10&amp;sort=-published
       SEARCH requests that use the text/xml or application/xml content types
       MUST be processed per the requirements established by
       <xref target="RFC5323" />.
+      <cref anchor="xml">This can be relaxed to XML with a document element in the "DAV:" namespace, or even to the two element names mentionbed in <xref target="RFC5323" section="2.2.2"/>.</cref>
     </t>
 
     <t>
@@ -234,6 +235,7 @@ q=foo&amp;limit=10&amp;sort=-published
       however, that because SEARCH requests are safe and idempotent, responses
       to a SEARCH MUST NOT invalidate previously cached responses to other
       requests directed at the same effective request URI.
+      <cref anchor="cache">By default, that is. We need to figure out under which conditions we can make the result cacheable.</cref>
     </t>
 
     <t>
